@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Limitação de recursos usando PAM</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="next" href="ch06s03.html" title="Restrições de acesso a programas/diretórios/arquivos usando grupos" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Limitação de recursos usando PAM</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s03.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Limitação de recursos usando PAM</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-pam"></a>Limitação de recursos usando PAM</h2></div></div></div>
+<p>
+Plugglable Autentication Modules (Módulos de autenticação plugáveis) são um
+conjunto de bibliotecas usadas para fazer autenticação, gerenciamento de
+contas, controle de recursos dos usuários no sistema, em adição ao tradicional
+sistema de acesso baseado em usuários/grupos.  Este recurso permite modificar a
+forma que um aplicativo autentica e define recursos para o usuário sem
+necessidade de recompilar o aplicativo principal.  Os recursos que desejamos
+controlar restrições via PAM são especificados individualmente por serviços nos
+arquivos correspondentes em <code class="filename">/etc/pam.d</code> e então os arquivos
+correspondentes em <code class="filename">/etc/security</code> são usados para controlar
+tais restrições.
+</p>
+<p>
+Nesta seção assumirei explicações dirigidas aos recursos controlados pelos
+arquivos em <code class="filename">/etc/security</code> A maioria das explicações são
+baseadas em testes e nos próprios exemplos dos arquivos de configuração do PAM.
+</p>
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-pam-suporte"></a>Descobrindo se um determinado programa tem suporte a PAM</h3></div></div></div>
+<p>
+Um método simples de se determinar se um programa binário possui suporte a PAM
+é executando o comando:
+</p>
+<pre class="screen">
+ldd [programa]
+</pre>
+<p>
+Por exemplo:
+</p>
+<pre class="screen">
+ldd /bin/login
+
+libcrypt.so.1 =&gt; /lib/libcrypt.so.1 (0x4001c000)
+libpam.so.0 =&gt; /lib/libpam.so.0 (0x40049000)
+libpam_misc.so.0 =&gt; /lib/libpam_misc.so.0 (0x40051000)
+libdl.so.2 =&gt; /lib/libdl.so.2 (0x40054000)
+libc.so.6 =&gt; /lib/libc.so.6 (0x40058000)
+/lib/ld-linux.so.2 =&gt; /lib/ld-linux.so.2 (0x40000000)
+</pre>
+<p>
+Caso a biblioteca <code class="filename">libpam</code> for listada, o programa tem
+suporte a PAM compilado.  Programas que não possuem suporte a PAM deverão ter o
+código fonte modificado inserindo as funções para tratamento dos módulos de
+autenticação.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-pam-policy"></a>Definindo uma política padrão restritiva</h3></div></div></div>
+<p>
+A política padrão do PAM é especificado em
+<code class="filename">/etc/pam.d/other</code> e define o que acontecerá caso nenhum dos
+arquivos de controle de serviço em <code class="filename">/etc/pam.d</code> confiram com
+o serviço em questão.  Normalmente o módulo <code class="filename">pam_unix.so</code> é
+usado para fazer a política padrão, para deixar o sistema mais seguro, utilize
+a seguinte configuração no arquivo <code class="filename">/etc/pam.d/other</code>:
+</p>
+<pre class="screen">
+auth     required       /usr/lib/security/pam_warn.so
+auth     required       /usr/lib/security/pam_deny.so
+account  required       /usr/lib/security/pam_deny.so
+password required       /usr/lib/security/pam_warn.so
+password required       /usr/lib/security/pam_deny.so
+session  required       /usr/lib/security/pam_deny.so
+</pre>
+<p>
+O módulo <code class="filename">pam_deny.so</code> é responsável por fazer o bloqueio, e
+o <code class="filename">pam_warn</code> envia avisos ao <span class="command"><strong>syslog</strong></span>
+(facilidade <span class="emphasis"><em>auth</em></span> nível <span class="emphasis"><em>notice</em></span>) caso
+serviços módulos PAM que necessitem do serviço de autenticação sejam bloqueados
+(isto não é feito automaticamente pelo <code class="filename">pam_deny.so</code>).
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Esta configuração poderá causar
+bloqueio em muitas coisas caso possua módulos de autenticação mau configurados.
+Esteja certo de utilizar o módulo <code class="filename">pam_warn.so</code> (antes do
+<code class="filename">pam_deny.so</code>) nas diretivas restritivas para entender qual
+é o problema através da análise dos arquivos de logs.
+</p>
+<p>
+Mais detalhes sobre a configuração de módulos de autenticação poderão ser
+encontrados no endereço <a class="ulink" href="ftp://ftp.us.kernel.org/pub/linux/libs/pam/Linux-PAM-html/pam.html" target="_top">ftp://ftp.us.kernel.org/pub/linux/libs/pam/Linux-PAM-html/pam.html</a>
+e <a class="ulink" href="http://www.kernel.org/pub/linux/libs/pam/pre/doc/rfc86.0.txt.gz" target="_top">http://www.kernel.org/pub/linux/libs/pam/pre/doc/rfc86.0.txt.gz</a>.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-pam-login"></a>Restringindo/Bloqueando o login</h3></div></div></div>
+<p>
+Isto é controlado pelo arquivo <code class="filename">/etc/security/access.conf</code>.
+O formato deste arquivo consistem em três campos separados por ":":
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">Primeiro campo</code> - Garante ("+") ou bloqueia ("-") o acesso
+caso as condições nos outros campos confiram.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Segundo campo</code> - Contém o login, grupo.  O formato
+<span class="emphasis"><em>usuário@computador</em></span> pode ser usado para conferir com
+usuários que acessam de determinadas máquinas.  Caso existam mais de um
+parâmetro, estes devem ser separados usando espaços.  As palavras chave
+<code class="literal">ALL</code> (todos) e <code class="literal">EXCEPT</code> (exceção) e console
+também podem ser usadas.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Terceiro campo</code> - Lista de terminais (tty - na forma listada
+pelo <span class="command"><strong>ttyname</strong></span>), nomes de máquinas, nomes de domínios
+(começando com "."), endereços IP ou FQDN, porção de rede (finalizando com um
+".").  As palavras chave <code class="literal">ALL</code> (todos) e
+<code class="literal">LOCAL</code> (máquinas na mesma rede) também podem ser usadas.
+</p>
+</li></ul></div>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> - A configuração padrão do
+<code class="filename">access.conf</code> é garantir o acesso a todos os usuários,
+através de qualquer lugar (permissiva).
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span>: Mesmo se existir uma regra
+autorizando o acesso ao usuário, as restantes serão verificadas em busca de uma
+que bloqueie o acesso do usuário.  Se nenhuma regra conferir, o usuário terá
+acesso garantido.
+</p>
+<p>
+<span class="strong"><strong>OBS3:</strong></span> - O nome de grupo somente é checado
+quando nenhum nome de usuário confere com nenhum usuário logado no sistema.
+</p>
+<p>
+<span class="strong"><strong>OBS4:</strong></span> - Grupos/usuários NIS podem ser
+especificados precedendo o nome do usuário ou grupo por uma "@".
+</p>
+<p>
+Abaixo uma configuração restrita de
+<code class="filename">/etc/security/access.conf</code>:
+</p>
+<pre class="screen">
+#
+# Desabilita o login de todos os usuários EXCETO o root no terminal tty1
+-:ALL EXCEPT root:tty1
+
+# Permite o login no console de todos os usuários especificados.
++:gleydson root:console
+
+# Conexões vindas da rede *.debian.org e *.debian.org.br de usuários pertencendo 
+# ao grupo operadores são consideradas seguras (exceto para o usuário root).
++:operadores EXCEPT root: .debian.org .debian.org.br
+
+# Qualquer outra tentativa de acesso não definida acima é bloqueada imediatamente.
+-: ALL: ALL
+</pre>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-pam-root"></a>Restringindo o acesso a root no su</h3></div></div></div>
+<p>
+A restrição de acesso a usuário <code class="literal">root</code> pelo PAM funciona
+permitindo que somente alguns usuários que pertençam a um grupo criado pelo
+administrador possam se tornar o superusuário usando o comando
+<span class="command"><strong>su</strong></span>.  Esta restrição funciona até mesmo para os usuários que
+possuem a senha correta de root, retornando uma mensagem de login ou senha
+incorretos.  Isto é extremamente útil para restrições de acesso.
+</p>
+<p>
+Um outro ponto positivo é caso ocorra um possível acesso não autorizado em seu
+sistema ou um daemon seja corrompido e o atacante cair em um shell, ele não
+poderá obter <code class="literal">root</code> na máquina pois o UID do daemon
+provavelmente não terá autorização.  A distribuição <span class="command"><strong>Debian</strong></span>,
+em especial, possui grupos e nomes de usuários organizados de forma a permitir
+segurança e separação total caso utilize este mecanismo.
+</p>
+<p>
+Este recurso se mostra bem eficiente para proteger a integridade da máquina até
+mesmo no comprometimento de máquinas que possui a senha semelhante, somente se
+usado em conjunto com as restrições de acesso de outros serviços remotos (como
+o <span class="command"><strong>ssh</strong></span>, <span class="command"><strong>ftp</strong></span>, etc).  O guia Foca documenta
+as formas de restrição e seu impacto na segurança da máquina nos capítulos do
+nível Avançado (veja o índice para buscar o capítulo correspondente ao que
+deseja proteger).
+</p>
+<p>
+Para configurar esta restrição, siga os seguintes passos:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+Crie um grupo onde os usuários cadastrados terão acesso
+<code class="literal">root</code>.  Por exemplo, <code class="literal">usuarios-su</code> (ou algo
+mais discreto).
+</p>
+</li><li class="listitem">
+<p>
+Edite o arquivo <code class="filename">/etc/pam.d/su</code>.  Insira a seguinte linha
+(caso não existir) no arquivo de configuração:
+</p>
+<pre class="screen">
+auth       required   pam_wheel.so group=usuarios-su
+</pre>
+<p>
+O que ela faz é usar o módulo <code class="filename">pam_wheel.so</code> requerendo que
+os usuários pertençam ao grupo <code class="filename">usuarios-su</code>.  Salve e saia
+do editor.
+</p>
+</li><li class="listitem">
+<p>
+Ainda como usuário <code class="literal">root</code>, adicione os usuários que terão
+acesso a root no grupo <code class="filename">usuarios-su</code>.  Recomendo que
+adicione seu usuário primeiro, principalmente se estiver fazendo acesso remoto,
+pois se acontecer uma queda no link não ficará sem acesso root por cair na
+restrição :-)
+</p>
+</li><li class="listitem">
+<p>
+Tente pegar o <code class="literal">root</code> com outros usuários que não pertençam ao
+grupo <code class="filename">usuarios-su</code> estes simplesmente terão o acesso
+negado.
+</p>
+</li></ul></div>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-pam-time"></a>Restrições de serviços PAM baseados em dia/hora</h3></div></div></div>
+<p>
+Estas restrições são controladas pelo arquivo
+<code class="filename">/etc/security/time.conf</code>, a sintaxe deste arquivo é quatro
+campos separados por ";":
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">Primeiro campo</code> - Nome do serviço PAM que será controlado (um
+dos serviços contidos em <code class="filename">/etc/pam.d</code>).
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Segundo campo</code> - Lista de nomes de terminais que a regra que
+aplicará.  O sinal "&amp;" tem a função <span class="emphasis"><em>and</em></span>, "|" tem a função
+<span class="emphasis"><em>or</em></span> e "!"  especifica uma exceção.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Terceiro campo</code> - Nome de usuários afetados pela regra.  O
+sinal "&amp;" tem a função <span class="emphasis"><em>and</em></span>, "|" tem a função
+<span class="emphasis"><em>or</em></span> e "!"  especifica uma exceção.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> O "*" poderá ser usado somente no
+primeiro, segundo ou terceiro campo em uma mesma regra.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Quarto campo</code> - DiaSemana/faixa-de-horas que a restrição se
+aplicará.  O dia da semana é especificado em duas letras:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">Mo</code> - Segunda-feira
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Tu</code> - Terça-feira
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">We</code> - Quarta-feira
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Th</code> - Quinta-feira
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Fr</code> - Sexta-feira
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Sa</code> - Sábado
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Su</code> - Domingo
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Wk</code> - Todos os dias da semana
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Wd</code> - Somente sábado e domingo (fim de semana)
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Al</code> - Todos os dias
+</p>
+</li></ul></div>
+<p>
+O sinal "!"  especifica uma exceção.  A faixa de horas é especificada após o
+dia no formato HHMM-HHMM.  Por exemplo:
+</p>
+<pre class="screen">
+MoTuWe0000-2400 - Segundas, terças e quartas 
+MoFrSu0800-1900- - Segundas, sextas e domingo das 08:00 da manha as 19:00 da noite.
+FrFr0500-0600 - Não será realizada na sexta (especificações repetidas são anuladas) 
+                de 05:00 as 06:00.
+WkWe0731-1456 - Todos os dias da semana a partir de Quarta de 07:31 da manhã as 
+                14:56 da tarde.
+AlMo0000-2400 - Todos os dias da semana, exceto segunda-feira.
+</pre>
+</li></ul></div>
+<p>
+Por padrão o acesso é garantido a todos os usuários.  Abaixo um exemplo de
+restrições usando o <code class="filename">/etc/security/time.conf</code>:
+</p>
+<pre class="screen">
+# Bloqueia o login do usuário user1 ou user2 em qualquer tty, a restrição 
+# durante todos os dias de 00:00 as 06:30
+login;tty*;user1|user2;!Al0000-0630
+
+# Bloqueia o acesso do usuário root ao serviço login nos terminais tty* 
+# (e não nos terminais ttyp*) nos finais de semana.
+login;tty* &amp; !ttyp*;root;!Wd0000-2400
+
+# O usuário 1 não poderá efetuar o login as terças feiras de 00:00 as 06:00
+login;!tty*;user1;Tu0000-0600
+</pre>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> Mesmo se existir uma regra autorizando
+o acesso ao usuário, as restantes serão verificadas em busca de uma que
+bloqueie o acesso do usuário.  Se nenhuma regra conferir, o usuário terá acesso
+garantido.
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span> Quando as restrições de tempo são
+ativadas no <code class="filename">/etc/security/time.conf</code>, o daemon
+<span class="command"><strong>logoutd</strong></span> poderá ser ativado manualmente (através de
+<code class="filename">/etc/init.d/logoutd</code>) para monitora as restrições neste
+arquivo, forçando o logout de usuário de acordo com as configurações do
+<code class="filename">/etc/security/time.conf</code>.  Isto ocorrerá automaticamente na
+próxima vez que iniciar o sistema (a distribuição detecta a presença de
+restrições de tempo no arquivo <code class="filename">/etc/security/time.conf</code>
+para decidir se deve ou não carregar este daemon).
+</p>
+<p>
+Quando não está em execução, os limites de tempo são verificados somente no
+login do usuário, ele poderá ultrapassar este tempo sem ser desconectado do
+sistema.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-pam-group"></a>Permitindo acesso a grupos extras</h3></div></div></div>
+<p>
+Este recurso é controlado pelo arquivo
+<code class="filename">/etc/security/group.conf</code>.  Este arquivo é composto por 5
+campos separados por ";" (os 4 primeiros são os mesmos explicados em <a class="xref" href="ch06s02.html#d-restr-pam-time" title="Restrições de serviços PAM baseados em dia/hora">“Restrições de serviços PAM baseados em dia/hora”</a>.  O 5o campo contém um ou mais grupos (separados
+por espaços ou vírgulas) que serão adicionados aos grupos do usuário quando as
+condições dos campos anteriores conferirem.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Se o usuário escrever um programa que
+chama um interpretador de comandos e der a permissão SGID (chmod g+s programa),
+ele terá acesso àquele grupo na hora que quiser.  Restrinja o uso de grupos
+somente a usuários de confiança ou crie grupos específicos para evitar
+problemas.
+</p>
+<p>
+Exemplo de configuração do arquivo
+<code class="filename">/etc/security/group.conf</code>:
+</p>
+<pre class="screen">
+# Permite que o usuário gleydson tenha acesso ao grupo floppy efetuando o login
+# entre 08:00 da manha e 19:00 da noite
+login;tty*;gleydson;Al0800-1900;floppy
+
+# Todos os usuários podem ter acesso ao grupo games e sound aos sábados e domingos
+login;tty*;*;SaSu0000-2400;sound games
+
+# Todos os usuários podem ter acesso ao grupo games e sound todos os dias 
+# de 18:00 as 05:00 da manhã (fora do horário de expediente ;-)
+login;tty*;*;Al1800-0500;sound,games
+
+# Backups são permitidos fora do horário de expediente (para não sobrecarregar 
+# a CPU e evitar o uso excessivo de disco). 
+login;tty*;gleydson;Al1830-2400;backup
+</pre>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> Mesmo que uma regra confira com o
+usuário, as outras também serão verificadas para garantir acesso grupos extras.
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span> O padrão na maioria das distribuições
+é limitar o número máximo de grupos do usuário para 32.  Caso precise aumentar
+este limite, será necessário recompilar o kernel (e também a glibc, se
+necessário) para aceitar um número maior modificando a variável
+<em class="replaceable"><code>ngroup</code></em>.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-pam-limits"></a>Limitação de recursos do shell</h3></div></div></div>
+<p>
+Estas restrições são especificadas no arquivo
+<code class="filename">/etc/security/limits.conf</code>.  Seu formato consiste em 4
+campos separados por ou ou mais espaços:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">Primeiro campo</code> - Especifica o nome de usuário, um nome de
+grupo (@grupo) ou um "*" especificando que as restrições nos outros campos se
+aplicam a todos os grupos e todos os usuários.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Segundo campo</code> - Tipo de restrição:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">soft</code> - Limite suave de bloqueio.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">hard</code> - Limite rígido de bloqueio.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">-</code> - Quando o tipo de restrição não se aplica ao Ítem que
+deseja restringir o acesso.
+</p>
+</li></ul></div>
+<p>
+Quando somente o limite "hard" (rígido) é especificado, o limite suave assume o
+mesmo valor.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Terceiro campo</code> - Ítem que deseja restringir o acesso:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">core</code> - Limita o tamanho do arquivo core (KB)
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">data</code> - Tamanho máximo de arquivo de dados (KB)
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">fsize</code> - Tamanho máximo de arquivo (KB)
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">memlock</code> - Tamanho máximo do espaço de endereços bloqueado na
+memória (KB)
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">nofile</code> - Número máximo de arquivos abertos
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">rss</code> - Tamanho máximo residente (KB)
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">stack</code> - Tamanho máximo da pilha (KB)
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">cpu</code> - Tempo máximo de uso da CPU (MIN)
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">nproc</code> - Número máximo de processos
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">as</code> - Limite de espaço de endereços
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">maxlogins</code> - Número máximo de logins
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">priority</code> - Prioridade de execução de processos de usuários
+</p>
+</li></ul></div>
+</li><li class="listitem">
+<p>
+<code class="literal">Quarto campo</code> - Especifica o valor do campo anterior
+</p>
+</li></ul></div>
+<p>
+Os limites aplicados ao usuário podem ser visualizados através do comando
+<code class="literal">ulimit -S -a</code> (para listar limites suaves - soft) e
+<code class="literal">ulimit -H -a</code> (para listar limites rígidos - hard).  Caso o
+parâmetro <span class="emphasis"><em>-S</em></span> ou <span class="emphasis"><em>-H</em></span> sejam omitidos, os
+limites listados serão os suaves (soft).  Um exemplo de
+<code class="filename">/etc/security/limits.conf</code> (retirado da distribuição
+<span class="command"><strong>Debian GNU/Linux</strong></span>:
+</p>
+<pre class="screen">
+*               soft    core            0
+*               hard    rss             10000
+@student        hard    nproc           20
+@faculty        soft    nproc           20
+@faculty        hard    nproc           50
+ftp             hard    nproc           0
+@student        -       maxlogins       4
+gleydson        -       maxlogins       2
+</pre>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Estas permissões passam a ter efeito no
+momento que o usuário se conecta ao sistema, e não quando elas são modificadas
+no arquivo <code class="filename">/etc/security/limits.conf</code>.
+</p>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s03.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Capítulo 6. Restrições de acesso, recursos e serviços </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Restrições de acesso a programas/diretórios/arquivos usando grupos</td></tr></table></div></body></html>

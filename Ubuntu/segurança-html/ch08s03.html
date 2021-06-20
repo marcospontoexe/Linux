@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Desativando softwares e serviços desnecessários</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch08.html" title="Capítulo 8. Segurança de Host" /><link rel="prev" href="ch08s02.html" title="Chroot, Container e Virtualização" /><link rel="next" href="ch08s04.html" title="Protegendo BIOS e o GRUB2" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Desativando softwares e serviços desnecessários</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch08s02.html">Anterior</a> </td><th width="60%" align="center">Capítulo 8. Segurança de Host</th><td width="20%" align="right"> <a accesskey="n" href="ch08s04.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch08.html">Segurança de Host</a></span> &gt; <span class="breadcrumb-node">Desativando softwares e serviços desnecessários</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-hostsecurity-svcclean"></a>Desativando softwares e serviços desnecessários</h2></div></div></div><p>
+Versão em vídeo desta seção pode estar disponível no canal do <span class="emphasis"><em>Guia Foca</em></span> no YouTube: 
+<a class="link" href="https://rdr.guiafoca.org/gf-segur-hostsec-svcclean" target="_top">Desativando softwares e serviços desnecessários</a>.
+</p><p>
+Executar essa tarefa auxilia a manter o sistema rápido e seguro, reduzindo o consumo de RAM,
+IRQs, melhorando a performance global e tempo na sequencia de boot.
+
+Avalie sempre a função da máquina antes de decidir a desativação do serviço,
+e se ele tem alguma importância no funcionamento do conjunto, caso sua máquina
+seja um servidor web, não tem sentido possuir serviço de impressão <span class="command"><strong>CUPS</strong></span>.
+</p><p>
+Serviços como <span class="command"><strong>portmap</strong></span>, <span class="command"><strong>rexec</strong></span>, <span class="command"><strong>rlogin</strong></span>, 
+<span class="command"><strong>cups</strong></span>, <span class="command"><strong>avahi</strong></span> podem ser desativados (ou até mesmo
+completamente removidos) em um servidor que precisa apenas de <span class="command"><strong>ssh</strong></span> por 
+exemplo (ao menos que outro serviço como o <span class="command"><strong>NFS</strong></span> esteja instalado, nesse caso 
+o <span class="command"><strong>portmap</strong></span> é requerido).
+</p><p>
+O primeiro passo é parar o serviço em execução. Execute um dos comandos abaixo para interromper o processo 
+(técnicas organizadas de de sistemas mais novos para mais antigos):
+</p><p>
+<span class="emphasis"><em>RedHat/Debian/Mint/Ubuntu</em></span>:
+</p><pre class="screen">
+systemctl stop portmap
+service portmap stop
+/etc/init.d/portmap stop
+</pre><p>
+</p><p>
+e em seguida, desative o serviço com:
+<span class="emphasis"><em>RedHat</em></span>:
+</p><pre class="screen">
+chkconfig portmap off
+chkconfig portmap --del
+systemctl disable portmap
+</pre><p>
+</p><p>
+<span class="emphasis"><em>Debian/Mint/Ubuntu</em></span>:
+</p><pre class="screen">
+systemctl disable portmap
+service portmap stop
+update-rc.d -f portmap remove
+</pre><p>
+</p><p>
+Caso deseje remover completamente o serviço, utilize o gerenciador de pacotes apropriado 
+de sua distribuição para fazer a remoção:
+</p><p>
+<span class="emphasis"><em>APT</em></span> - <code class="literal">apt remove rpcbind</code>
+</p><p>
+<span class="emphasis"><em>RPM</em></span> - <code class="literal">youm remove rpcbind</code>
+</p></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch08s02.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch08.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch08s04.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Chroot, Container e Virtualização </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Protegendo BIOS e o GRUB2</td></tr></table></div></body></html>

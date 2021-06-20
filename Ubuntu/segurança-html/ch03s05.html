@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Configurando um servidor de logs</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch03.html" title="Capítulo 3. Arquivos e daemons de Log" /><link rel="prev" href="ch03s04.html" title="Programas úteis para monitoração e gerenciamento de arquivos de logs" /><link rel="next" href="ch04.html" title="Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Configurando um servidor de logs</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s04.html">Anterior</a> </td><th width="60%" align="center">Capítulo 3. Arquivos e daemons de Log</th><td width="20%" align="right"> <a accesskey="n" href="ch04.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch03.html">Arquivos e daemons de Log</a></span> &gt; <span class="breadcrumb-node">Configurando um servidor de logs</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="log-server"></a>Configurando um servidor de logs</h2></div></div></div>
+<p>
+As mensagens das máquinas de sua rede podem ser centralizadas em uma única
+máquina, isto facilita o gerenciamento, análise e solução de problemas que
+ocorrem nas máquinas da rede.  Mais importante ainda é que qualquer invasão a
+estação de trabalho não será registrada localmente (podendo ser apagada
+posteriormente pelo invasor, isso é comum).
+</p>
+<div class="variablelist"><dl class="variablelist"><dt><span class="term">Configurando o servidor de logs</span></dt><dd>
+<p>
+Caso esteja usando o <span class="command"><strong>rsyslog</strong></span>, ative os módulos
+<span class="emphasis"><em>module(load='imudp')</em></span> e <span class="emphasis"><em>module(load='imtcp')</em></span>.
+e a opção <span class="emphasis"><em>input()</em></span> correspondente ao protocolo usado
+TCP/UDP no <code class="filename">/etc/rsyslog.conf</code> colocando a opção
+e reinicie o serviço usando <code class="literal">systemctl restart rsyslog</code>.
+</p>
+</dd><dt><span class="term">Configurando máquinas cliente</span></dt><dd>
+<p>
+Modifique o arquivo <code class="filename">/etc/rsyslogd.conf</code> (veja <a class="xref" href="ch03s02.html#log-rsyslogd-exemplo" title="Arquivo de configuração rsyslog.conf">“Arquivo de configuração <code class="filename">rsyslog.conf</code>”</a> colocando o nome do computador seguido de "@"
+para redirecionar as mensagens dos logs:
+</p>
+<pre class="screen">
+auth,authpriv.*                 @servlog
+*.*;auth,authpriv.none          @servlog
+cron.*                          @servlog
+daemon.*                        @servlog
+kern.*                          -/var/log/kern.log
+kern.*						@servlog
+lpr.*                           @servlog
+mail.*                          /var/log/mail.log
+user.*                          -/var/log/user.log
+user.*						@servlog
+uucp.*                          -/var/log/uucp.log
+</pre>
+<p>
+E reinicie o daemon <span class="command"><strong>rsyslogd</strong></span> da máquina cliente para re-ler o
+arquivo de configuração: <code class="literal">killall -HUP rsyslogd</code> ou
+<code class="literal">systemctl restasrt rsyslog</code>.
+</p>
+</dd></dl></div>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> Mantenha o relógio do servidor de logs
+sempre atualizado (use o <span class="command"><strong>ntpdate</strong></span> ou <span class="command"><strong>chrony</strong></span> ou outro daemon de
+sincronismo NTP para automatizar esta tarefa).
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span> Se desejar modificar a localização
+padrão do <code class="filename">/etc/rsyslog.conf</code>, modifique o arquivo
+<code class="filename">syslogd.c</code> na linha:
+</p>
+<pre class="screen">
+#define _PATH_LOGCONF   "/etc/syslog.conf"
+</pre>
+<p>
+Use a imaginação para escolher um nome de arquivo e localização que dificulte a
+localização deste arquivo por pessoas não autorizadas.
+</p>
+<p>
+<span class="strong"><strong>OBS3:</strong></span> Em uma grande rede, é recomendável
+configurar um computador dedicado como servidor de log (desativando qualquer
+outro serviço) e configurar o <span class="command"><strong>iptables</strong></span> para aceitar somente
+o tráfego indo para a porta UDP e TCp 514 (syslogd):
+</p>
+<pre class="screen">
+iptables -P INPUT DROP
+iptables -A INPUT -p udp --dport 514 -j ACCEPT
+iptables -A INPUT -p udp --dport 514 -j ACCEPT
+</pre>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s04.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch03.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Programas úteis para monitoração e gerenciamento de arquivos de logs </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas</td></tr></table></div></body></html>

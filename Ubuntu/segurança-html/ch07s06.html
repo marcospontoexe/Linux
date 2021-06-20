@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Gerenciamento de uma CA e de chaves publicas e privadas</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s05.html" title="openssl" /><link rel="next" href="ch07s07.html" title="Certificados Auto-Assinados" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Gerenciamento de uma CA e de chaves publicas e privadas</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s05.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s07.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Gerenciamento de uma CA e de chaves publicas e privadas</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-x509-pubpriv-keys"></a>Gerenciamento de uma CA e de chaves publicas e privadas</h2></div></div></div><p>
+Nesta seção, você encontrará detalhes desde como <span class="emphasis"><em>Criar uma CA privada</em></span>, os Procedimentos 
+usados por uma entidade certificadora.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-gerandorsa"></a>Gerando uma chave RSA de 2048 bits</h3></div></div></div><p>
+Siga o procedimento abaixo para gerar uma chave privada 2048. Caso deseje gerar uma chave mais forte,
+substitua 2048 por um número maior (como 3072, 4096):
+</p><span class="command"><strong>
+openssl genrsa -des3 -out chave_privada.pem 2048
+</strong></span></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-gerando-pkcs8"></a>Gerando uma chave PKCS8 de 2048 bits</h3></div></div></div><p>
+Para gerar um certificado PKCS8, siga o seguinte procedimento:
+</p><span class="command"><strong>
+openssl genrsa 2048 | openssl pkcs8 -topk8 -out servidor.key
+</strong></span><p>
+<span class="emphasis"><em>OBS: </em></span> Note que certificados PKCs8 iniciam com <span class="emphasis"><em>-----BEGIN ENCRYPTED PRIVATE KEY-----</em></span>.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-exp-arquivo"></a>Exportando a chave RSA publica para arquivo</h3></div></div></div><p>
+Siga o procedimento abaixo para exporta a chave RSA pública para arquivo:
+</p><span class="command"><strong>
+openssl rsa -in chave_privada.pem -outform PEM -pubout -out chave_publica.pem
+</strong></span><span class="command"><strong>
+openssl rsa -in chave_privada.pem -outform PEM -pubout &gt; chave_publica.pem
+</strong></span><p>
+É importante <span class="emphasis"><em>SEMPRE</em></span> especificar o parametro <code class="literal">-pubout</code>, 
+pois o padrão é exportar a chave privada. Tenha certeza de incluílo!
+</p><p>
+Próximo passo, abra o <code class="filename">chave_publica.pem</code> e tenha certeza que ele começa com
+</p><pre class="screen">-----BEGIN PUBLIC KEY-----</pre><p>. 
+Este é como o formato de arquivo de chaves pública se parece.
+</p><p>
+Desta forma, caso deseje exportar uma chave privada, remova o <code class="literal">-pubout</code>:
+</p><span class="command"><strong>
+openssl rsa -in chave_privada.pem -out private_unencrypted.pem -outform PEM
+</strong></span><p>
+Com o comando acima, a chave gerada iniciará com a strings:
+</p><pre class="screen">
+-----BEGIN RSA PRIVATE KEY-----
+</pre><p>
+As chaves geradas são encodificadas em base64 em formato texto plano. Caso
+selecione uma senha para a chave privada, o arquivo será encriptado com 
+sua senha. Caso perca a senha o par de chave se tornará inútil.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-protecting"></a>Protegendo a chave privada</h3></div></div></div><p>
+Dependendo do nível de proteção de dados que deseja proteger, é importante 
+manter a <span class="emphasis"><em>chave privada</em></span> em um backup e segura. A <span class="emphasis"><em>chave pública</em></span> 
+pode ser distribuida e embutida em aplicações web, como PHP, Ruby e outros scripts.
+</p><p>
+Para relizar o backup de uma chave privada, veja as tecnicas em <a class="xref" href="ch07s06.html#s-criptografia-x509-pubpriv-exp-arquivo" title="Exportando a chave RSA publica para arquivo">“Exportando a chave RSA publica para arquivo”</a>
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-procdiv-gerencCA"></a>Requisitos para gerenciar uma CA</h3></div></div></div><p>
+Basicamente, uma entidade que funciona como CA, precisa obedecer os seguintes requisitos abaixo para 
+permitir o gerencimaento de forma segura dos certificados gerados:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+   Você deve publicar o certificado root da CA, assim ele poderá ser instalado em 
+larga escala pelos aplicativos
+   </p></li><li class="listitem"><p>
+Você deve publicar o arquivo CRL
+  </p></li><li class="listitem"><p>
+Você deve publicar detalhes do certificado, fornecendo seu número serial
+     </p></li><li class="listitem"><p>
+Você deverá prover um formulário digital para os usuários enviarem requisições de certificados
+     </p></li></ol></div><p>
+É claro que um sistema que gerenciam uma CA possuem diversas camadas de segurança, passando
+por diversos checks para emissão, registro de acesso e armazenamento por longos períodos 
+(pelo menos igual o equivalente ao tempo de emissão do seu maior certificado), qual canal foi 
+solicitada a emissão, e o certificado emitido apenas após as validações de consistencias 
+adequadas. Validação de certificados de identidade deve ser feita criteriosamente por mais 
+de uma pessoa devidamente habilitadas para operação segura dos procedimentos e um conjunto 
+de automações que gerenciam os ítens acima (como anúncio de CRL na web).
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-creatingPrivCA"></a>Criando uma CA privada</h3></div></div></div><p>
+Vamos seguir passo a passo, com o procedimento para criação de uma CA privada, desde a chave, 
+CSR até a geração do certificado. Começaremos pela geração da chave privada da CA. Execute
+o seguinte comando:
+</p><span class="command"><strong>
+openssl req -new -newkey rsa:2048 -nodes -out ca/ca.csr -keyout ca/ca.key -sha256
+</strong></span><p>
+Onde:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><span class="emphasis"><em>2048</em></span> - É o tamanho da chave, quanto maior, mais segurança e mais lento nas
+    operações de criptografia e descriptografia de dados. Valores recomendados: 2048, 3072, 4096.
+    </p></li><li class="listitem"><p><span class="emphasis"><em>-out [arquivo]</em></span> - Especifica o arquivo de saída que armazenará o 
+    arquivo CSR. Este será usado para geração do certificado final, assinado pela entidade certificadora.
+    </p></li><li class="listitem"><p><span class="emphasis"><em>-keyout [arquivo]</em></span> - Especifica o arquivo de saída que armazenará a 
+    chave privada gerada pelo <span class="command"><strong>openssl</strong></span></p></li><li class="listitem"><p>
+    <span class="emphasis"><em>-sha256</em></span> - Algoritmo usado para assinatura do certificado.
+    </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-creatingCACRT"></a>Criando um certificado de CA</h3></div></div></div><p>
+Para gerar um certificado baseado na chave de CA privada:
+</p><span class="command"><strong>
+openssl x509 -signkey ca/ca.key -days 10000 -req -in ca/ca.csr -out ca/ca.crt -sha256
+</strong></span><p>
+Onde:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+    <span class="emphasis"><em>signkey</em></span> - Chave da CA criada no passo anterior, usada para gerar o certificado
+    privado da CA.
+    </p></li><li class="listitem"><p>
+    <span class="emphasis"><em>days</em></span> - Especifica a validade do certificado da CA (em dias). Após este período,
+    o certificado se tornará <span class="emphasis"><em>Inválido!</em></span>. 
+    </p></li><li class="listitem"><p>
+    <span class="emphasis"><em>-in arquivo_CSR</em></span> - Especifica o caminho para o arquivo CSR gerado no passo 
+    anterior, para criação do certificado da CA.
+    </p></li><li class="listitem"><p>
+    <span class="emphasis"><em>-out arquivo_crt</em></span> - Especifica o arquivo de Certificado que será gerado ao final
+    do procedimento.
+    </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-CRTSigning"></a>Assinando um arquivo CRT</h3></div></div></div><p>
+Assumindo que você é uma CA e alguém te envia um arquivo CRT para validação e assinatura, siga o 
+seguinte procedimento para assinar o Certificado, e devolver ao usuário, para que ele consiga 
+utilizar o certificado de forma válida:
+</p><span class="command"><strong>
+openssl x509 -req -days 768 -in csr.csr -CA ca/ca.crt -CAkey ca/ca.key -out cert-assinado.crt -set_serial 01 -sha256
+</strong></span><p>
+Onde:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+  <span class="emphasis"><em>-in [arquivo] </em></span> - Especifica o arquivo CSR enviado pelo cliente que será 
+  assinado.
+   </p></li><li class="listitem"><p>
+  <span class="emphasis"><em>-CAkey [arquivo] </em></span> - Especifica o arquivo chave da CA que você criou anteriormente.
+   </p></li><li class="listitem"><p>
+  <span class="emphasis"><em>-out [arquivo] </em></span> - Arquivo que será gerado e deverá ser enviado para o cliente para que
+  ele conclua o procedimento de geração do certificado assinado por uma CA.
+   </p></li><li class="listitem"><p>
+  <span class="emphasis"><em>-CA [arquivo] </em></span> - Especifica o certificado da CA que deverá usar para assinar
+  o CSR.
+   </p></li></ul></div><p>
+Após executado o comando, o arquivo assinado especificado pela opção <code class="literal">-out</code>, 
+deverá ser enviado ao cliente para que ele possa utilizar o certificado em sua aplicação.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-renew"></a>Renovando um Certificado</h3></div></div></div><p>
+Caso vocẽ seja uma CA (ou esteja admnistrando uma CA auto-assinada), os seguintes procedimentos
+precisam ser executados para criar um novo certificado:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+O usuário precisa enviar o antigo arquivo <code class="filename">CSR</code> ou criar um novo CSR baseado na 
+antiga chave criptográfica privada.
+    </p></li><li class="listitem"><p>
+O certificado antigo precisa ser revogado antes do novo CSR enviado precisa ser assinado. 
+Para localizar o certificado antigo, olhe no arquivo <code class="filename">index.txt</code> e 
+procure pelo campo DN (Distinguished Name), que corresponde a requisição. Obtenha o número serial 
+correspondente àquele certificado (campo Serial Number).
+    </p><p>
+No arquivo <code class="filename">index.txt</code> é normal encontrar os seguintes campos (e seus 
+respectivos significados):
+    </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><span class="emphasis"><em>R</em></span> - Certificados Revogadas</p></li><li class="listitem"><p><span class="emphasis"><em>V</em></span> - Certificados Válidos</p></li><li class="listitem"><p><span class="emphasis"><em>E</em></span> - Certificados Expirados</p></li></ul></div><p>
+    </p></li><li class="listitem"><p>
+Se desejar assinar a requisição manualmente, execute o comando:
+<span class="command"><strong>openssl ca -config /etc/openssl.cnf -out novo_certificado.pem \
+-infiles newreq.pem -startdate [now] -enddate [previous enddate+365days]
+</strong></span>
+    </p><p>
+    Note que este certificado utiliza a data de inicio <span class="emphasis"><em>now</em></span> significando que
+    ele permanece válido já no momento da geração. Algumas CAs colocam a validade para algumas horas
+    antes para evitar possíveis problemas com o horário de máquinas que estão recebendo o certificado.
+    Note que a validade do certificado é definida pela expiração anterior + 365 dias.
+    </p></li></ol></div><p>
+Agora basta enviar o <code class="filename">novo_certificado.pem</code> assinado para o cliente para que ele 
+possa fazer a instalação no sistema alvo.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-revoking-cert"></a>Revogando um Certificado</h3></div></div></div><p>
+Para revogar um certificado, de o comando:
+<span class="command"><strong>openssl ca -revoke certificado.pem</strong></span>
+</p><p>
+O banco de dados é atualizado e o certificado marcado como revogado. Você precisará gerar
+o novo banco de dados CRL:
+</p><span class="command"><strong>
+openssl ca -gencrl -config /etc/openssl.cnf -out crl/revogados-ca.crl
+</strong></span><p>
+<span class="emphasis"><em>Nota</em></span>: O arquivo <span class="emphasis"><em>CRL</em></span> atualizado deverá ser sempre disponibilizado 
+em seu website para os clientes.
+</p><p>
+Os parâmetros adiiconais aceitos durante a revogação do certificado são <span class="emphasis"><em>crldays</em></span> / 
+<span class="emphasis"><em>crlhours</em></span> e <span class="emphasis"><em>crlexts</em></span>.
+Os primeiro dos parametros indicam quando o próximo CRL será atualizado e e o último usará a 
+sessão <code class="literal">crl_exts</code> no openssl.cnf para produzir um CRL <code class="literal">v2</code> ao 
+invés do CRL <code class="literal">v1</code>.
+ </p><p>
+Segue um exemplo de revogação de certificado indicando atualização do CRL em 7 dias:
+</p><pre class="screen">
+openssl ca -gencrl -config /etc/openssl.cnf -crldays 7 -crlexts crl_ext \
+-out crl/sopac-ca.crl
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-revoking-CA"></a>Revogando uma CA</h3></div></div></div><p>
+Como a <span class="emphasis"><em>CA</em></span> é criada sendo um certificado auto-assinado (<span class="emphasis"><em>issuer</em></span>
+é igual ao <span class="emphasis"><em>subject</em></span>), ela <span class="emphasis"><em>NÃO</em></span> pode ser revogada. 
+Ninguém pode emitir um certificado de revogação que seriam autoritativos em cima daquela CA, pois
+representa o topo na cadeia de validação de segurança.
+ </p><p>
+Entretanto, existe um consenso para evita que uma <span class="emphasis"><em>CA</em></span> comprometida cause 
+dados em toda a estrutura da árvore do topo para baixo, que consiste em remover a CA comprometida
+dos navegadores e banco de dados de sistemas operacionais, sem envolve rum CRL, pois devido a 
+crescente risco de tal comprometimento, os navegadores mais modernos atualizam essa lista de CAs
+confiáveis automaticamente.
+ </p><p>
+Isto pode ser feito também no <span class="command"><strong>Windows</strong></span> e <span class="command"><strong>MacOS</strong></span> 
+que também possuem uma lista de certificados <span class="emphasis"><em>desautorizados</em></span>, 
+e esta lista é verificada antes da lista confiável do sistema operacional. Com isso
+até mesmo certificados de CA adicionadas na cadeia de confiança podem ser 
+'marcados' como não confiáveis.
+ </p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-genRSApair"></a>Gerando um par de chaves RSA a partir da chave privada</h3></div></div></div><p>
+execute o seguinte comando para gera o par de chaves e salvar no arquivo <code class="filename"> chave_privada.pem</code>:
+</p><span class="command"><strong>
+openssl genpkey -algorithm RSA -out chave_privada.pem -pkeyopt rsa_keygen_bits:2048
+</strong></span><p>
+Após executar este procedimento, não se esqueça de remover a permissão de leitura de outros 
+usuários com <span class="command"><strong>chmod go-r chave_privada.pem</strong></span>.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-extractPubKeyfromPrivate"></a>Extraindo a chave pública a partir da chave privada do certificado</h3></div></div></div><p>
+Caso tenha a chave privada, e por alguma razão necessite gerar novamente a chave pública a partir deste
+certificado, execute o seguinte procedimento para obter o arquivo:
+</p><span class="command"><strong>
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+</strong></span><p>
+Como mencionado anteriormente, a <span class="emphasis"><em>Chave Pública</em></span> pode ser distribuida sem qualquer
+procupação.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-extractTextElements"></a>Extraindo elementos texto do certificado</h3></div></div></div><p>
+Siga o procediment abaixo para visualizar em <code class="literal">formato humano</code>, os detalhes de um 
+certificado:
+</p><span class="command"><strong>
+openssl rsa -text -in private_key.pem
+</strong></span><p>
+O conteúdo do certificado será exibido para a saída padrão.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-GenPubkey"></a>Gerando uma chave Pública</h3></div></div></div><p>
+Para gerar uma chave pública em formato <span class="emphasis"><em>PEM</em></span>, utilize o seguinte comando abaixo, 
+subsituindo <code class="filename">certificado.pem</code> pelo nome do seu certificado privado gerado 
+anteriormente:
+</p><span class="command"><strong>
+openssl rsa -in certificado.pem -out chave_publica.pem -outform PEM -pubout
+</strong></span>
+Será gerado um arquivo <code class="filename">chave_publica.pem</code>, contendo o certificado público.
+</div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-Genrandfilekey"></a>Gerando arquivo binário contendo números aleatórios</h3></div></div></div><p>
+Alguns sistemas como o <span class="command"><strong>WireGuard</strong></span>, requerem um arquivo de números aleatórios gerado
+para permitir a criação de certificados. Este arquivo pode ser gerado com o comando abaixo:
+</p><span class="command"><strong>
+openssl rand -base64 128 -out key.bin
+</strong></span><p>
+Note que foi criada uma chave 128 bits, e será encodada usando <span class="emphasis"><em>base64</em></span>.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-fillautomation"></a>Automatizando preenchimento de dados de certificado</h3></div></div></div><p>
+Você deve ter notado que sempre que gera um certificado são requeridos dados como Cidade, País, Estado,
+Email, CN, etc. Esse preenchimento pode ser feito automaticamente via linha de comando, com isso
+seus scripts poderão operar totalmente em modo não interativo (sem intervenção humana), facilitando
+a adição deles em um ciclo DevOps.
+</p><p>
+Para isso, precisamos apenas informar o parametro <code class="literal">-subj</code> para o <span class="command"><strong>OpenSSL</strong></span>,
+usando a construção <span class="emphasis"><em>Chave=Valor</em></span>, como abaixo:
+</p><span class="command"><strong>
+openssl ... -subj "/C=BR/ST=ES/L=Vitoria/O=GuiaFoca/OU=Departamento de Seguranca/CN=guiafoca.org"
+</strong></span><p>
+Como deve ter observado acima, mais de um parâmetro pode ser especificado separando os mesmos por uma
+<code class="literal">/</code>.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-usingSNI"></a>Usando SNI nos domínios</h3></div></div></div><p>
+Mais de um nome de domínio pode ser adicionado as extesões SSl usando o <span class="emphasis"><em>subjectAltnames</em></span>, 
+com isso, o certificado será vaálido para o subject e também para os nomes DNS adicionais especificados
+nesse campo. Por exemplo:
+</p><pre class="screen">
+openssl req -new -sha256 \
+    -key guiafoca.key \
+    -subj "/C=BR/ST=ES/O=Guia Foca/CN=guiafoca.org" \
+    -reqexts SAN \
+    -config &lt;(cat /etc/ssl/openssl.cnf \
+        &lt;(printf "\n[SAN]\nsubjectAltName=DNS:www.guiafoca.org,DNS:www2.guiafoca.org")) \
+    -out dominio.csr
+</pre><p>
+Após isso, o certificdo gerado também passará a atender corretamente os dominios:
+<code class="literal">guiafoca.org</code>, <code class="literal">www.guiafoca.org</code> e <code class="literal">www2.guiafoca.org</code>.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-criptobigfiles"></a>Encriptando arquivos grandes</h3></div></div></div><p>
+Devido a forma que o algoritmo RSA trabalha, não é possível encriptar arquivos muito grandes. Por padrão, 
+o arquivo encriptado não pode ser maior que <span class="emphasis"><em>(n - 11) (onde n é o tamanho da chave)</em></span>. O uso mais efetivo 
+da criptografia RSA é para encriptar uma senha gerada aleatóriamente, e então encriptar o <span class="emphasis"><em>arquivo grande</em></span>
+usando uma criptografia simétrica. 
+</p><p>
+Caso tentar encriptar um arquivo maior que o tamanho acima, o comando de encriptação finalizará com erro.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-apache-verlevels"></a>Especificando níveis de validação no Apache</h3></div></div></div><p>
+Nesta seção, mostraremos como altera o nível de validação do servidor web <span class="command"><strong>Apache</strong></span> para ou relaxar ou ser rigoroso 
+sobre a validação da cadeia de segurança de certificados. Faremos uso das opções <code class="literal">SSLVerifyClient</code> e 
+<code class="literal">SSLVerifyDepth</code> como na configuração abaixo:
+</p><pre class="screen">
+SSLVerifyClient optional
+SSLVerifyDepth 1
+SSLOptions +StdEnvVars
+</pre><p>
+    <span class="emphasis"><em>SSLVerifyClient</em></span> - Permite enviar o certificado de cliente de forma opcional e dizemos que 
+    devemos verificar a CA que assinou o certificado de cliente, mas não o parent da CA (<span class="emphasis"><em>SSLVerifyDepth 1</em></span>).
+    Também que devemos passar as variáveis de ambiente SSL para o servidor (<span class="emphasis"><em>StdEnvVars</em></span>).
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-apache-verlevels-test"></a>Enviando um certificado SSL de cliente para testes</h3></div></div></div><p>
+Agora que fizemos a configuração do <span class="command"><strong>Apache</strong></span> para validação de certificado de cliente (permitindo a conexão apenas para quem 
+possuir o certificado assinado), podemos fazer o teste enviando o certificando via <span class="command"><strong>curl</strong></span>:
+</p><span class="command"><strong>
+curl --cert guiafoca/all.crt --key guiafoca/all.key --cacert guiafoca/ca.crt https://guiafoca.org
+</strong></span><p>
+Provavelmente você receberá um erro de <span class="emphasis"><em>CA desconhecida</em></span> (“unknown ca”):
+</p><pre class="screen">
+curl: (35) error:14094418:SSL routines:SSL3_READ_BYTES:tlsv1 alert unknown ca
+</pre><p>
+Para corrigir isto, precisaremos dizer ao <span class="command"><strong>Apache</strong></span> sobre a CA do GuiaFoca. Fazemos
+isso adicionando a seguinte linha ao nosso VirtualHost:
+</p><pre class="screen">
+SSLCACertificateFile /caminho/para/o/ca.crt
+</pre><p>
+Agora, se fizemos uma nova requisição, veremos os dados do servidor novamente, mas 
+dessa vez deverão existir valores que iniciam com SSL_CLIENT_. Para tornar o envio do 
+certificado obrigatório, edite o VirtualHost e altere:
+</p><pre class="screen">
+SSLVerifyClient optional
+</pre><p>
+para 
+</p><pre class="screen">
+SSLVerifyClient require 
+</pre><p>
+E reinicie o <span class="command"><strong>Apache</strong></span>. Agora, se enviar uma nova requisição
+via <span class="command"><strong>curl</strong></span> após fazer a verificação, e não enviar o certificado
+do cliente, você obterá o seguinte erro:
+</p><pre class="screen">
+curl: (35) error:14094410:SSL routines:SSL3_READ_BYTES:sslv3 alert handshake failure
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-pubpriv-id_check"></a>Verificando uma identidade</h3></div></div></div><p>
+Após o procedimento de validação de chave de cliente funcional, nós podemos nos aprofundar na verificação
+da identidade de usuário. Existem duas formas de fazer isso:
+</p><p>
+A primeira, é verificar o número serial do certificado do usuário. Este será o mesmo
+durante a validade do certificado. Caso o certificado for substituido por um novo, 
+o número serial mudará. Esta é a opção mais segura:
+</p><pre class="screen">
+if ($_SERVER['SSL_CLIENT_M_SERIAL'] !== 'ABACABBF0CA') {
+  echo "Você não deveria estar conectando aqui";
+  exit;
+}
+</pre><p>
+Este código só rodará se o certificado do cliente for assinado por uma CA que você confia,
+mas não é o certificado que está esperando. Se não for uma CA que confie, então o comando 
+falhará com uma falha na negociação.
+</p><p>
+A outra opção para verificar a identidade é usar o <code class="literal">SSL_CLIENT_S_DN_Email</code>. Um endereço
+de e-mail pode ser usado em múltiplos ceritifcados, assim você não poderá ter 
+certeza que quem está confiando é a pessoal que deu o certificado client. No entanto,
+como você precisa confiar na CA que assinou o certificado antes, 
+é aceitável e isto não será um risco tão grande como poderia ser:
+</p><pre class="screen">
+if ($_SERVER['SSL_CLIENT_S_DN_Email'] !== '[gleydson@guiafoca.org]') {
+  echo "Você não deveria estar aqui";
+  exit;
+}
+</pre><p>
+Com essas duas opções, poderá ser escolhido identificar e autorizar o acesso de
+pessoas pessoas baseadas no número serial do certificado ou pelo endereço de e-mail.
+</p></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s05.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s07.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">openssl </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Certificados Auto-Assinados</td></tr></table></div></body></html>

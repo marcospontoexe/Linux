@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Criptografia de blocos usando DM-Crypt / cryptsetup</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s11.html" title="Usando o GPG para Autenticação e Criptografia" /><link rel="next" href="ch07s13.html" title="Criptografia de arquivos usando ENCFS" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Criptografia de blocos usando DM-Crypt / cryptsetup</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s11.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s13.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Criptografia de blocos usando DM-Crypt / cryptsetup</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-fs-cryptsetup"></a>Criptografia de blocos usando DM-Crypt / cryptsetup</h2></div></div></div><p>
+Versão em vídeo desta seção pode estar disponível no canal do <span class="emphasis"><em>Guia Foca</em></span> no <span class="command"><strong>YouTube</strong></span>: 
+<a class="link" href="https://rdr.guiafoca.org/gf-segur-cripto-dm-crypt" target="_top">Criptografia com o DM Crypto</a>.
+</p><p>
+Criptografia de dispositivo de blocos, simplesmente signifia que você encriptará 
+<span class="emphasis"><em>TODO</em></span> o dispositivo que será montado (como o o <code class="filename">/dev/sda1</code>). 
+Desta forma, todo e qualquer arquivo armazenado nessa partição, estará automaticamente criptografado.
+Esta metodo é bastante utilizado pelos instaladores de distribuições <span class="command"><strong>Linux</strong></span> 
+e também por Smartphones que utilizam <span class="command"><strong>Android</strong></span> como sistema operacional. 
+</p><p>
+Quando é utilizado a criptografia de um dispositivo como <code class="filename">/dev/sda1</code>, 
+primeiro ele é <span class="emphasis"><em>decriptado</em></span> e entregue como um outro 
+dispositivo como <code class="filename">/dev/mapper/cripto</code> (o nome é de sua livre escolha),
+e esse dispositivo que será formatado (com qualquer sistema de arquivos de sua escolha 
+usando o <span class="command"><strong>mkfs.*</strong></span>: <span class="command"><strong>ext4</strong></span>, <span class="command"><strong>reiserfs</strong></span>,<span class="command"><strong>XFS</strong></span>, <span class="command"><strong>Btrfs</strong></span>, 
+etc). 
+</p><p>
+Como o <span class="command"><strong>device mapper</strong></span> entregará um dipsositivo de 
+blocos normal em <code class="filename">/dev/mapper/cripto</code>, pouco importa qual sistema de 
+arquivos será usado na formação, podendo até mesmo usar <span class="command"><strong>VFAT</strong></span> :-)
+</p><p>
+A encriptação de dispositivos de blocos também tem benefícios, permitindo 
+também que a a segurança seja aplicada a todos os arquivos na inicialização do sistema,
+assm todos os sistemas de arquivos estarão encriptados pela mesma chave, desta 
+forma, se o dispositivo de bloco é encriptado, os sistemas de arquivos neste
+dispositivo também estarão automaticamente encriptados.
+</p><p>
+O uso de criptografia de blocos também nos garante um nível adicional
+ de segurança, pois o invasor não terá <span class="emphasis"><em>qualquer</em></span> aos arquivos, 
+ou sequer os atributos (permissões, diretório, tamanho de arquivos) quando 
+usamos o <span class="command"><strong>cryptsetup</strong></span>. 
+Observe que cada sistema de criptografia possui suas vantagens e desavantagens,
+desta forma o uso do <span class="command"><strong>DM crypt/cryptsetup</strong></span> é interessante 
+quando possui acesso completo a máquina e pode <span class="emphasis"><em>FORMATAR</em></span> 
+a partição que armazena dados, para criptografa-la. 
+ </p><p>
+Sistemas que usam a criptografia a nível de sistema de arquivos 
+(como o <span class="command"><strong>EncfS</strong></span> ou o <span class="command"><strong>eCryptFS</strong></span>), não 
+requer privilégios especiais ou perda de dados para sua implantação, 
+baseado nisso, você poderá tomar suas decisões sobre qual melhor sistema
+de criptografia escolher e a diferença entre eles.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-setup"></a>Encriptando um sistema de arquivos com DM-Crypto / cryptsetup</h3></div></div></div><p>
+A ferramenta que utilizarmos para essa configuração é o <span class="command"><strong>cryptsetup</strong></span>, 
+que basicamente usa o <span class="command"><strong>DMCrypt</strong></span> com o <code class="literal">Luks</code> (Luks significa 
+<span class="emphasis"><em>Linux Unified Key Setup</em></span>) e com ele podemos criar, definir senhas de acesso
+(DM-Crypt permite até 8 chaves diferentes) para gerenciar a encriptação do Device Mapper. 
+ </p><p>
+Como reforçado atneriormente, a criptografoa do em-crypto ocorre na camada de dispositivo 
+de blocos, assim os arquivos estarão disponíveis imediatamente sem qualquer necessidade
+de comandos especiais após a montagem.
+Desta forma, o primeiro passo é isntalar o cryptsetup:
+</p><span class="command"><strong>
+apt-get install cryptsetup
+</strong></span><p>
+Após isso, execute o seguinte comando no sistema de 
+arquivos que será preparado para criptografia com o <span class="command"><strong>DM Crypto</strong></span>:
+ </p><span class="command"><strong>
+cryptsetup -y --cipher aes-xts-plain64 --hash sha512 --key-size 512 luksFormat /dev/sdc1
+</strong></span><p>
+O comando acima diz para <span class="emphasis"><em>APAGAR</em></span> e criar um sistema encriptado (luksFormat) 
+em <code class="filename">/dev/sdc1</code>, usando o cipher <code class="literal">aes-xts-plain64</code>, que 
+garante boa performance e alta segurança. Ele será criado usando o hash <code class="literal">sha512</code>
+e tamanho da chave (<code class="literal">key-size</code>) de 512 bits (veja <a class="xref" href="ch07s12.html#s-criptografia-fs-cryptsetup-listando-limites" title="Listando limites e algoritmos suportados">“Listando limites e algoritmos suportados”</a>).
+ </p><p>
+Caso digite apenas <span class="command"><strong>cryptsetup -y luksFormat /dev/sdc1</strong></span>, serão utilizados
+os seguintes valores padrões:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+<span class="emphasis"><em>--cipher</em></span> - Usa o <code class="literal">aes-xts-plain64</code> como padrão a partir da versão 1.6. 
+Pois o antigo <code class="literal">aes-cbc-essiv</code> tem bugs e ataques conhecidos.
+    </p></li><li class="listitem"><p>
+<span class="emphasis"><em>key-size 256</em></span> - O valor padrão usado é 256. Note que o <span class="emphasis"><em>XTS</em></span> divide a chave por dois, assim
+para usar um <span class="emphasis"><em>AES-256</em></span>, configure o <span class="emphasis"><em>XTS key-size</em></span> como <code class="literal">512</code>.
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>hash sha256</em></span> - Algoritmo usado para derivação de chave. O <span class="emphasis"><em>sha1</em></span> é considerado
+mais seguro, mas ele não é usado por padrão por causa de compatibilidade.
+    </p></li><li class="listitem"><p>
+<span class="emphasis"><em>iter-time</em></span> - Número de milisegundos para gastar com o processamento 
+a frase senha <span class="emphasis"><em>PBKDF2</em></span>. 2000 ms é o padrão, e o ideal é manter o número com um valor alto, 
+e ainda aceitável para os usuários.
+  </p></li><li class="listitem"><p>
+<span class="emphasis"><em>-y / --verify-passphrase yes</em></span> - Pede a confirmação da frase senha. Este é o padrão para o 
+<code class="literal">luksFormat</code> e <code class="literal">luksAddKey</code>.
+    </p></li></ul></div><p>
+Após executar o comando, lhe será pedido para digitar <code class="literal">YES</code> em maiúsculas para confirmar e depois uma 
+frase senha (veja <a class="xref" href="ch04s02.html#d-contas-cms-senhas" title="Senhas fáceis de adivinhar e a escolha de boas senhas">“Senhas fáceis de adivinhar e a escolha de boas senhas”</a>) para iniciar a formatação.
+</p><p>
+Após isso, a estrutura de criptografia está criada e pronta para ser usada como
+qualquer sistema de arquivos normal.
+Execute o comando abaixo para tornar o dispositivo de criptografia front-end acessível para 
+montagem (descriptografado):
+</p><span class="command"><strong>cryptsetup luksOpen /dev/sdc1 testecripto</strong></span><p>
+Informe a frase-senha escolhida quando perguntado. Agora, você poderá formatar o dispositivo e iniciar o 
+armazenamento de arquivos, como faria com outro sistema de arquivos qualquer, e montaremos ele em 
+<code class="filename">/data</code>:
+</p><pre class="screen">
+# mkfs.ext4 /dev/mapper/testecripto
+# mount /dev/mapper/testecripto /data
+</pre><p>
+Para mostrar o stauts do volume mapeado, incluindo cipher usado, tamanho da 
+chave, o dispositivo, número de setores e modo do volume, digite:
+</p><span class="command"><strong>
+cryptsetup -v status testecripto
+</strong></span><pre class="screen">
+  type:    LUKS1
+  cipher:  aes-xts-plain64
+  keysize: 512 bits
+  device:  /dev/sdc1
+  offset:  4096 sectors
+  size:    1044480 sectors
+  mode:    read/write
+</pre><p>
+Para listar a hierarquia de blocos associados, digite: <span class="command"><strong>lsblk -p</strong></span>
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-closing-dev"></a>Desmontando o dispositivo criptografado</h3></div></div></div><p>
+Como temos um sistema de arquivos criptografado montado, precisamos desmonta-lo em duas etapas:
+</p><p>
+1 - Desmontar o dispositivo (como um sistema de arquivos qualquer), com o comando:
+<span class="command"><strong>umount /data</strong></span>
+</p><p>
+Note que o dispositivo ainda está acessível e pode ser montado por qualquer pessoa com um simples comando mount 
+(<span class="command"><strong>ls /dev/mapper/testecripto</strong></span> ou <span class="command"><strong>cryptsetup -v status testecripto</strong></span>). Para 
+encerrar o dispositivo de criptografia, digite o comando: 
+<span class="command"><strong>cryptsetup luksClose dispositivo</strong></span>
+</p><p>
+Note que o parametro <code class="literal">luksOpen</code> e <code class="literal">luksClose</code> pode ser substituido respectivamente
+por <code class="literal">open</code> e <code class="literal">close</code>. 
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-listando-limites"></a>Listando limites e algoritmos suportados</h3></div></div></div><p>
+Você pode verificar os ciphers suportados e seus limites (para configuração de tamanho mínimo e máximo de chave em bits), 
+visualizando o arquivo <code class="filename">/proc/crypto</code>. Listamos abaixo um exemplo resumido de saída desse arquivo (note que
+ele lista além do nome do cyper, o módulo do kernel, se é interno/externo, o tamanho mínimo/máximo de chaves, se é assincrono, etc):
+</p><pre class="screen">
+name         : __xts(aes)
+driver       : cryptd(__xts-aes-aesni)
+module       : cryptd
+priority     : 451
+refcnt       : 2
+selftest     : passed
+internal     : yes
+type         : skcipher
+async        : yes
+blocksize    : 16
+min keysize  : 32
+max keysize  : 64
+ivsize       : 16
+chunksize    : 16
+walksize     : 16
+
+name         : cmac(aes)
+driver       : cmac(aes-aesni)
+module       : cmac
+priority     : 300
+refcnt       : 2
+selftest     : passed
+internal     : no
+type         : shash
+blocksize    : 16
+digestsize   : 16
+
+name         : pkcs1pad(rsa,sha256)
+driver       : pkcs1pad(rsa-generic,sha256)
+module       : kernel
+priority     : 100
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : akcipher
+
+name         : ecdh
+driver       : ecdh-generic
+module       : ecdh_generic
+priority     : 100
+refcnt       : 2
+selftest     : passed
+internal     : no
+type         : kpp
+
+name         : xts(aes)
+driver       : xts-aes-aesni
+module       : aesni_intel
+priority     : 401
+refcnt       : 2
+selftest     : passed
+internal     : no
+type         : skcipher
+async        : yes
+blocksize    : 16
+min keysize  : 32
+max keysize  : 64
+ivsize       : 16
+chunksize    : 16
+walksize     : 16
+
+name         : __ctr(aes)
+driver       : __ctr-aes-aesni
+module       : aesni_intel
+priority     : 400
+refcnt       : 1
+selftest     : passed
+internal     : yes
+type         : skcipher
+async        : no
+blocksize    : 1
+min keysize  : 16
+max keysize  : 32
+ivsize       : 16
+chunksize    : 16
+walksize     : 16
+
+name         : hmac(sha256)
+driver       : hmac(sha256-generic)
+module       : kernel
+priority     : 100
+refcnt       : 9
+selftest     : passed
+internal     : no
+type         : shash
+blocksize    : 64
+digestsize   : 32
+
+name         : hmac(sha1)
+driver       : hmac(sha1-generic)
+module       : kernel
+priority     : 100
+refcnt       : 9
+selftest     : passed
+internal     : no
+type         : shash
+blocksize    : 64
+digestsize   : 20
+
+name         : jitterentropy_rng
+driver       : jitterentropy_rng
+module       : kernel
+priority     : 100
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : rng
+seedsize     : 0
+
+name         : crc32c
+driver       : crc32c-intel
+module       : kernel
+priority     : 200
+refcnt       : 16
+selftest     : passed
+internal     : no
+type         : shash
+blocksize    : 1
+digestsize   : 4
+
+name         : stdrng
+driver       : drbg_pr_hmac_sha512
+module       : kernel
+priority     : 202
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : rng
+seedsize     : 0
+
+name         : stdrng
+driver       : drbg_pr_hmac_sha384
+module       : kernel
+priority     : 201
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : rng
+seedsize     : 0
+
+name         : lzo-rle
+driver       : lzo-rle-scomp
+module       : kernel
+priority     : 0
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : scomp
+
+name         : aes
+driver       : aes-generic
+module       : kernel
+priority     : 100
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : cipher
+blocksize    : 16
+min keysize  : 16
+max keysize  : 32
+
+name         : sha384
+driver       : sha384-generic
+module       : kernel
+priority     : 100
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : shash
+blocksize    : 128
+digestsize   : 48
+
+name         : sha512
+driver       : sha512-generic
+module       : kernel
+priority     : 100
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : shash
+blocksize    : 128
+digestsize   : 64
+
+name         : sha224
+driver       : sha224-generic
+module       : kernel
+priority     : 100
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : shash
+blocksize    : 64
+digestsize   : 28
+
+name         : sha256
+driver       : sha256-generic
+module       : kernel
+priority     : 100
+refcnt       : 10
+selftest     : passed
+internal     : no
+type         : shash
+blocksize    : 64
+digestsize   : 32
+
+name         : ecb(cipher_null)
+driver       : ecb-cipher_null
+module       : kernel
+priority     : 100
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : skcipher
+async        : no
+blocksize    : 1
+min keysize  : 0
+max keysize  : 0
+ivsize       : 0
+chunksize    : 1
+walksize     : 1
+
+name         : rsa
+driver       : rsa-generic
+module       : kernel
+priority     : 100
+refcnt       : 1
+selftest     : passed
+internal     : no
+type         : akcipher
+
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-benchmark"></a>Avaliando a performance de cada algoritmo</h3></div></div></div><p>
+O desempenho de cada algoritmo pode variar conforme cada sistema, alguns podem apresentar um excelente desempenho em <span class="emphasis"><em>aes</em></span>
+enquanto outros podem desempenhar melhor com <span class="emphasis"><em>twofish</em></span>. O <span class="command"><strong>cryptsetup</strong></span> possui uma excelente teste 
+de performance interno que te ajudar a selecionar o melhor algoritmo que se adapte ao seu sistema:
+</p><p>
+Para executar o teste, digite o comando <span class="command"><strong>cryptsetup benchmark</strong></span>:
+</p><pre class="screen">
+------------------------------------
+PBKDF2-sha1       414129 iterations per second for 256-bit key
+PBKDF2-sha256     509017 iterations per second for 256-bit key
+PBKDF2-sha512     348595 iterations per second for 256-bit key
+PBKDF2-ripemd160  286183 iterations per second for 256-bit key
+PBKDF2-whirlpool  207721 iterations per second for 256-bit key
+#  Algorithm | Key |  Encryption |  Decryption
+     aes-cbc   128b    78,6 MiB/s    91,1 MiB/s
+ serpent-cbc   128b    28,0 MiB/s    31,0 MiB/s
+ twofish-cbc   128b    52,4 MiB/s    61,5 MiB/s
+     aes-cbc   256b    60,9 MiB/s    68,0 MiB/s
+ serpent-cbc   256b    28,2 MiB/s    28,4 MiB/s
+ twofish-cbc   256b    54,7 MiB/s    62,0 MiB/s
+     aes-xts   256b    92,4 MiB/s    91,2 MiB/s
+ serpent-xts   256b    29,8 MiB/s    31,2 MiB/s
+ twofish-xts   256b    60,3 MiB/s    61,8 MiB/s
+     aes-xts   512b    70,3 MiB/s    68,8 MiB/s
+ serpent-xts   512b    30,0 MiB/s    31,2 MiB/s
+ twofish-xts   512b    61,2 MiB/s    61,9 MiB/s
+</pre><p>
+Note que o teste é feito em <span class="emphasis"><em>Memória RAM</em></span> e ele retornará os 
+resultados máximos que pode serm alcançados em sua máquina em especial
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-crypto-options"></a>Opções de encriptação com o DM-Crypt</h3></div></div></div><p>
+O <span class="command"><strong>cryptsetup</strong></span> suporta diferentes modos de oepração de encriptação, que 
+podem ser usados com o <span class="command"><strong>dm-crypt</strong></span>. A mais comum (e padrão) é a <span class="emphasis"><em>luks</em></span>, mas
+as seguintes podem ser utilizadas:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p><span class="emphasis"><em>luks</em></span> - Padrão utilizado pelo <span class="command"><strong>cryptsetup</strong></span></p></li><li class="listitem"><p><span class="emphasis"><em>plain</em></span> - Para usar o dm-crypt no modo plain</p></li><li class="listitem"><p><span class="emphasis"><em>loopaes</em></span> - Para usar o modo legado loopaes</p></li><li class="listitem"><p><span class="emphasis"><em>tcrypt</em></span> - Para usar o modo de compatibilidade com o <span class="command"><strong>TrueCrypt</strong></span>/<span class="command"><strong>Veracrypt</strong></span></p></li></ol></div><p>
+Para utilizar, use o seguinte parâmetro na criação do sistema de arquivos encriptado: <span class="emphasis"><em>--type luks</em></span>
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-header-dump"></a>Fazendo dump do cabeçalho de dispositivos</h3></div></div></div><p>
+A visualização do cabeçalho é útil para determinar a versão usada
+pelo Luks, cipher, hash, payload e bits de criptografia. Também é possível
+ver quantos slots de frase-senhas estão usados pelo cryptsetup. Por padrão, 
+são permitidos a utilização de até 8 frase-senhas para abertura de um dispositivo de blocos.
+</p><p>
+Para isso, digite: <span class="command"><strong>cryptsetup luksDump /dev/sdc1</strong></span>
+</p><pre class="screen">
+LUKS header information for /de/sdc1
+
+Version:        1
+Cipher name:    aes
+Cipher mode:    xts-plain64
+Hash spec:      sha256
+Payload offset: 4096
+MK bits:        256
+MK digest:      ef 74 30 8d d2 2c 4f ec e7 d5 5d 09 4c e5 74 44 d3 53 1e 36 
+MK salt:        ab 6c d1 a7 32 f5 6c be 23 c7 37 d2 8b bf b5 da 
+                59 56 96 41 54 76 6f 26 62 a6 eb ec ef 20 c8 62 
+MK iterations:  124750
+UUID:           61037615-84d0-48f1-b414-ed5efe86bc87
+
+Key Slot 0: ENABLED
+        Iterations:             978966
+        Salt:                   bc 22 5b 48 b5 55 8f 01 2d 49 b7 5b 70 61 81 c7 
+                                e1 11 e3 c4 3b a0 ae 69 f5 fe 1f a4 cc bf 8a 71 
+        Key material offset:    8
+        AF stripes:             4000
+Key Slot 1: DISABLED
+Key Slot 2: DISABLED
+Key Slot 3: DISABLED
+Key Slot 4: DISABLED
+Key Slot 5: DISABLED
+Key Slot 6: DISABLED
+Key Slot 7: DISABLED
+</pre><p>
+Note no exemplo acima, o cipher usado (aes), bits da chave (256) e que existe apenas uma frase senha
+armazenada no Slot 0.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-keymng"></a>Gerenciamento de chaves</h3></div></div></div><p>
+É possível ter até 8 chaves por dispositivo criptografado usando o padrão <span class="command"><strong>LUKs</strong></span>. 
+Isto permite ao usuário usar um <span class="emphasis"><em>key escrow</em></span>: Uma chave é usada para uso diário, outra
+mantida em escrow (garantia) no caso da primeira ser esquecida ou se o arquivo de chave for perdido/danificado,
+o acesso ao conteúdo da partição não será perdido.
+</p><p>
+Por padrão, o slot 0 é criado durante a formatção da chave.
+</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-fs-cryptsetup-keymng-add"></a>Adicionando uma chave ao Luks</h4></div></div></div><p>
+Para adicionar uma chave, use o comando:
+</p><span class="command"><strong>
+cryptsetup luksAddKey /dev/sdc1 [arquivo/de/chave]
+</strong></span><p>
+O padrão é peguntar pela frase-senha na console, que será adicionada ao próximo slot livre. Caso
+<code class="literal">[arquivo/de/chave]</code> seja especificado esse será usado (sem perguntar pela senha).
+</p><p>
+Para usar um arquivo de chave atual para autorizar a ação, a opção
+<code class="literal">--key-file</code> ou <code class="literal">-d</code> precisa ser seguida por uma frase senha
+válida precisa ser digitada.
+ </p><span class="command"><strong>
+cryptsetup luksAddKey /dev/sdc1 (/arquivo/de/chave) -d /caminho/para/o/arquivo
+</strong></span><p>
+Para substituir uma chave, é possível usar a opção <span class="emphasis"><em>-S/--key-slot [num]</em></span> para
+indicar um número de slot que será substituido:
+</p><pre class="screen">
+cryptsetup luksAddKey /dev/sdc1 -S 3
+cryptsetup luksDump /dev/sdc1 | grep 'Slot 6'
+</pre><p>
+O retorno será algo parecido com:
+</p><pre class="screen">
+Key Slot 6: ENABLED
+</pre></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-fs-cryptsetup-keymng-del"></a>Removendo uma chave do Luks</h4></div></div></div><p>
+Existem basicamente três formas de remover uma chave do cabeçalho do Luks:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><span class="emphasis"><em>luksRemoveKey</em></span> - Usando a frase/senha ou arquivo de senhas. Note que é requerido uma frase-senha existente no Luks, 
+ ou seja: caso houver apenas uma senha, ela não poderá ser removida.</p></li><li class="listitem"><p>
+<span class="emphasis"><em>luksKillSlot [num]</em></span> - Remove uma chave de um slot (usando outra chave). Este comando é 
+bastante útil quando você perde ou esquece uma frase senha armazenada no Luks. Recomendável adicionar uma 
+nova frase-senha (veja <a class="xref" href="ch07s12.html#s-criptografia-fs-cryptsetup-keymng-add" title="Adicionando uma chave ao Luks">“Adicionando uma chave ao Luks”</a> para detalhes).
+  </p><p>
+Antigamente era usado o <span class="emphasis"><em>luksDelKey</em></span>, mas ele era pouco intuitivo... por exemplo, para apagar 
+a primeira chave do chaveiro usando a sintaxe antiga, o comando era o seguinte:
+  <code class="literal">luksDelKey 1 0</code>.
+  </p></li><li class="listitem"><p>
+<span class="emphasis"><em>luksErase</em></span> - Remove <span class="emphasis"><em>TODAS</em></span> as chaves ativas. Ele não pergunta uma frase-senha
+qualquer! é como se fosse um format no cabeçalho de acessos. Encare isso como uma forma ideal para <span class="emphasis"><em>DESTRUIR</em></span>
+o acesso a um dispositivo se preciso. Você somente erá acesso ao conteúdo, caso tiver feito um backup do cabeçalho, como
+explicado em <a class="xref" href="ch07s12.html#s-criptografia-fs-cryptsetup-keymng-brest" title="Backup e Restore de cabeçalho/chaves">“Backup e Restore de cabeçalho/chaves”</a>
+   </p></li></ul></div><p>
+<span class="emphasis"><em>Exemplos:</em></span>
+</p><pre class="screen">
+# cryptsetup luksRemoveKey /dev/dispositivo
+
+Será pedida a frase/senha que deverá ser removida.
+
+# cryptsetup luksKillSlot /dev/dispositivo 6
+
+Será pedida uma frase senha existente para remover a frase-senha do Slot
+</pre></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-keymng-brest"></a>Backup e Restore de cabeçalho/chaves</h3></div></div></div><p>
+O backup do cabeçalho do LUKS é importante para recuperar o acesso a partição, caso necessite em uma situação de corrompimento
+(ou caso a tenha excluido propositalmente, dependendo da situação em que se encontra). Como regra, recomendo não deixar o 
+backup do cabeçalho na mesma máquina em que a partição LUKS se encontra, e se possível criptografe-a, com GPG (veja <a class="xref" href="ch07s11.html#d-cripto-gpg-e" title="Encriptando Dados">“Encriptando Dados”</a>).
+</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-fs-cryptsetup-keymng-brest-backup"></a>Fazendo o Backup de chaves/cabeçalhos</h4></div></div></div><p>
+Para fazer o backup, é fácil, execute o seguinte comando, para acria ro arquivo 
+<code class="filename">backup-header-luks.img</code> em <code class="filename">/backup</code>:
+</p><span class="command"><strong>
+cryptsetup luksHeaderBackup /dev/sdc1 --header-backup-file /backup/backup-header-luks.img
+</strong></span><p>
+Note que a recomendação é que o backup seja armazenado fora da máquina, em local seguro, e 
+se possível criptografado com GPG (veja <a class="xref" href="ch07s11.html#d-cripto-gpg-e" title="Encriptando Dados">“Encriptando Dados”</a>).
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-fs-cryptsetup-keymng-brest-restore"></a>Fazendo a restauração de backup de chaves/cabeçalhos</h4></div></div></div><p>
+Para fazer a restauração de um backup gerado com o procedimento de <a class="xref" href="ch07s12.html#s-criptografia-fs-cryptsetup-keymng-brest-backup" title="Fazendo o Backup de chaves/cabeçalhos">“Fazendo o Backup de chaves/cabeçalhos”</a>, 
+primeiro copie o backup do cabeçalho para um diretório local na máquina (vamos assumir <code class="filename">/backup</code>
+neste exemplo), execute uma validação do cabeçalho com:
+</p><span class="command"><strong>
+cryptsetup -v --header /backup/backup-header-luks.img open /dev/sdc1 teste
+</strong></span><p>
+E o sistema deverá retornar algo como:
+</p><pre class="screen">
+Key slot 0 unlocked
+Command successful.
+</pre><p>
+Agora fazemos a validação da montagem do dispositivo gerado após a validação 
+do cabeçalho com:
+</p><pre class="screen">
+mount /dev/mapper/teste /mnt/ &amp;&amp; ls /mnt
+umount /mnt
+cryptsetup luksClose teste
+</pre><p>
+Os comandos acima fazem respectivamente: 
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+  Monta o dispositivo gerado a partir do cabeçalho de validação. Se tudo ocorrer bem
+  (&amp;&amp;), lista o conteúdo da pasta <code class="filename">/mnt</code>.
+    </p></li><li class="listitem"><p>
+  Desmonta o ponto de montagem <code class="filename">/mnt</code>.
+    </p></li><li class="listitem"><p>
+  Fecha o dispositivo do Luks <code class="filename">teste</code>, impedindo que ele seja novamente montado.
+     </p></li></ol></div><p>
+Agora que validamos que o cabeçalhos esta OK, a restauração pode ser feita, exectando o comando:
+</p><span class="command"><strong>
+cryptsetup luksHeaderRestore /dev/sdc1 --header-backup-file /backup/backup-header-luks.img
+</strong></span><p>
+Agora execute novamente o <span class="command"><strong>cryptsetup dump</strong></span> (veja <a class="xref" href="ch07s12.html#s-criptografia-fs-cryptsetup-header-dump" title="Fazendo dump do cabeçalho de dispositivos">“Fazendo dump do cabeçalho de dispositivos”</a>) 
+para confirmar a restauração do cabeçalho de criptografia.
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-fs-cryptsetup-keymng-brest-manualbkprest"></a>Fazendo o Backup e Restore manual usando dd</h4></div></div></div><p>
+Existe também a possibilidade de usar o <span class="command"><strong>dd</strong></span> para o backup e restore dos cabeçalhos.
+O cabeçalho sempre reside no inicio do dispositivo criptogravado e o backup pode ser realizado sem precisar de 
+acesso a ferramenta <span class="command"><strong>cryptsetup</strong></span>. Siga o seguinte procedimento:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Usaremos a ferramenta <span class="command"><strong>cryptsetup</strong></span> apenas para pegar o OffSet 
+(quantidade de blocos de setores) correspondentes ao cabeçalho do Luks que precisam 
+ser lidos no inicio da partição:
+    </p><span class="command"><strong>
+cryptsetup luksDump /dev/device | grep "Payload offset"
+    </strong></span><p>
+Teremos uma saída como:
+     </p><pre class="screen">
+Payload offset:	4040
+     </pre><p>
+Em um disco de 512 bytes por setor, a quantidade de bytes que serão copiados pelo <span class="command"><strong>dd</strong></span> 
+é dada pela fórmula: <span class="emphasis"><em>bytes_por_setor x OffSet</em></span>
+      </p></li><li class="listitem"><p>
+Agora, obtenha o valor de setores da unidade de disco com o comando:
+<span class="command"><strong>fdisk -l /dev/device | grep "Sector size"</strong></span>
+     </p></li><li class="listitem"><p>
+Agora que temos os valores de bytes por setor e do Offset, vamos inserir os valores para
+realizar o backup com o poderoso comando <span class="command"><strong>dd</strong></span> (lendo essa quantidade de 
+bytes do inicio do disco (512 x 4040) e salvando no arquivo <code class="filename">/backup/backup-luks-dd.img</code>):
+     </p><span class="command"><strong>
+dd if=/dev/sdc1 of=/backup/backup-luks-dd.img bs=512 count=4040
+     </strong></span><p>
+Você verá uma saída como:
+     </p><pre class="screen">
+271+1 registros de entrada
+271+1 registros de saída
+138856 bytes (139 kB, 136 KiB) copiados, 0,00123232 s, 92,8 MB/s
+    </pre><p>
+  <span class="emphasis"><em>OBS:</em></span> Como sugerido anteriormente, armazene o backup em um local protegido
+e de preferencia em um outro computador e criptografado com GPG, para garantir dupla segurança
+e integridade dos dados armazenados (veja <a class="xref" href="ch07s11.html#d-cripto-gpg-e" title="Encriptando Dados">“Encriptando Dados”</a>).
+      </p></li></ol></div><p>
+A partir desse ponto, a restauração do backup é bastante simples. Basta copiar o arquivo
+contendo o backup do cabeçalho com <code class="filename">/backup/backup-luks-dd.img</code> e 
+executar o comando:
+</p><span class="command"><strong>
+dd if=/backup/backup-luks-dd.img of=/dev/sdc1 bs=512 count=4040
+</strong></span><p>
+O backup será integralmente restaurado e você poderá conferir se o cabeçalho está novamente
+íntegro com <a class="xref" href="ch07s12.html#s-criptografia-fs-cryptsetup-header-dump" title="Fazendo dump do cabeçalho de dispositivos">“Fazendo dump do cabeçalho de dispositivos”</a> e acessando 
+novamente o sistema ce arquivos criptografado.
+</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-reencrypt"></a>Convertendo automaticamente sistemas para criptografia e desconvertendo</h3></div></div></div><p>
+O <span class="command"><strong>cryptsetup</strong></span> possui o comando <span class="command"><strong>cryptsetup-reencrypt</strong></span> que é usado 
+para converter um sistema não encriptado para um sistema LUKS.
+</p><p>
+ <span class="emphasis"><em>ATENÇÃO!</em></span> É fortemente recomendável que faça um backup completo dos dados
+ que serão criptografados sob risco de perda de dados durante o processo automatizado!
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-cryptsetup-reencrypt-conv"></a>Convertendo a partição para Criptografica</h3></div></div></div><p>
+Supondo que desejamos converter o dispositivo <code class="filename">/dev/sdc1</code> para criptografia, 
+executamos o seguinte procedimento:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Primeiro, rodar o fsck na partição, para assegurar que a mesma encontre-se totalmente íntegra:
+     </p><span class="command"><strong>
+e2fsck -f /dev/sdc1
+   </strong></span><pre class="screen">
+
+e2fsck 1.43-WIP (18-May-2015)
+Pass 1: Checking inodes, blocks, and sizes
+...
+/dev/sdc1: 12/166320 files (0.0% non-contiguous), 28783/665062 blocks
+    </pre></li><li class="listitem"><p>
+  Depois precisamos reduzir o tamanho do sistema de arquivos para o menor tamanho 
+  possível (considerando os arquivos armazenados). Assumindo que o sistema de arquivos 
+  atual é um <code class="literal">EXT?</code>, para isso usaremos o <span class="command"><strong>resize2fs</strong></span>
+  com o <code class="literal">-M</code>:
+     </p><span class="command"><strong>
+resize2fs -M /dev/sdc1
+     </strong></span><pre class="screen">
+resize2fs 1.43-WIP (18-May-2015)
+Resizing the filesystem on /dev/sdc1 to 26347 (4k) blocks.
+The filesystem on /dev/sdc1 is now 26347 (4k) blocks long.
+      </pre><p>
+O objetivo disso é reservar 'espaço livre' na partição para que a mesma
+tenha espaço suficiente para armazenar os arquivos que estão sendo encriptados.
+      </p><p>
+Por experiência própria, recomendo ter pelo menos 40% de espaço em disco livre, 
+principalmente se estiver armazenando arquivos muito grandes, onde cada um ocupe
+pelo menos 1% de espaço em seu disco.
+      </p></li><li class="listitem"><p>
+Agora rodaremos o comando de encriptação:
+     </p><span class="command"><strong>
+cryptsetup-reencrypt /dev/sdb1 --new  --reduce-device-size 4096S
+     </strong></span><pre class="screen">
+WARNING: this is experimental code, it can completely break your data.
+Enter new passphrase: 
+Progress: 100,0%, ETA 00:00, 2596 MiB written, speed  37,6 MiB/s
+     </pre></li><li class="listitem"><p>
+  Agora abriremos o dispositivo após reencriptação inicial. Neste passo você 
+especificará a senha de descriptografia/acesso ao sistema de arquivos:
+      </p><span class="command"><strong>
+cryptsetup open /dev/sdc1 recrypt
+      </strong></span><pre class="screen">
+Enter passphrase for /dev/sdc1: 
+...
+        </pre></li><li class="listitem"><p>
+Agora o último passo será voltar o sistema de arquivos ao tamanho original, após a conversão 
+para criptografia. Novamente usaremos o <span class="command"><strong>resize2fs</strong></span>:
+       </p><span class="command"><strong>
+resize2fs /dev/mapper/recrypt
+       </strong></span><p>
+Você verá a seguinte saída do comando:
+       </p><pre class="screen">
+resize2fs 1.43-WIP (18-May-2015)
+Resizing the filesystem on /dev/mapper/recrypt to 664807 (4k) blocks.
+The filesystem on /dev/mapper/recrypt is now 664807 (4k) blocks long.
+      </pre></li><li class="listitem"><p>
+Pronto, a partir de agora, o sistema está pronto para uso, bastando montar o dispositivo 
+(que já foi decriptado), com:
+        </p><pre class="screen">
+mount /dev/mapper/recrypt /mnt
+        </pre></li></ol></div></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s11.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s13.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Usando o <span class="command"><strong>GPG</strong></span> para Autenticação e Criptografia </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Criptografia de arquivos usando ENCFS</td></tr></table></div></body></html>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Certificados com extensões X509 V3</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s08.html" title="Teste de cliente/servidor SSL/TLS com openssl" /><link rel="next" href="ch07s10.html" title="Alternativas seguras a serviços sem criptografia" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Certificados com extensões X509 V3</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s08.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s10.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Certificados com extensões X509 V3</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-x509-extensions-v3"></a>Certificados com extensões X509 V3</h2></div></div></div><p>
+Os certificados com extenções X509 V3 basicamente extendem a funcionalidade básica de 
+campos dos certificdos convencionais. gerlamente possuem a versão em hexadecimal 
+<span class="emphasis"><em>0x2</em></span> (corresponde a 3). Com <span class="emphasis"><em>extensões de certificados 
+V3</em></span>, você poderá adicionar detalhes como o <code class="literal">alternative
+Subject Name</code> e restrições de utilização, como por exemplo,
+ele não poder ser usados para criar outros certificados.
+</p><p>
+Algumas extensões contém campos onde podemos especificar OIDs e geralmente é recomendado 
+que objetos como extensões e restrições, sejam incluidas no formato de uma OIDEssas OIDs 
+(assim como  no <span class="command"><strong>SNMP</strong></span>) são utilizadas como identificador único de objetos, como 
+uma empresa ou extensão de certificado. 
+</p><p> 
+O utilização de uma extensão OID ocorre da seguinte forma: Se uma extensão com um OID
+for encontrado no certificado e estiver marcado como <span class="emphasis"><em>critical</em></span>, 
+a aplicação <span class="emphasis"><em>precisará</em></span> interpretadr a extensão incluindo qualquer
+parametro <span class="emphasis"><em>opcional</em></span> relacionado a ela, caso contrário o certificado
+será rejeitado.
+</p><p>
+Exemplo certificado X.509 V3:
+</p><pre class="screen">
+Data:
+  Version:  v3
+  Serial Number: 0x1
+  Signature Algorithm: SHA1withRSA - 1.2.240.113747.1.1.5
+  Issuer: CN=Certificate Manager,OU=tecnologia,O=spiritsec,L=Vitoria,ST=ES=BR
+  Validity: 
+    Not Before: Friday, February 21, 2015 08:00:10 AM PST America/Sao_Paulo
+    Not  After: Monday, February 21, 2017 08:00:10 AM PST America/Sao_Paulo
+  Subject: CN=Certificate Manager,OU=tecnologia,O=spiritsec,L=Vitoria,ST=ES,C=BR
+  Subject Public Key Info: 
+    Algorithm: RSA - 1.2.240.113747.1.1.1
+    Public Key: 
+      Exponent: 65537
+      Public Key Modulus: (2048 bits) :
+        E3:71:2A:CE:E4:24:DC:C4:AB:DF:A3:2E:80:42:0B:D9:
+        CE:50:BE:88:4A:5C:C5:B3:73:BF:49:4D:77:31:8A:88:
+        15:A3:56:5F:E4:93:68:83:00:BB:4F:C0:47:03:67:F1:
+        30:76:43:00:10:28:A8:97:70:40:CA:64:FA:9E:42:DF:
+        35:3D:0E:05:C6:09:F2:47:0B:D5:CE:24:DD:0A:F7:84:
+        4E:FA:16:09:3B:91:D3:EE:24:E9:AF:F6:A1:49:E1:96:
+        70:DE:6F:02:BE:3A:07:1A:0B:FD:FE:2F:75:FD:F9:FC:
+        63:69:36:06:5B:09:C6:84:92:17:9C:3E:64:C3:C4:C9
+  Extensions: 
+    Identifier: Netscape Certificate Type - 2.16.240.1.113747.1.1
+      Critical: no 
+      Certificate Usage: 
+        SSL CA 
+        Secure Email BR
+        ObjectSigning BR
+    Identifier: Basic Constraints - 2.5.29.19
+      Critical: yes 
+      Is CA: yes 
+      Path Length Constraint: UNLIMITED
+    Identifier: Subject Key Identifier - 2.5.29.14
+      Critical: no 
+      Key Identifier: 
+        2B:36:84:87:27:A3:F5:9D:8E:63:E4:BE:77:EF:AF:79:
+        9C:32:85:83
+    Identifier: Authority Key Identifier - 2.5.22.35
+      Critical: no 
+      Key Identifier: 
+        3A:45:31:85:23:BC:F5:9D:8E:64:E3:BE:79:EF:AF:73:
+        92:68:88:84
+    Identifier: Key Usage: - 2.5.29.15
+      Critical: yes 
+      Key Usage: 
+        Digital Signature 
+        Key CertSign 
+        Crl Sign 
+  Signature: 
+    Algorithm: SHA1withRSA - 1.2.240.113747.1.1.5
+    Signature: 
+      AB:96:65:3D:10:FA:C7:AA:74:38:2D:93:54:32:C0:5B:
+      23:18:93:E9:7C:32:E6:AA:4F:4E:38:93:61:83:3A:6A:
+      A1:11:91:C2:D2:A3:48:0A:6C:07:54:A8:B8:42:0E:B4:
+      E1:AE:42:B4:B5:36:24:4A:4F:83:61:64:13:69:03:DF:
+      40:88:0B:CB:39:57:8C:6A:9F:52:7E:26:F9:24:5E:E7:
+      BA:FB:FD:93:13:AF:24:3A:8F:DB:E3:DC:C9:F9:1F:67:
+      AA:BD:0B:95:84:9D:EB:FA:02:95:A0:49:2C:05:D4:B0:
+      30:EA:A6:80:30:20:FF:B5:85:C8:4B:74:D9:DC:BB:50
+</pre></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s08.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s10.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Teste de cliente/servidor SSL/TLS com openssl </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Alternativas seguras a serviços sem criptografia</td></tr></table></div></body></html>

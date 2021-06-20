@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Protegendo BIOS e o GRUB2</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch08.html" title="Capítulo 8. Segurança de Host" /><link rel="prev" href="ch08s03.html" title="Desativando softwares e serviços desnecessários" /><link rel="next" href="ch08s05.html" title="Limitando o uso de recursos de usuários" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Protegendo BIOS e o GRUB2</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch08s03.html">Anterior</a> </td><th width="60%" align="center">Capítulo 8. Segurança de Host</th><td width="20%" align="right"> <a accesskey="n" href="ch08s05.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch08.html">Segurança de Host</a></span> &gt; <span class="breadcrumb-node">Protegendo BIOS e o GRUB2</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-hostsecurity-biosgrub2prot"></a>Protegendo BIOS e o GRUB2</h2></div></div></div><p>
+Versão em vídeo desta seção pode estar disponível no canal do <span class="emphasis"><em>Guia Foca</em></span> no YouTube: 
+<a class="link" href="https://rdr.guiafoca.org/gf-segur-hostsec-biosgrub2prot" target="_top">OpenSCAP e validação de conteúdo SCA</a>.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-biosgrub2prot-"></a>Senha no GRUB2</h3></div></div></div><p>
+A proteção de senha do grub2 pode ser utilizada para:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Proteger todas as entradas de menu</p></li><li class="listitem"><p>Específicas entradas</p></li><li class="listitem"><p>Para usuários específicos, por exemplo, 
+o usuário Gleydson pode acessar o Linux, mas não o Windows no modo
+de recuperação, que é acessível pela Michelle</p></li></ol></div><p>
+Para adicionar a proteção de boot no <span class="command"><strong>Grub</strong></span>, você tem as seguintes opções:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+O administrador deve ativar a proteção de senha manualmente editando os arquivos
+de configuação do grub
+    </p></li><li class="listitem"><p>
+Usuários e senhas devem ser identificados no arquivo <code class="filename">/etc/grub.d/00_header</code> 
+ou outro arquivo de script do Grub.
+</p></li><li class="listitem"><p>
+ A proteção de entradas específicas deve ser identificada em um dos arquivos abaixo:
+   <span class="emphasis"><em>a</em></span> - editando scripts em <code class="filename">/etc/grub.d/10_linux</code> e <code class="filename">30_os-prober</code>
+   <span class="emphasis"><em>b</em></span> - Editando o aruivo de configuração customizado criado pelo usuário
+   <span class="emphasis"><em>c</em></span> - Um dos métodos acima fazem o grub automaticamente adicionar o requisito de senha
+       se o update-grub for rodado
+   <span class="emphasis"><em>d</em></span> - Se o arquivo <code class="filename">grub.cfg</code> for editado diretamente. A proteção de senha será perdida
+quando o <span class="command"><strong>update-grub</strong></span> rodar
+</p></li><li class="listitem"><p>
+Se qualquer forma de proteção de senha do <span class="command"><strong>grub2</strong></span> for ativada. O nome e senha de 
+superusuario serao requeridos para ter acesso a linha de comando do <span class="command"><strong>grub2</strong></span> e modos
+de edição de menu
+</p></li><li class="listitem"><p>
+O username e senha pode ser diferente do login/senha de sistema
+</p></li><li class="listitem"><p>
+Até que a encriptação do grub2 seja usada, a senha é armazenada em texto plano
+em um arquivo legível, o ideal é ativar a encriptação de arquivo.
+  </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-biosgrub2prot-prompt-opts"></a>Protegendo opçoes do prompt do Grub2</h3></div></div></div><p>
+Para proteção contra a entrada do menu de edição e uso de opções como
+single user, etc, no grub 0.97 crie uma senha com <span class="command"><strong>grub-md5-crypt</strong></span> e então use a opção
+no <code class="filename">grub.cfg</code>:
+
+</p><pre class="screen">
+password --md5 hash_do_grub-md5-crypt
+</pre><p>
+</p><p>
+Desta forma, o sistema sempre lhe pedirá uma senha quando acessar o menu
+de edição do grub.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-biosgrub2prot-bootprot"></a>Protegendo o sistema com senha de boot do Grub</h3></div></div></div><p>
+Esta instruções são válidas para a versão 2 do Grub. Antes mesmo do sistema
+sistema operacional ser carregado, o <span class="command"><strong>Grub2</strong></span> permite acesso aos 
+arquivos armazenados no sistema de arquivos. Usuários <span class="emphasis"><em>sem permissão de root</em></span> 
+podem acessar arquivos do <span class="command"><strong>Linux</strong></span> no qual nâo deveriam ter acesso, assim que o 
+<span class="command"><strong>Grub </strong></span>carregar. Para bloquear este tipo
+de acesso e evitar que os usuários iniciem certos sistemas operacionais, defina
+uma senha de boot.
+</p><p>
+<span class="emphasis"><em>OBS</em></span>: Com o uso de senha, a splash screen tradicional não é mostrada.
+</p><p>
+O procedimento para gerar é o seguinte:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Entre como root
+</p></li><li class="listitem"><p>
+ Encripte a senha usando grub2-mkpasswd-pbkdf2:
+ </p><pre class="screen">
+grub2-mkpasswd-pbkdf2
+Password: ****
+Reenter password: ****
+PBKDF2 hash of your password is grub.pbkdf2.sha512.10000.3CA4611006FE96BC22..
+ </pre><p>
+ </p></li><li class="listitem"><p>
+Cole a string encriptada gerada no arquivo <span class="command"><strong>/etc/grub.d/40_custom</strong></span> junto com o comando
+<span class="command"><strong>set superusers</strong></span>. As linhas comentadas devem ser mantidas no inicio do aquivo, pois
+são usadas pelos scripts de manutenção de arquivos do grub:
+</p><pre class="screen">
+set superusers="root"
+password_pbkdf2 root grub.pbkdf2.sha512.10000.9CA4611006FE96BC77A
+export superusers
+</pre><p>
+</p><p>
+Para definir a senha em texto plano (não recomendável) a entrada a seguir pode
+ser usada:
+</p><p>
+</p><pre class="screen">
+password root senha1234
+</pre><p>
+</p></li><li class="listitem"><p>
+Execute em seguida: grub2-mkconfig -o /boot/grub2/grub.cfg
+</p></li></ol></div><p> 
+Agora reinicie a máquina. Após o reboot, você será perguntardo pelo usuário 
+e senha para tentar iniciar qualquer entrada no menu. Caso as credenciais 
+estiverem corretas, o sistema inicializará a entrada selecionada do menu.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-biosgrub2prot-menuentries"></a>Protegendo entradas de menus do Grub</h3></div></div></div><p>
+As entradas <span class="emphasis"><em>menuentry</em></span> do Grub podem ser protegidas com os 
+seguintes parâmetros:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+ A presença de <span class="emphasis"><em>--unrestricted</em></span> desativa a proteção de senha
+ </p></li><li class="listitem"><p>
+A presença de <span class="emphasis"><em>--users</em></span> ativa a proteção de senha para usuários específicos,
+por exemplo:
+<span class="emphasis"><em>--users "Jane"</em></span> - autoriza o superusuario e "Jane"
+<span class="emphasis"><em>--users Jane,Sergio</em></span> - autoriza o superusuario e "Jane" e "Sergio".
+  </p></li></ol></div><p>
+Seguem mais exemplos de sintaxe no menu do <span class="emphasis"><em>Grub2</em></span>:
+</p><pre class="screen">
+# Todos os usuários (nenhuma proteção)
+menuentry 'Ubuntu, with Linux 3.6.0-14-generic' --class ubuntu -class os --unrestricted {
+
+# Somente superusuário:
+menuentry 'Ubuntu, with Linux 3.6.0-14-generic' --class ubuntu -class os --users "" {
+
+# Superuser e gleydson:
+menuentry 'Ubuntu, with Linux 3.6.0-14-generic' --class ubuntu -class os --users gleydson {
+
+# Superuser, gleydson, foca:
+menuentry 'Ubuntu, with Linux 3.2.0-24-generic' --class ubuntu -class os --users gleydson,foca {
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-biosgrub2prot-protwinrecovery"></a>Protegendo a partição de recuperação do Windows</h3></div></div></div><p>
+Note que este método somente funciona se o <span class="command"><strong>Grub2</strong></span> identificar uma partição de recovery do Windows:
+</p><pre class="screen">
+1 - Determine a partição recovery do Window. altere sdXY para os valores corretos
+2 - No 30_os-prober:
+</pre><p>
+ Altere a entrada no menu de:
+ </p><pre class="screen">
+menuentry "${LONGNAME} (on ${DEVICE})" --class windows --class os {
+</pre><p>
+Para
+</p><pre class="screen">
+if [ ${DEVICE} = "/dev/sdXY" ]; then
+menuentry "${LONGNAME} (on ${DEVICE})" --users "" {
+else
+menuentry "${LONGNAME} (on ${DEVICE})" {
+fi
+</pre><p>
+Finalmente, execute o <span class="command"><strong>update-grub</strong></span> para atualizar o 
+<code class="filename">/boot/grub/grub.cfg</code>.
+</p></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch08s03.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch08.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch08s05.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Desativando softwares e serviços desnecessários </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Limitando o uso de recursos de usuários</td></tr></table></div></body></html>

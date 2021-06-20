@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Criptografia de arquivos usando ENCFS</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s12.html" title="Criptografia de blocos usando DM-Crypt / cryptsetup" /><link rel="next" href="ch07s14.html" title="Usando o eCryptfs para encriptar arquivos, montagem automatica do home" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Criptografia de arquivos usando ENCFS</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s12.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s14.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Criptografia de arquivos usando ENCFS</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-fs-encfs"></a>Criptografia de arquivos usando ENCFS</h2></div></div></div><p>
+Versão em vídeo desta seção pode estar disponível no canal do <span class="emphasis"><em>Guia Foca</em></span> no <span class="command"><strong>YouTube</strong></span>: 
+<a class="link" href="https://rdr.guiafoca.org/gf-segur-cripto-encfs" target="_top">Criptografia com o EncFS</a>.
+</p><p>
+O <span class="command"><strong>ENCFS</strong></span> é uma ferramenta userspace para criptografia no sistema de arquivos.
+parecida com o <span class="command"><strong>eCryptfs</strong></span> (veja <a class="xref" href="ch07s14.html" title="Usando o eCryptfs para encriptar arquivos, montagem automatica do home">“Usando o eCryptfs para encriptar arquivos, montagem automatica do home”</a>) e tem como objetivo deixar dados 
+seguros com o mínimo de trabalho possível e em sistemas onde você possui somente 
+acesso usuário. Basicamente ele trabalha encriptando uma pasta existente utilizando o 
+<span class="command"><strong>FUSE</strong></span> para montar e encriptar diretórios.
+</p><p>
+Devido a isso, sua funcionalidade é bem simples, e não depende de módulos
+ee kernel adicionais que podem não existir na máquina que está configurando.
+</p><p>
+Ele não utiliza <code class="literal">loopback</code> ou devicemapper como o <code class="literal">dm-crypt</code>
+(veja NNNNNNNN)
+ e <code class="literal">TrueCrypt</code> (veja NNNNNNNN).
+</p><p>
+O <span class="command"><strong>EncFS</strong></span> é definitivamente o software mais simples se desejar criptografia
+de arquivos no <span class="command"><strong>Linux</strong></span>.
+</p><p>
+Uma das maiores vantagens dele em cima de outros sistemas, é não requerer privilégios
+de super usuário (root) para funcionar, e qualquer usuário pode implementa-lo. Ele também 
+não precisa criar um arquivo simples e criar um sistema de arquivos dentro dele; É usado um 
+sistema de arquivos atual sem modificações.
+</p><p>
+Ele também é cross plataforma (enquanto o <span class="command"><strong>eCryptfs</strong></span> é ligado ao 
+<span class="command"><strong>Linux</strong></span>),
+a criptografia é feita arquivo a arquivo, o que permite inúmeras 
+vantagens como a criptografia de arquivos armazenados em storage de objetos (<code class="literal">Dropbox</code>, 
+<code class="literal">Google Drive</code>, <code class="literal">OneDrive</code>, etc)
+</p><p>
+É possível também fazer um 2FA armazenando a chave de volume fora do
+sistema de arquivos de origem do EnCFS.
+</p><p>
+Outra vantagem; como a criptografia é feita individualmente, por 
+arquivo, isso reduz o risco de corrompimento a apenas um arquivo.
+</p><p>
+Isto também cria algumas desvantagens: Como os aquivos encriptados não 
+estão armazenados em um arquivo único de imagem, alguém com acesso ao sistema ainda
+pode ser a estrutura de diretórios, o número de arquivos, tamanhos e quando
+foram modificados. Eles no entanto não poderão ver o conteúdo.
+</p><p>
+Outra vantagem em cima do <span class="command"><strong>eCryptfs</strong></span> é que não precisa se lembrar 
+de todos os parametros para armazenamento da criptografia (ciphers, key type, etc), pois
+todos são armazenados no arquivo <code class="filename">.encfs6.xml</code>. Você só precisa 
+se lembrar da frase-senha.
+</p><p>
+<span class="emphasis"><em>OBS</em></span>: A implementação atual do encfs é vulnerável a múltiplos 
+ataques, um deles é a dedução de dados usando redução de complexidade de descriptografia.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-encfs-limitacoes"></a>Limitações</h3></div></div></div><p>
+O <span class="command"><strong>EncFS</strong></span> possui as seguintes limitações
+Qualquer um com acesso ao diretório de origem, poderá ver o tamanho de 
+arquivos, quantos arquivos estão armazenados, que permissões possuem
+o tamanho aproximado, e quando foram modificados pela última vez, mesmo
+eles estando criptografados.
+</p><p>
+Sem suprote a nomes de arquivos muito longos. Limitado 
+a 190 caracteres.
+</p><p>
+Utilize a versão 1.9 ou superior para menos riscos de segurança do 
+padding no final de arquivos.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-encfs-install"></a>Instalando</h3></div></div></div><p>
+Para instalar o <span class="command"><strong>encfs</strong></span>, execute o seguinte comando:
+<span class="command"><strong>apt install encfs</strong></span>
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-encfs-configurando"></a>Criando a Criptografia</h3></div></div></div><p>
+Para criar um sistema de arquivos criptografado, execute o seguinte comando:
+<span class="command"><strong>
+encfs /diretorio/origem /diretorio/destino
+</strong></span>
+</p><p>
+Será perguntado a opção de nível de segurança usada. Selecione
+<code class="literal">p</code> para usar o modo paraóico. O sistema então 
+lhe perguntará a frase-senha
+</p><p>
+Agora os arquivos podem ser gravados na pasta destino. Note que o 
+arquivo <code class="filename">.encfs6.xml</code> será gravado em cada pasta 
+individual que utiliza a criptografia.
+</p><p>
+para desmontar o sistema de arquivos, digite:
+fusermount -u /diretorio/destino
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-encfs-pwChange"></a>Alterando a senha</h3></div></div></div><p>
+Para alterar a senha definida para acesso ao sistema de arquivos encriptado com o 
+<span class="command"><strong>EncFS</strong></span>, use o seguinte comando:
+<span class="command"><strong>
+encfsctl passwd /diretorio/origem
+</strong></span>
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-encfs-fstab"></a>Montando via fstab</h3></div></div></div><p>
+O formato para adição da montagem automatica no <code class="filename">/etc/fstab</code> é o seguinte:
+</p><pre class="screen">
+encfs#/diretorio/origem /diretorio/destino fuser noauto,user 0 0
+</pre></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s12.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s14.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Criptografia de blocos usando DM-Crypt / cryptsetup </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Usando o eCryptfs para encriptar arquivos, montagem automatica do home</td></tr></table></div></body></html>

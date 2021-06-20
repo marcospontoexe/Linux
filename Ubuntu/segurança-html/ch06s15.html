@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Restrições no hardware do sistema</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s14.html" title="Suporte a senhas com algorítmo SHA e md5" /><link rel="next" href="ch07.html" title="Capítulo 7. Criptografia" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Restrições no hardware do sistema</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s14.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch07.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Restrições no hardware do sistema</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-hardware"></a>Restrições no hardware do sistema</h2></div></div></div>
+<p>
+As restrições descritas aqui são úteis para diminuir as chances de um ataque
+por acesso físico ser realizado com sucesso no sistema que desejamos proteger.
+</p>
+<p>
+Ter um sistema totalmente seguro é praticamente impossível, mas existem
+diversas maneiras de se dificultar as coisas.
+</p>
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-hardware-bios"></a>BIOS do sistema</h3></div></div></div>
+<p>
+Algumas restrições podem ser configuradas na para diminuir as chances de se
+obter acesso <code class="literal">root</code> (usando métodos conhecidos de recuperação
+via disquete/CD inicializável) ou simplesmente aumentar nossa confiança no
+sistema:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+Coloque uma senha para entrada no Setup da máquina, compartilhe esta senha
+<span class="strong"><strong>somente</strong></span> com as pessoas que tem poder de root
+(ou seja, pessoal de confiança que administra a máquina).
+</p>
+</li><li class="listitem">
+<p>
+Mude a seqüencia de partida para somente sua unidade de disco rígido que contém
+o sistema operacional.  As BIOS trazem convenções de DOS para especificar o
+método de partida, então <span class="emphasis"><em>Only C</em></span> quer dizer somente o
+primeiro disco rígido, <span class="emphasis"><em>SCSI</em></span> tentar dispositivos SCSI
+primeiro, etc.  Isso pode variar de acordo com o modelo de sua BIOS.
+</p>
+</li></ul></div>
+<p>
+Com os dois ítens acima qualquer um ficará impedido de inicializar o sistema a
+partir de um disco de recuperação ou entrar no Setup para modificar a ordem de
+procura do sistema operacional para dar a partida via disquetes.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-hardware-floppy"></a>Retirada da unidade de disquetes</h3></div></div></div>
+<p>
+Como não é seguro confiar nas restrições de senha da BIOS (qualquer um com
+conhecimentos de hardware e acesso físico a máquina pode abrir o gabinete e dar
+um curto na bateria que mantém os dados na CMOS ou aterrar o pino de sinal da
+CMOS), a retirada da unidade de disquetes é recomendada, isso dificultará
+bastante as coisas.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-hardware-netboot"></a>Placas de rede com eprom de boot</h3></div></div></div>
+<p>
+Evite a utilização de placas de rede com recursos de boot via EPROM no
+servidor, um servidor dhcp/bootp/tftp poderá ser configurado sem problemas por
+um cracker na rede (caso a BIOS esteja com a ordem inadequada de procura de
+discos) e o ataque se dar com mais "sofisticação" e rapidez.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-hardware-lilo"></a>Protegendo o LILO</h3></div></div></div>
+<p>
+A opção <span class="emphasis"><em>passwd=senha</em></span> e <span class="emphasis"><em>restricted</em></span>
+poderão ser usadas na seção da imagem que desejamos proteger.  Respectivamente
+pedem uma senha para a inicialização do sistema e caso argumentos como
+<span class="emphasis"><em>root=single</em></span> sejam usados para conseguir acesso
+<code class="literal">root</code> sem fornecer senha.
+</p>
+<p>
+E deixe somente as permissões de acesso ao usuário <code class="literal">root</code>
+(caso contrário sua senha poderá ser vista por qualquer usuário) e modifique os
+atributos deste arquivo para imutável para que nem mesmo o
+<code class="literal">root</code> possa modifica-lo: <code class="literal">chattr +i
+/etc/lilo.conf</code>.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-hardware-harddisk"></a>Disco rígido</h3></div></div></div>
+<p>
+O disco rígido do servidor poderá se retirado como alternativa para se ter
+acesso aos dados armazenados.  Isto poderá ser dificultado com o uso de lacres
+de disco ou outras maneiras de dificultar mais esta tarefa (mais parafusos,
+armazenamento em partes de difícil manipulação do HD, etc) qualquer coisa que
+possa lhe fazer ganhar tempo e despertar suspeitas para evitar o sucesso desta
+alternativa (ousada).
+</p>
+<p>
+Dados importantes ou confidenciais poderão ser armazenados em um sistema de
+arquivos criptografados e serem montados somente pelos administradores que
+possuem acesso físico ao sistema.  O algoritmo <span class="emphasis"><em>Serpent</em></span> é
+muito forte na proteção de dados além de possuir um ótimo desempenho.  Patches
+de criptografia poderão ser aplicados no kernel para ativação deste recurso
+(veja <a class="xref" href="">???</a>) para detalhes.
+</p>
+<p>
+Sensores podem ser ligados na carcaça do HD como forma de disparar um pequeno
+alarme embutido no gabinete do servidor, se você gosta de eletrônica poderá
+montar um destes facilmente para chamar a atenção alimentado por fonte/baterias
+em um circuito de emergência, e poderá acomodar sua caixa em uma segunda
+"carcaça de fonte" apenas para desviar suspeitas.  Um circuito interno de
+câmeras também é uma boa alternativa para monitorar a movimentação.
+</p>
+<p>
+Esquemas de segurança dependendo do porte da organização e dos dados que se
+desejam proteger deverão ser elaborados e postos em prática.  Todos os métodos
+imagináveis deverão ser considerados de acordo com as possibilidades do
+ambiente.
+</p>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s14.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Suporte a senhas com algorítmo SHA e md5 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Capítulo 7. Criptografia</td></tr></table></div></body></html>

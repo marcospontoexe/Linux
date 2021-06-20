@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Tipos de ataques mais comuns para se conseguir uma senha.</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch04.html" title="Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas" /><link rel="prev" href="ch04s02.html" title="Criação, monitoramento e segurança de contas" /><link rel="next" href="ch04s04.html" title="Melhorando a segurança das senhas armazenadas em seu sistema" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Tipos de ataques mais comuns para se conseguir uma senha.</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04s02.html">Anterior</a> </td><th width="60%" align="center">Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas</th><td width="20%" align="right"> <a accesskey="n" href="ch04s04.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch04.html">Gerenciamento de contas e cuidados para a proteção de senhas</a></span> &gt; <span class="breadcrumb-node">Tipos de ataques mais comuns para se conseguir uma senha.</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-contas-ataques"></a>Tipos de ataques mais comuns para se conseguir uma senha.</h2></div></div></div>
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-ataques-deducao"></a>Dedução</h3></div></div></div>
+<p>
+O cracker se aproveita da ingenuidade de usuários que deixam senhas em branco,
+usam senhas simples como o próprio nome, "abcdef", "asdfg", "123456", e outros
+tipos de senhas comuns para tentar obter acesso ao sistema.  Senhas deduzidas
+são geralmente senhas muito simples e muito usadas...  Uma situação comum para
+a escolha de uma senha deste tipo é o medo de esquecer a senha (quando não se
+consegue pensar em algo mais difícil e ao mesmo tempo que seja fácil de
+lembrar) e quando o usuário é pego desprevenido e não se sabe o que usar como
+senha (como na assinatura de um provedor Internet, muito comum essa situação).
+</p>
+<p>
+Geralmente é muito rápido e muito eficaz dependendo das habilidades do atacante
+dispõe.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-ataques-engsocial"></a>Engenharia Social</h3></div></div></div>
+<p>
+Ataques por engenharia social são feitos através de pesquisa de dados pessoais
+e outras características relacionadas ao usuário (time de futebol, data de
+nascimento dele, da esposa, filhos, nome da atriz predileta, etc) e usando
+estes dados coletados para auxiliar na descoberta da senha.  Este ataque requer
+uma pesquisa sobre os hábitos, gostos, etc.  Mas existem outros tipos de ataque
+baseados em engenharia social, inclusive com o cracker passando-se pelo
+usuário.  Para diminuir as possibilidades deste tipo de ataque entenda e siga
+os procedimentos da parte "Senhas Boas" na <a class="xref" href="ch04s02.html#d-contas-cms-senhas" title="Senhas fáceis de adivinhar e a escolha de boas senhas">“Senhas fáceis de adivinhar e a escolha de boas senhas”</a> e continue lendo esta seção.
+</p>
+<p>
+Outro detalhe importante para diminuir as possibilidades de um ataque deste
+tipo bem sucedido é permitir somente o acesso do serviço de
+<span class="command"><strong>finger</strong></span> a redes confiáveis (locais onde uns conhecem os
+outros).  Os detalhes fornecidos pelo finger podem ser suficientes para
+garantir sucesso deste tipo de ataque:
+</p>
+<pre class="screen">
+#finger joao
+Login: joao          			Name: Joao P. M.
+Directory: /home/joao              	Shell: /bin/bash
+Office: Sala 400 Andar 2, 123-4567  Home: 123-7654
+Last login Fri Aug 25 21:20 (AMT) on tty3
+No mail.
+Grupo de cadastramento.
+</pre>
+<p>
+As últimas linhas da saída do finger são os dados contidos nos arquivos
+<code class="filename">.plan</code> e <code class="filename">.project</code> do diretório de
+usuário.  O cracker com base nos dados fornecidos acima pelo finger poderia
+inventar uma situação em que necessitaria de troca de senha por algum motivo.
+Abaixo uma situação onde o cracker sabe que não existe identificador de
+chamadas na empresa e conhece as fragilidades:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+Cracker: Disca para o CPD?
+</p>
+</li><li class="listitem">
+<p>
+Vitima: CPD?
+</p>
+</li><li class="listitem">
+<p>
+Cracker: Oi, eu sou o Joao P.  M.  do grupo de cadastramento aqui do segundo
+andar, estou tentando entrar no sistema mas por algum motivo ele não aceita
+minha senha (fazendo-se de ignorante no assunto).
+</p>
+</li><li class="listitem">
+<p>
+Vitima: Por favor Sr. verifique se o Caps Lock do seu teclado está ativado,
+letras em maiúsculas/minúsculas fazem diferença em nossos sistemas.
+</p>
+</li><li class="listitem">
+<p>
+Cracker: Ok vou checar (espera um tempo).  Não, esta tudo Ok, você poderia
+agilizar isto de alguma maneira, preciso lançar algumas fichas no sistema.
+</p>
+</li><li class="listitem">
+<p>
+Vitima: Posso modificar sua senha para um nome qualquer, depois você poderá
+trocar por si próprio.
+</p>
+</li><li class="listitem">
+<p>
+Cracker: Ok, por mim tudo bem.
+</p>
+</li><li class="listitem">
+<p>
+Vitima: Humm, modifiquei para "cad1234", basta você usa-la e terá acesso ao
+sistema.  Após isso execute o utilitário passwd para troca-la para algo que
+desejar.
+</p>
+</li><li class="listitem">
+<p>
+Cracker: Ok, muito obrigado.  Tenha um bom dia.
+</p>
+</li></ul></div>
+<p>
+Este é um exemplo simples de ataque por engenharia social.  Dependendo do
+objetivo, este tipo de ataque pode levar semanas e as vezes requer contatos com
+diversas empresas criando diversas situações para obter detalhes necessários
+para atingir o objetivo.
+</p>
+<p>
+As políticas de segurança de senhas minimizam riscos deste tipo.  Como este é
+um caso que o requisitante é um funcionário próximo do departamento de
+informática, o mais adequado seria o administrador se deslocar ao setor (ou
+enviar um técnico do setor treinado para tal situação) para saber se quem diz
+ser quem é está realmente no local enfrentando aquela situação.  O contato com
+o responsável do setor (conhecido do técnico) também pode ser uma alternativa
+antes de entregar uma senha a um desconhecido.
+</p>
+<p>
+Para casos externos (principalmente para empresas que mantém determinados
+serviços em funcionamento em nosso servidor, como servidores de páginas), o
+procedimento correto seria passar uma nova senha por e-mail (de preferência
+criptografado com <span class="command"><strong>pgp</strong></span>) ao invés de telefone.  Isto garantirá
+que a senha não caia nas mãos erradas.
+</p>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> Qualquer detalhe sobre a política de
+criação de senhas, trocas de senhas, etc.  poderá ter muito valor para um
+cracker obter acesso ao seu sistema.
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span> Dificulte as maneiras para se obter
+acesso <code class="literal">root</code> ao sistema via conta de usuário comum.  É de
+extrema importância utilizar conexões de dados criptografadas quando for
+necessário acesso externo ao seu sistema.
+</p>
+<p>
+<span class="strong"><strong>OBS3:</strong></span> Nunca use uma mesma senha para fazer
+tudo (banco, acessar seu sistema, conectar-se ao seu provedor, senha de root).
+Você estará em sérios apuros caso alguém tenha acesso a esta senha.  É difícil
+lembrar de várias senhas, mas você pode aditar uma senha e criar modificações a
+partir dela para utilização em outros locais, por exemplo: "wekpdm" =&gt;
+"Bwekpdm1" =&gt; "3wekpdmS", etc.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-ataques-dicionario"></a>Ataques por dicionário</h3></div></div></div>
+<p>
+De posse do arquivo de senhas <code class="filename">/etc/passwd</code>, o cracker
+utiliza um arquivo que contém diversas palavras que serão tentadas como senha.
+Este trabalho é feito automaticamente por ferramentas dedicadas a este tipo de
+tarefa e pode levar dias dependendo da lista de senhas do cracker e quantidades
+de usuários existentes no arquivo de senha.
+</p>
+<p>
+Note que o uso de criptografia <span class="emphasis"><em>md5</em></span> e <span class="emphasis"><em>senhas
+ocultas</em></span> dificultam bastante ao arquivo de senhas e o sucesso de um
+ataque bem sucedido (veja <a class="xref" href="ch04s04.html#d-contas-segsenhas-shadow" title="Shadow Passwords">“Shadow Passwords”</a> e <a class="xref" href="ch04s04.html#d-contas-segsenhas-sha-md5" title="Senhas Sha512, SHA256 e MD5">“Senhas Sha512, SHA256 e MD5”</a>).
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-ataques-bruteforce"></a>Brute Force</h3></div></div></div>
+<p>
+De posse do arquivo de senhas <code class="filename">/etc/passwd</code> o cracker
+utiliza uma ferramenta que tenta diversas combinações de letras seqüencialmente
+na tentativa de descobrir uma senha.  Este ataque geralmente é usado como
+último recurso após um ataque por dicionário, e leva muito tempo para descobrir
+uma senha.
+</p>
+<p>
+Dependendo se uma senha conter caracteres aleatórios, combinação de letras
+maiúsculas/minúsculas, números, a senha será praticamente impossível de ser
+descoberta.  Note que o uso de criptografia <span class="emphasis"><em>md5</em></span> e
+<span class="emphasis"><em>senhas ocultas</em></span> aumentam bastante a proteção das senhas
+(veja <a class="xref" href="ch04s04.html#d-contas-segsenhas-shadow" title="Shadow Passwords">“Shadow Passwords”</a> e <a class="xref" href="">???</a>).
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-ataques-monteclad"></a>Monitoramento de toques do teclado</h3></div></div></div>
+<p>
+Este ataque (popularmento chamado <span class="emphasis"><em>keylogger</em></span>) é muito comum em sistemas MAC e 
+Windows, um programa malicioso é instalado sem o conhecimento do usuário que grava todos os toques do teclado em um
+arquivo escondido pelo cracker.  Após certo tempo o cracker obtém acesso ao
+arquivo e aos dados que ele contém.  Este tipo de ataque é muito perigoso e
+pode capturar senhas não só do sistema como números de cartão de crédito
+digitados (caso o usuário tenha feito compras on-line), conta bancária+senha e
+tudo mais que for digitado pelo teclado.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-ataques-loginfalso"></a>Login falso</h3></div></div></div>
+<p>
+Esta é uma forma rápida de se conseguir acesso a um sistema.  É criada uma tela
+de login idêntica a original do sistema, só que ao digitar nome e senha, estes
+são gravados em um arquivo (que será mais tarde recuperado pelo cracker para
+obter acesso ao sistema) e uma mensagem de erro será exibida pelo sistema.
+</p>
+<p>
+Naturalmente o usuário pensará que digitou o nome/senha incorretamente e fará
+uma nova tentativa, a segunda ocorrerá com sucesso (fazendo este pensar que
+errou *mesmo* a senha).
+</p>
+<p>
+Sua atenção é muito importante para evitar este tipo de ataque, caso desconfie
+de algo errado, entra no sistema e dê um <code class="literal">find --type f -cmin
+-3</code> para localizar os arquivos modificados nos últimos 3 minutos e
+localizar possíveis bancos de dados de senhas.
+</p>
+<p>
+Outra alternativa é realmente digitar uma senha inválida intencionalmente (e
+diferente da correta) e na segunda tentativa lançar a senha válida (normalmente
+sistemas deste tipo bem elaborados chamam o verdadeiro sistema de login na
+segunda tentativa).
+</p>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04s02.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04s04.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Criação, monitoramento e segurança de contas </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Melhorando a segurança das senhas armazenadas em seu sistema</td></tr></table></div></body></html>

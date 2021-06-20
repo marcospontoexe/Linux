@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Restrições por MAC Address/IP</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s06.html" title="Restrições baseadas em usuário/IP" /><link rel="next" href="ch06s08.html" title="Desabilitando serviços não usados no Inetd" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Restrições por MAC Address/IP</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s06.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s08.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Restrições por MAC Address/IP</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-ipmac"></a>Restrições por MAC Address/IP</h2></div></div></div>
+<p>
+Esta proteção oferece uma barreira maior se segurança contra IPs spoofing
+evitando que pessoas mal intencionadas façam um IP spoofing da máquina para
+obter acessos privilegiados que somente o detentor original do MAC/IP teria.
+Recomendo não levar em consideração que isto seja a solução definitiva contra
+IP spoofing, pois é possível falsificar o MAC address de uma interface para
+tomar outra identidade.
+</p>
+<p>
+Este método poderá ser aplicado para fornecer um maior laço de confiança por
+hardware entre as máquinas que compõem uma rede de servidores.  Ele também
+evita mesmo que uma máquina configurada de forma errônea tenha acesso indevido
+ao servidor ou em uma situação extrema, se torne o gateway da rede.
+</p>
+<p>
+Para restringir as conexões para uma máquina <span class="command"><strong>Linux</strong></span> por MAC
+address, utilize o firewall <span class="command"><strong>iptables</strong></span>.  Com ele será
+permitido fazer a restrição por serviços, criando uma barreira bastante chata
+para crackers tentarem se conectar a um serviço.  Como referência, leia a seção
+<a class="xref" href="ch05s06.html#fw-iptables-mod-mac" title="Especificando o endereço MAC da interface">“Especificando o endereço MAC da interface”</a>.
+</p>
+<p>
+Outra situação é a restrição por par MAC/IP usando o próprio cache arp da
+máquina, usando entradas estáticas de endereços.  Um exemplo deste uso é quando
+você é extremamente paranóico ou quando uma rede que utiliza algum método de
+autenticação baseado no <code class="filename">rhosts</code> (como é o caso do sistema
+de backup do <span class="command"><strong>Amanda</strong></span>), então é importante dizer para as
+máquinas servidoras, qual o MAC address/IP privilegiado que terá o acesso ao
+usuário para conexão sem senha.
+</p>
+<p>
+O local padronizado para definir um MAC estático (e bastante desconhecido da
+maioria dos administradores de sistemas) é o <code class="filename">/etc/ethers</code>.
+O formato deste arquivo é o <code class="literal">MAC Address</code> e
+<code class="literal">IP</code> separados por espaço, cada linha com uma nova entrada de
+MAC Address.  Veja o exemplo:
+</p>
+<pre class="screen">
+00:03:47:AA:AA:AB       www.focalinux.org.br
+00:03:47:BB:AA:BA       www2.focalinux.org.br
+00:03:47:BB:AA:BB       192.168.0.1
+</pre>
+<p>
+Caso não conheça o formato do endereço de MAC Address, os três primeiros 3
+campos definem o fabricante da placa de rede, e os 3 últimos é uma
+identificação única do fabricante para a Placa, ou seja, NENHUMA placa de rede
+fabricada tem o mesmo MAC Address físico.
+</p>
+<p>
+Para que o comando <span class="command"><strong>arp</strong></span> crie as entradas estáticas no seu
+cache ARP, será necessário executar o comando <code class="literal">arp -f
+/etc/ethers</code>.  Este comando poderá ser colocado em algum script ou
+diretório de inicialização de sua distribuição para que seja executado
+automaticamente (como por exemplo, no <code class="filename">/etc/rc.boot</code> da
+<span class="command"><strong>Debian</strong></span>).  Digitando <code class="literal">arp</code> você verá as
+linhas definidas no arquivo <code class="filename">/etc/ethers</code> marcadas com as
+opção (flag) <code class="literal">M</code> (manual/permanente).  Outra forma de
+verificar, é usando o <code class="literal">arp -a máquina</code> ou somente <code class="literal">arp
+-a</code>.  As máquinas especificadas estaticamente (manualmente) terão o
+nome <code class="literal">PERM</code> listados (cache arp permanente).
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Como deve ter notado, a restrição por
+MAC Address implica em um aumento no trabalho de gerenciamento das
+configurações.  Assim, planeje-se para que esta tarefa não seja desgastante,
+crie programas para realizar atualizações dinâmicas estudando a estrutura de
+sua rede e como suas máquinas se comunicam para não ter problemas obscuros
+quando tiver que fazer uma simples modificação em uma interface de rede :)
+</p>
+<p>
+Uma boa configuração restritiva requer análise sobre os impactos na rede.
+</p>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s06.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s08.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Restrições baseadas em usuário/IP </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Desabilitando serviços não usados no Inetd</td></tr></table></div></body></html>

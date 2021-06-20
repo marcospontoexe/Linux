@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Restrições baseadas em usuário/IP</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s05.html" title="Restringindo o comando su" /><link rel="next" href="ch06s07.html" title="Restrições por MAC Address/IP" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Restrições baseadas em usuário/IP</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s05.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s07.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Restrições baseadas em usuário/IP</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-identd"></a>Restrições baseadas em usuário/IP</h2></div></div></div>
+<p>
+O serviço <span class="command"><strong>identd</strong></span> permite identificar os usuários que estão
+realizando conexões TCP, adicionalmente esta característica é usada por
+programas para fazer restrições para usuários em adição ao endereço de
+origem/destino.  A sintaxe usada nas diretivas de acesso é especificada na
+forma <span class="emphasis"><em>usuário@endereço</em></span>.  O <a class="xref" href="">???</a> explica
+a configuração/utilização/vulnerabilidades e recomendações sobre este serviço.
+</p>
+<p>
+Diversos programas que possuem controle de acesso baseado em IP's/hosts aceitam
+esta especificação, como o <span class="command"><strong>exim</strong></span>, <span class="command"><strong>ircd</strong></span>, e
+o conhecido <span class="command"><strong>tcpd</strong></span>.
+</p>
+<p>
+Segue um exemplo da utilização do <span class="command"><strong>identd</strong></span> com o arquivo
+<code class="filename">hosts.allow</code>:
+</p>
+<pre class="screen">
+# Permite o acesso ao serviço de telnet somente ao usuário gleydson conectando
+# a partir da máquina com IP 192.168.1.1
+in.telnetd: gleydson@192.168.1.1
+
+# Permite o acesso ao serviço ftp somente ao usuário gleydson conectando de 
+# qualquer máquina da rede 192.168.1.*
+in.ftpd: gleydson@192.168.1.
+</pre>
+<p>
+Note que a utilização do <span class="command"><strong>identd</strong></span> torna a utilização do
+serviço um pouco mais restrita, somente conhecendo os "logins" de quem tem
+acesso ao serviço, um cracker conseguirá ter acesso ao mesmo serviço naquele
+sistema (este é um dos motivos que é recomendado sempre divulgar o mínimo
+detalhes possíveis sobre o sistema para minimizar riscos de ataques).
+</p>
+<p>
+Veja mais detalhes sobre o uso do <span class="command"><strong>identd</strong></span> em <a class="xref" href="">???</a>.
+</p>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s05.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s07.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Restringindo o comando <span class="command"><strong>su</strong></span> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Restrições por MAC Address/IP</td></tr></table></div></body></html>

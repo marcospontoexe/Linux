@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>logger</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch03.html" title="Capítulo 3. Arquivos e daemons de Log" /><link rel="prev" href="ch03s02.html" title="Daemon de log do sistema" /><link rel="next" href="ch03s04.html" title="Programas úteis para monitoração e gerenciamento de arquivos de logs" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">logger</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s02.html">Anterior</a> </td><th width="60%" align="center">Capítulo 3. Arquivos e daemons de Log</th><td width="20%" align="right"> <a accesskey="n" href="ch03s04.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch03.html">Arquivos e daemons de Log</a></span> &gt; <span class="breadcrumb-node">logger</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="log-logger"></a>logger</h2></div></div></div>
+<p>
+Este comando permite enviar uma mensagem nos log do sistema.  A mensagem é
+enviada aos logs via daemon <span class="command"><strong>syslogd</strong></span> ou via soquete do
+sistema, é possível especificar a prioridade, nível, um nome identificando o
+processo, etc.  Seu uso é muito útil em shell scripts ou em outros eventos do
+sistema.
+</p>
+<p>
+<span class="command"><strong>logger</strong></span> [<span class="emphasis"><em>opções</em></span>] [<span class="emphasis"><em>mensagem</em></span>]
+</p>
+<p>
+Onde:
+</p>
+<div class="variablelist"><dl class="variablelist"><dt><span class="term"><span class="emphasis"><em>mensagem</em></span></span></dt><dd>
+<p>
+Mensagem que será enviada ao daemon <span class="emphasis"><em>syslog</em></span>
+</p>
+</dd><dt><span class="term"><span class="emphasis"><em>opções</em></span>, </span><span class="term">-i</span></dt><dd>
+<p>
+Registra o PID do processo
+</p>
+</dd><dt><span class="term">-s</span></dt><dd>
+<p>
+Envia a mensagem ambos para a saída padrão (STDOUT) e syslog.
+</p>
+</dd><dt><span class="term">-f [arquivo]</span></dt><dd>
+<p>
+Envia o conteúdo do arquivo especificado como <span class="emphasis"><em>mensagem</em></span> ao
+syslog.
+</p>
+</dd><dt><span class="term">-t [nome]</span></dt><dd>
+<p>
+Especifica o nome do processo responsável pelo log que será exibido antes do
+PID na mensagem do syslog.
+</p>
+</dd><dt><span class="term">-p [prioridade]</span></dt><dd>
+<p>
+Especifica a prioridade da mensagem do syslog, especificada como
+<code class="literal">facilidade.nível</code>.  Veja os tipos de prioridade/níveis em
+<a class="xref" href="ch03s02.html#log-rsyslogd-exemplo" title="Arquivo de configuração rsyslog.conf">“Arquivo de configuração <code class="filename">rsyslog.conf</code>”</a>.  O valor padrão
+<span class="emphasis"><em>prioridade.nível</em></span> é <span class="emphasis"><em>user.notice</em></span>
+</p>
+</dd><dt><span class="term">-u [soquete]</span></dt><dd>
+<p>
+Envia a mensagem para o [soquete] especificado ao invés do syslog
+</p>
+</dd></dl></div>
+<p>
+Mais detalhes sobre o funcionamento sobre o daemon de log do sistema
+<span class="command"><strong>rsyslogd</strong></span>, veja <a class="xref" href="ch03s02.html#log-rsyslogd" title="rsyslogd">“rsyslogd”</a>
+</p>
+<p>
+Exemplos: <code class="literal">logger -i -t focalinux Teste teste teste</code>,
+<code class="literal">logger -i -f /tmp/mensagem -p security.emerg</code>
+</p>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s02.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch03.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch03s04.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Daemon de log do sistema </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Programas úteis para monitoração e gerenciamento de arquivos de logs</td></tr></table></div></body></html>

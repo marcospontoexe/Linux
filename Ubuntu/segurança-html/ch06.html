@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Capítulo 6. Restrições de acesso, recursos e serviços</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="index.html" title="Guia Foca - Segurança" /><link rel="prev" href="ch05s08.html" title="Exemplos de configurações do iptables" /><link rel="next" href="ch06s02.html" title="Limitação de recursos usando PAM" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch05s08.html">Anterior</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch06s02.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-node">Restrições de acesso, recursos e serviços</span></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="d-restr"></a>Capítulo 6. Restrições de acesso, recursos e serviços</h1></div></div></div><div class="toc"><p><strong>Índice</strong></p><dl class="toc"><dt><span class="section"><a href="ch06.html#d-restr-bash">Limitando recursos no <span class="command"><strong>bash</strong></span></a></span></dt><dd><dl><dt><span class="section"><a href="ch06.html#d-restr-bash-readonly">Uso do comando readonly para exportar variáveis</a></span></dt><dt><span class="section"><a href="ch06.html#d-restr-homedir">Restrições nos diretórios de usuários e root</a></span></dt><dt><span class="section"><a href="ch06.html#d-restr-bash-restricted">Restrições básicas do shell bash com bash -r/--restricted, rbash</a></span></dt><dt><span class="section"><a href="ch06.html#d-restr-bash-logoutocioso">Finalizando consoles inativos</a></span></dt><dt><span class="section"><a href="ch06.html#d-restr-bash-logging">Desabilitando o registro de comandos digitados</a></span></dt><dt><span class="section"><a href="ch06.html#d-restr-bash-desshell">Desabilitando serviços de shell para usuários</a></span></dt></dl></dd><dt><span class="section"><a href="ch06s02.html">Limitação de recursos usando PAM</a></span></dt><dd><dl><dt><span class="section"><a href="ch06s02.html#d-restr-pam-suporte">Descobrindo se um determinado programa tem suporte a PAM</a></span></dt><dt><span class="section"><a href="ch06s02.html#d-restr-pam-policy">Definindo uma política padrão restritiva</a></span></dt><dt><span class="section"><a href="ch06s02.html#d-restr-pam-login">Restringindo/Bloqueando o login</a></span></dt><dt><span class="section"><a href="ch06s02.html#d-restr-pam-root">Restringindo o acesso a root no su</a></span></dt><dt><span class="section"><a href="ch06s02.html#d-restr-pam-time">Restrições de serviços PAM baseados em dia/hora</a></span></dt><dt><span class="section"><a href="ch06s02.html#d-restr-pam-group">Permitindo acesso a grupos extras</a></span></dt><dt><span class="section"><a href="ch06s02.html#d-restr-pam-limits">Limitação de recursos do shell</a></span></dt></dl></dd><dt><span class="section"><a href="ch06s03.html">Restrições de acesso a programas/diretórios/arquivos usando grupos</a></span></dt><dt><span class="section"><a href="ch06s04.html">Dando poderes de root para executar determinados programas</a></span></dt><dt><span class="section"><a href="ch06s05.html">Restringindo o comando <span class="command"><strong>su</strong></span></a></span></dt><dt><span class="section"><a href="ch06s06.html">Restrições baseadas em usuário/IP</a></span></dt><dt><span class="section"><a href="ch06s07.html">Restrições por MAC Address/IP</a></span></dt><dt><span class="section"><a href="ch06s08.html">Desabilitando serviços não usados no Inetd</a></span></dt><dt><span class="section"><a href="ch06s09.html">Evitando o uso de <code class="filename">hosts.equiv</code> e <code class="filename">.rhosts</code></a></span></dt><dt><span class="section"><a href="ch06s10.html">Restringindo o uso do shutdown</a></span></dt><dt><span class="section"><a href="ch06s11.html">Restringindo o acesso ao sistema de arquivos /proc</a></span></dt><dt><span class="section"><a href="ch06s12.html">Limitando o uso de espaço em disco (quotas)</a></span></dt><dd><dl><dt><span class="section"><a href="ch06s12.html#d-restr-quotas-install">Instalando o sistema de quotas</a></span></dt><dt><span class="section"><a href="ch06s12.html#d-restr-quotas-editando">Editando quotas de usuários/grupos</a></span></dt><dt><span class="section"><a href="ch06s12.html#d-restr-quotas-mudtodos">Modificando a quota de todos os usuários de uma vez</a></span></dt><dt><span class="section"><a href="ch06s12.html#d-restr-quotas-checando">Verificando a quota disponível ao usuário</a></span></dt><dt><span class="section"><a href="ch06s12.html#d-restr-quotas-todas">Verificando a quota de todos os usuários/grupos do sistema</a></span></dt><dt><span class="section"><a href="ch06s12.html#d-restr-quotas-warn">Avisando usuários sobre o estouro de quota</a></span></dt></dl></dd><dt><span class="section"><a href="ch06s13.html">Suporte a senhas ocultas</a></span></dt><dt><span class="section"><a href="ch06s14.html">Suporte a senhas com algorítmo SHA e md5</a></span></dt><dt><span class="section"><a href="ch06s15.html">Restrições no hardware do sistema</a></span></dt><dd><dl><dt><span class="section"><a href="ch06s15.html#d-restr-hardware-bios">BIOS do sistema</a></span></dt><dt><span class="section"><a href="ch06s15.html#d-restr-hardware-floppy">Retirada da unidade de disquetes</a></span></dt><dt><span class="section"><a href="ch06s15.html#d-restr-hardware-netboot">Placas de rede com eprom de boot</a></span></dt><dt><span class="section"><a href="ch06s15.html#d-restr-hardware-lilo">Protegendo o LILO</a></span></dt><dt><span class="section"><a href="ch06s15.html#d-restr-hardware-harddisk">Disco rígido</a></span></dt></dl></dd></dl></div>
+<p>
+Este capítulo documenta diversos métodos de fazer restrições de contas,
+limitação de acesso interno/externo, de recursos por usuários/grupos, login,
+tempo máximo ocioso, e outros modos para limitar o uso de recursos do sistema.
+Também são descritos métodos para aumentar a segurança do acesso físico a seu
+servidor e maneiras de restringir o uso de serviços disponíveis no sistema.
+</p>
+<p>
+Se você deseja restringir o acesso de máquinas na rede ou portas específicas em
+sua máquina , veja também <a class="xref" href="ch05.html" title="Capítulo 5. Firewall iptables">Capítulo 5, <em>Firewall iptables</em></a> .
+</p>
+
+<div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-bash"></a>Limitando recursos no <span class="command"><strong>bash</strong></span></h2></div></div></div>
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-bash-readonly"></a>Uso do comando readonly para exportar variáveis</h3></div></div></div>
+<p>
+Variáveis exportadas na forma comum podem ser modificadas a qualquer momento
+pelo usuário, e isso pode trazer problemas de acordo com o tipo de sistema que
+administramos.  A definição da variável como somente leitura (readonly) evita a
+maioria destes problemas:
+</p>
+<pre class="screen">
+readonly TESTE="123"
+</pre>
+<p>
+A variável <em class="replaceable"><code>TESTE</code></em> não poderá ser modificada ou
+excluída.  Com isto o administrador pode "bloquear" a modificação de variáveis
+que controlam o funcionamento de determinados recursos do interpretador de
+comandos (alguns deles serão vistos ainda nesta seção).
+</p>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> Algumas variáveis de controle de
+ambientes ambiente do interpretador de comandos já são iniciadas com valores
+somente leitura (como as variáveis <em class="replaceable"><code>EUID</code></em> e
+<em class="replaceable"><code>PPID</code></em>)
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span> Variáveis exportadas como somente
+leitura em shell scripts são mantidas até a finalização do script e depois
+liberadas.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-homedir"></a>Restrições nos diretórios de usuários e root</h3></div></div></div>
+<p>
+O controle de acesso a diretórios de usuários é importante quando desejamos que
+outras pessoas não tenham acesso ao diretório de outros usuários, violando a
+privacidade do mesmo e obtendo acesso a partes indesejáveis, principalmente do
+usuário <code class="literal">root</code>.  É recomendado restringir o acesso somente ao
+<code class="literal">dono</code> e <code class="literal">grupo</code> do usuário, bloqueando o
+acesso a outros tipos de usuários:
+</p>
+<pre class="screen">
+chmod 2750 /root
+chmod 2750 /home/usuario
+</pre>
+<p>
+O exemplo acima permitirá o acesso do diretório <code class="filename">/root</code> e
+<code class="filename">/home/usuario</code> somente ao usuário e grupo que pertencem.
+Este processo pode ser facilitado na criação dos diretórios de usuários em
+<code class="filename">/home</code> especificando a variável:
+<em class="replaceable"><code>DIR_MODE=0750</code></em> no arquivo
+<code class="filename">/etc/adduser.conf</code>.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Algumas distribuições de
+<span class="command"><strong>Linux</strong></span> garantem o acesso livre a diretórios de usuários por
+padrão pois alguns daemons que requerem acesso a diretório de usuários rodam
+sob outros usuários ao invés do root.  Um bom exemplo é a utilização do recurso
+"UserDir" do <span class="command"><strong>Apache</strong></span> para servir requisições como
+<code class="filename">http://servidor.org/~usuario</code>.
+</p>
+<p>
+A restrição de diretório home neste caso bloqueará o acesso do servidor web
+<span class="command"><strong>Apache</strong></span> ao diretório
+<code class="filename">/home/usuario/public_html</code>.  Mesmo assim, uma alternativa
+para garantir a utilização da restrição é incluir o usuário do servidor web
+<span class="command"><strong>Apache</strong></span> (<code class="literal">www-data</code>) no grupo "usuario" (que
+possui acesso ao diretório <code class="filename">/home/usuario</code>):
+</p>
+<pre class="screen">
+adduser www-data usuario
+</pre>
+<p>
+Isto garantirá que o servidor <span class="command"><strong>Apache</strong></span> continue servindo as
+requisições dentro do diretório <code class="filename">/home/usuario</code>, com acesso
+garantido via grupo.  O mesmo principio pode ser aplicado em outros programas,
+apenas leve em consideração que se um cracker tomar conta do processo que tem
+acesso ao seu diretório home restrito, ele certamente também terá acesso.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-bash-restricted"></a>Restrições básicas do shell bash com bash -r/--restricted, rbash</h3></div></div></div>
+<p>
+Quando o <span class="command"><strong>bash</strong></span> é iniciado com o parâmetro
+<code class="literal">-r</code>, <code class="literal">--restricted</code> ou como
+<span class="command"><strong>rbash</strong></span>, o shell restringe o uso dos seguintes recursos em sua
+seção:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+Usar o comando <span class="command"><strong>cd</strong></span> para mudar de diretório.
+</p>
+</li><li class="listitem">
+<p>
+Definindo, modificar ou apagar a variáveis <em class="replaceable"><code>SHELL</code></em>,
+<em class="replaceable"><code>PATH</code></em>, <em class="replaceable"><code>ENV</code></em>,
+<em class="replaceable"><code>BASH_ENV</code></em>.
+</p>
+</li><li class="listitem">
+<p>
+Nomes de comandos que contém <code class="filename">/</code>
+</p>
+</li><li class="listitem">
+<p>
+Especificar um nome de arquivo contendo uma <code class="filename">/</code> como
+argumento para o comando <span class="command"><strong>builtin</strong></span> (embutido no interpretador
+de comandos).
+</p>
+</li><li class="listitem">
+<p>
+Especificar uma <code class="filename">/</code> como argumento a opção
+<span class="emphasis"><em>-p</em></span> no comando <span class="command"><strong>hash</strong></span> (embutido no
+interpretador de comandos).
+</p>
+</li><li class="listitem">
+<p>
+Importar a definição de funções do ambiente do shell atual.
+</p>
+</li><li class="listitem">
+<p>
+Analisar o valor da variável <em class="replaceable"><code>SHELLOPTS</code></em> do ambiente
+do shell atual.
+</p>
+</li><li class="listitem">
+<p>
+Redirecionando a saída padrão usando os operadores de redirecionamento
+<code class="literal">&gt;</code>, <code class="literal">&gt;|</code>, <code class="literal">&lt;&gt;</code>,
+<code class="literal">&gt;&amp;</code>, <code class="literal">&gt;&amp;</code>; e
+<code class="literal">&gt;&gt;</code>.
+</p>
+</li><li class="listitem">
+<p>
+Usando o comando embutido <span class="command"><strong>exec</strong></span> para substituir o shell por
+outro comando.
+</p>
+</li><li class="listitem">
+<p>
+Usar as opções <span class="emphasis"><em>-f</em></span> ou <span class="emphasis"><em>-d</em></span> com o comando
+<span class="command"><strong>enable</strong></span> (embutido no interpretador de comandos).
+</p>
+</li><li class="listitem">
+<p>
+Especificar a opção <span class="emphasis"><em>-p</em></span> ao comando interno
+<span class="command"><strong>command</strong></span>.
+</p>
+</li><li class="listitem">
+<p>
+Desativar o modo restrito com <code class="literal">set +r</code> ou <code class="literal">set +o
+restricted</code> *
+</p>
+</li></ul></div>
+<p>
+Estas restrições são ativadas após a leitura dos arquivos de inicialização do
+interpretador de comandos.  O shell restrito desliga as restrições quando um
+shell script é executado.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-bash-logoutocioso"></a>Finalizando consoles inativos</h3></div></div></div>
+<p>
+A variável <em class="replaceable"><code>TMOUT</code></em> determina o tempo de inatividade de
+um shell para que ele seja terminado.
+</p>
+<pre class="screen">
+export TMOUT=600
+</pre>
+<p>
+Terminará o <span class="command"><strong>bash</strong></span> caso nenhum comando seja executado no
+período de 600 segundos (5 minutos).  Veja <a class="xref" href="ch06.html#d-restr-bash-readonly" title="Uso do comando readonly para exportar variáveis">“Uso do comando readonly para exportar variáveis”</a> como complemento.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-bash-logging"></a>Desabilitando o registro de comandos digitados</h3></div></div></div>
+<p>
+Todos os comandos que digitamos em uma seção do shell são registrados no
+arquivo <code class="filename">~/.bash_history</code>, as seguintes variáveis fazem seu
+controle:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<em class="replaceable"><code>HISTFILE</code></em> - Nome do arquivo que armazenará o
+histórico de comandos.  O padrão é <code class="filename">~/.bash_history</code>.  Caso
+não seja especificado, os comandos não serão gravados após finalizar o shell.
+</p>
+</li><li class="listitem">
+<p>
+<em class="replaceable"><code>HISTSIZE</code></em> - Define o número de comandos que o arquivo
+de histórico poderá armazenar, o padrão é 500.
+</p>
+</li><li class="listitem">
+<p>
+<em class="replaceable"><code>HISTFILESIZE</code></em> - Define o número máximo de linhas no
+arquivo de histórico.
+</p>
+</li></ul></div>
+<p>
+Se você possui muitos usuários em seu sistema, é recomendado ajustar estas
+variáveis como somente leitura para que o usuário não desative o logging por
+qualquer motivo (veja <a class="xref" href="ch06.html#d-restr-bash-readonly" title="Uso do comando readonly para exportar variáveis">“Uso do comando readonly para exportar variáveis”</a>).
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-bash-desshell"></a>Desabilitando serviços de shell para usuários</h3></div></div></div>
+<p>
+Existem casos onde o usuário precisa estar cadastrado no sistema mas não
+precisa ter acesso a uma conta de login válida (como um sistema servidor de
+e-mail ou outros serviços).  Neste caso a desabilitação dos serviços de shell
+aumentará um pouco a segurança do sistema, mesmo conseguindo acesso a
+conta/senha estará impedido de entrar no sistema (pelo menos terá um pouco mais
+dificuldade para conseguir isso).
+</p>
+<p>
+Um programa que é muito usado para desabilitar o shell exibindo uma mensagem ao
+usuário que fez a tentativa é o <span class="command"><strong>falselogin</strong></span>.  Ele deve ser
+colocado como o "shell padrão" no arquivo <code class="filename">/etc/passwd</code> e
+exibirá a mensagem contida no arquivo <code class="filename">/etc/falselogin.conf</code>
+quando o login para aquele usuário for tentado.  Esta operação pode ser
+facilitada usando a variável
+<em class="replaceable"><code>DSHELL=/usr/bin/falselogin</code></em> no arquivo
+<code class="filename">/etc/adduser.conf</code>.
+</p>
+<p>
+Uma forma alternativa de desativar o serviço de login de TODOS os usuários
+(exceto o <code class="literal">root</code> e os já logados no sistema) é criar um
+arquivo chamado <code class="filename">/etc/nologin</code> e colocando uma mensagem
+dentro dele, que será exibida quando tentarem efetuar o login no sistema.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Tome cuidado ao usar esta alternativa,
+este método deve ser usado somente em caso de <span class="strong"><strong>EMERGÊNCIA</strong></span>, as distribuições <span class="command"><strong>Linux</strong></span>
+usam este método para bloquear o login de outros usuários durante o processo de
+inicialização, removendo assim que o processo é terminado.  Esteja consciente
+disso.
+</p>
+<p>
+Em alguns casos, o uso do PAM pra desabilitar os serviços de login pode ser
+mais adequado (veja <a class="xref" href="ch06s02.html#d-restr-pam-login" title="Restringindo/Bloqueando o login">“Restringindo/Bloqueando o login”</a>).
+</p>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch05s08.html">Anterior</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch06s02.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Exemplos de configurações do iptables </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Limitação de recursos usando PAM</td></tr></table></div></body></html>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Dando poderes de root para executar determinados programas</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s03.html" title="Restrições de acesso a programas/diretórios/arquivos usando grupos" /><link rel="next" href="ch06s05.html" title="Restringindo o comando su" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Dando poderes de root para executar determinados programas</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s03.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s05.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Dando poderes de root para executar determinados programas</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-sudo"></a>Dando poderes de root para executar determinados programas</h2></div></div></div>
+<p>
+A ferramenta ideal para isto é o <span class="command"><strong>sudo</strong></span>.  Através dela é
+possível permitir um usuário comum executar um comando como
+<span class="command"><strong>root</strong></span> e registrar quando isto foi feito.  É possível
+selecionar os usuários/grupos que terão acesso e quais aplicativos que poderão
+ser usados, estas configurações são feitas no arquivo
+<code class="filename">/etc/sudoers</code>.
+</p>
+<p>
+Por exemplo, para o usuário "john" usar o comando <code class="literal">shutdown</code>
+para desligar o computador: <code class="literal">sudo shutdown -h now</code>.
+</p>
+<p>
+O <span class="command"><strong>sudo</strong></span> é um programa muito completo, tomaria muitos
+Kilobytes neste guia.  Recomendo dar uma lida na página de manual para entender
+como as variáveis do arquivo de configuração funcionam.  Mesmo assim aqui vai
+um exemplo simples deste arquivo para iniciar rapidamente o uso do
+<span class="command"><strong>sudo</strong></span>:
+</p>
+<pre class="screen">
+# arquivo sudoers.
+#
+# Edite este arquivo com o comando 'visudo' como root 
+# 
+#
+
+# Especificação de máquinas. O primeiro campo (Host_Alias) diz que a variável 
+# LOCALSERVER será um nome/endereço de máquina
+Host_Alias	LOCALSERVER=192.168.0.1
+
+# Especificação de usuários. O primeiro campo (User_Alias) diz que a variável
+# NETMASTERS armazenará nomes de usuários
+User_Alias	NETMASTERS=gleydson, goodboy
+
+# Comandos. O primeiro campo (Cmnd_Alias) diz que a variável 
+# C_REDE contém comandos do sistema. Mais de um parâmetro
+# deve ser separado por vírgulas
+Cmnd_Alias	C_REDE=/sbin/ipchains, /sbin/iptables
+
+# Padrões que se aplicam aos usuários da variável NETMASTERS. O parâmetro
+# mail_always sempre envia um e-mail ao root avisando sobre o uso do 
+# sudo
+Defaults:NETMASTERS	mail_always
+
+# As linha que começam com o nome de usuário ou variável "User_Alias" 
+# definem o acesso aos recursos. O primeiro campo é o usuário, o segundo
+# o endereço de acesso (opcionalmente seguido de um sinal "=" para 
+# especificar opções adicionais) o terceiro o comando ou lista de comandos
+#
+# O usuário root não tem restrições
+root	ALL=(ALL) ALL
+
+# Permite que os usuários especificados na variável NETMASTERS 
+# acessando dos locais em LOCALSERVER utilizem os comandos 
+# em C_REDE (sem fornecer senha). 
+NETMASTERS	LOCALSERVER=NOPASSWD: C_REDE
+</pre>
+<p>
+Edite este arquivo com o comando <span class="command"><strong>visudo</strong></span>, ele faz algumas
+checagens para detectar problemas de configuração.  Para listar os comandos
+disponíveis para o usuário no <span class="command"><strong>sudo</strong></span>, utilize a opção
+<code class="literal">-l</code>, ex: <code class="literal">sudo -l</code>.
+</p>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s03.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s05.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Restrições de acesso a programas/diretórios/arquivos usando grupos </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Restringindo o comando <span class="command"><strong>su</strong></span></td></tr></table></div></body></html>

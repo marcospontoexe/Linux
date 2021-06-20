@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Daemon de log do sistema</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch03.html" title="Capítulo 3. Arquivos e daemons de Log" /><link rel="prev" href="ch03.html" title="Capítulo 3. Arquivos e daemons de Log" /><link rel="next" href="ch03s03.html" title="logger" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Daemon de log do sistema</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03.html">Anterior</a> </td><th width="60%" align="center">Capítulo 3. Arquivos e daemons de Log</th><td width="20%" align="right"> <a accesskey="n" href="ch03s03.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch03.html">Arquivos e daemons de Log</a></span> &gt; <span class="breadcrumb-node">Daemon de log do sistema</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s18.2"></a>Daemon de log do sistema</h2></div></div></div>
+<p>
+O Daemon de log simplesmente é um programa que registra as saída de logs do 
+kernel e sistema. No <span class="command"><strong>Linux</strong></span> o daemon mais usado é o 
+<span class="command"><strong>syslogd</strong></span>.
+</p>
+<p>
+A classificação de qual arquivo em <code class="filename">/var/log</code> receberá qual
+tipo de mensagem é controlado pelo arquivo de configuração
+<code class="filename">/etc/rsyslog.conf</code> através de
+<span class="emphasis"><em>facilidades</em></span> e <span class="emphasis"><em>níveis</em></span> (veja <a class="xref" href="ch03s02.html#log-rsyslogd-exemplo" title="Arquivo de configuração rsyslog.conf">“Arquivo de configuração <code class="filename">rsyslog.conf</code>”</a> para detalhes).
+</p>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="log-rsyslogd"></a>rsyslogd</h3></div></div></div>
+<p>
+Este daemon controla o registro de logs do sistema.
+</p>
+<p>
+<span class="command"><strong>rsyslogd</strong></span> [<span class="emphasis"><em>opções</em></span>]
+</p>
+<div class="variablelist"><dl class="variablelist"><dt><span class="term"><span class="emphasis"><em>opções</em></span>, </span><span class="term">-f</span></dt><dd>
+<p>
+Especifica um arquivo de configuração alternativo ao
+<code class="filename">/etc/rsyslog.conf</code>.
+</p>
+</dd><dt><span class="term">-h</span></dt><dd>
+<p>
+Permite redirecionar mensagens recebidas a outros servidores de logs
+especificados.
+</p>
+</dd><dt><span class="term">-n</span></dt><dd>
+<p>
+Evita que o processo caia automaticamente em background.  Necessário
+principalmente se o <span class="command"><strong>syslogd</strong></span> for controlado pelo
+<span class="command"><strong>init</strong></span>.
+</p>
+</dd><dt><span class="term">-d</span></dt><dd>
+<p>
+Ativa o modo de depuração do <span class="command"><strong>syslog</strong></span>.  O syslog permanecerá
+operando em primeiro plano e mostrará as mensagens no terminal atual.
+</p>
+</dd></dl></div>
+<p>
+Na distribuição <span class="command"><strong>Debian</strong></span>, o daemon <span class="command"><strong>syslogd</strong></span>
+é iniciado através do script <code class="filename">/etc/init.d/sysklogd</code>.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="log-rsyslogd-exemplo"></a>Arquivo de configuração <code class="filename">rsyslog.conf</code></h3></div></div></div>
+<p>
+O arquivo de configuração <code class="filename">/etc/rsyslog.conf</code> possui o
+seguinte formato:
+</p>
+<pre class="screen">
+facilidade.nível                    destino
+</pre>
+<p>
+A <span class="emphasis"><em>facilidade</em></span> e <span class="emphasis"><em>nível</em></span> são separadas
+por um "."  e contém parâmetros que definem o que será registrado nos arquivos
+de log do sistema:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">facilidade</code> - É usada para especificar que tipo de programa
+está enviando a mensagem.  Os seguintes níveis são permitidos (em ordem
+alfabética):
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">auth</code> - Mensagens de segurança/autorização (é recomendável
+usar authpriv ao invés deste).
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">authpriv</code> - Mensagens de segurança/autorização (privativas).
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">cron</code> - Daemons de agendamento (<span class="command"><strong>cron</strong></span> e
+<span class="command"><strong>at</strong></span>).
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">daemon</code> - Outros daemons do sistema que não possuem
+facilidades específicas.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">ftp</code> - Daemon de ftp do sistema.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">kern</code> - Mensagens do kernel.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">lpr</code> - Subsistema de impressão.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">local0 a local7</code> - Reservados para uso local.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">mail</code> - Subsistema de e-mail.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">news</code> - Subsistema de notícias da USENET.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">security</code> - Sinônimo para a facilidade
+<code class="literal">auth</code> (evite usa-la).
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">syslog</code> - Mensagens internas geradas pelo
+<span class="command"><strong>syslogd</strong></span>.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">user</code> - Mensagens genéricas de nível do usuário.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">uucp</code> - Subsistema de UUCP.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">*</code> - Confere com todas as facilidades.
+</p>
+</li></ul></div>
+<p>
+Mais de uma facilidade pode ser especificada na mesma linha do
+<code class="filename">rsyslog.conf</code> separando-as com ",".
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">nível</code> - Especifica a importância da mensagem.  Os seguintes
+níveis são permitidos (em ordem de importância invertida; da mais para a menos
+importante):
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">emerg</code> - O sistema está inutilizável.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">alert</code> - Uma ação deve ser tomada imediatamente para resolver
+o problema.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">crit</code> - Condições críticas.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">err</code> - Condições de erro.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">warning</code> - Condições de alerta.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">notice</code> - Condição normal, mas significante.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">info</code> - Mensagens informativas.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">debug</code> - Mensagens de depuração.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">*</code> - Confere com todos os níveis.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">none</code> - Nenhuma prioridade.
+</p>
+</li></ul></div>
+<p>
+Além destes níveis os seguintes sinônimos estão disponíveis:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">error</code> - Sinônimo para o nível err.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">panic</code> - Sinônimo para o nível emerg.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">warn</code> - Sinônimo para o nível warning.
+</p>
+</li></ul></div>
+</li><li class="listitem">
+<p>
+<code class="literal">destino</code> - O destino das mensagens pode ser um arquivo, um
+pipe (se iniciado por um "|"), um computador remoto (se iniciado por uma "@"),
+determinados usuários do sistema (especificando os logins separados por
+vírgula) ou para todos os usuários logados via <span class="command"><strong>wall</strong></span> (usando
+"*").
+</p>
+</li></ul></div>
+<p>
+Todas as mensagens com o nível especificado e superiores a esta especificadas
+no <span class="command"><strong>rsyslog.conf</strong></span> serão registradas, de acordo com as opções
+usadas.  Conjuntos de <span class="emphasis"><em>facilidades</em></span> e
+<span class="emphasis"><em>níveis</em></span> podem ser agrupadas separando-as por ";".
+</p>
+<p>
+OBS1: Sempre use TABS ao invés de espaços para separar os parâmetros do
+<code class="filename">rsyslog.conf</code>.
+</p>
+<p>
+OBS2: Algumas facilidades como <code class="literal">security</code>, emitem um beep de
+alerta no sistema e enviam uma mensagem para o console, como forma de alerta ao
+administrador e usuários logados no sistema.
+</p>
+<p>
+Existem ainda 4 caracteres que garantes funções especiais: "*", "=", "!"  e
+"-":
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+"*" - Todas as mensagens da <span class="emphasis"><em>facilidade</em></span> especificada serão
+redirecionadas.
+</p>
+</li><li class="listitem">
+<p>
+"=" - Somente o <span class="emphasis"><em>nível</em></span> especificado será registrado.
+</p>
+</li><li class="listitem">
+<p>
+"!"  - Todos os <span class="emphasis"><em>níveis</em></span> especificados e maiores NÃO serão
+registrados.
+</p>
+</li><li class="listitem">
+<p>
+"-" - Pode ser usado para desativar o sync imediato do arquivo após sua
+gravação.
+</p>
+</li></ul></div>
+<p>
+Os caracteres especiais "=" e "!"  podem ser combinados em uma mesma regra.
+</p>
+<p>
+Exemplo: Veja abaixo um exemplo de um arquivo
+<code class="filename">/etc/rsyslog.conf</code> padrão de sistemas
+<span class="command"><strong>Debian</strong></span>
+</p>
+<pre class="screen">
+# /etc/rsyslog.conf arquivo de configuração do rsyslog
+#
+# Para mais detalhes, instale o rsyslog-doc e veja o arquivo
+# /usr/share/doc/rsyslog-doc/html/configuration/index.html
+
+
+#################
+#### MODULOS ####
+#################
+
+module(load="imuxsock") # fornece suporte para log local do sistema
+module(load="imklog")   # fornece suprote a log do kernel (antigo ulogd)
+#module(load="immark")  # fornece recurso de colocação da mensagem --MARK-- 
+
+# fornece suporte a recebimento de mensagens do UDP
+#module(load="imudp")
+#input(type="imudp" port="514")
+
+# fornece suporte a recebimento de mensagens TCP
+#module(load="imtcp")
+#input(type="imtcp" port="514")
+
+
+###########################
+#### DIRETIVAS GLOBAIS ####
+###########################
+
+#
+# Usar o formato tradicional de timestamps.
+# Para ativar a precisão de timestamps, comente a seguinte linha.
+#
+$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+
+#
+# Configura as permissões padrões para todos os arquivos de log
+#
+$FileOwner root
+$FileGroup adm
+$FileCreateMode 0640
+$DirCreateMode 0755
+$Umask 0022
+
+#
+# Onde devem ser colocados os arquivos de spool e estado
+#
+$WorkDirectory /var/spool/rsyslog
+
+#
+# Inclui todos os arquivos de configuração que existirem em /etc/rsyslog.d/
+#
+$IncludeConfig /etc/rsyslog.d/*.conf
+#
+# Primeiro alguns arquivos de log padrões. Registrados por facilidade
+#
+
+auth,authpriv.*                 /var/log/auth.log
+*.*;auth,authpriv.none          -/var/log/syslog
+cron.*                         /var/log/cron.log
+daemon.*                        -/var/log/daemon.log
+kern.*                          -/var/log/kern.log
+lpr.*                           -/var/log/lpr.log
+mail.*                          /var/log/mail.log
+user.*                          -/var/log/user.log
+uucp.*                          -/var/log/uucp.log
+
+#
+# Registro de logs do sistema de mensagens. Divididos para facilitar
+# a criação de scripts para manipular estes arquivos.
+#
+mail.info                       -/var/log/mail.info
+mail.warn                       -/var/log/mail.warn
+mail.err                        /var/log/mail.err
+
+# Registro para o sistema de news INN
+#
+news.crit                       /var/log/news/news.crit
+news.err                        /var/log/news/news.err
+news.notice                     -/var/log/news/news.notice
+
+#
+# Alguns arquivos de registro "pega-tudo".
+# São usadas "," para especificar mais de uma prioridade (por 
+# exemplo, "auth,authpriv.none") e ";" para especificar mais de uma 
+# facilidade.nível que será gravada naquele arquivo.
+# Isto permite deixar as regras consideravelmente menores e mais legíveis
+#
+*.=debug;\
+        auth,authpriv.none;\
+        news.none;mail.none     -/var/log/debug
+*.=info;*.=notice;*.=warn;\
+        auth,authpriv.none;\
+        cron,daemon.none;\
+        mail,news.none          -/var/log/messages
+
+#
+# Emergências são enviadas para qualquer um que estiver logado no sistema. Isto
+# é feito através da especificação do "*" como destino das mensagens e são
+# enviadas através do comando wall.
+#
+*.emerg                         *
+
+#
+# Eu gosto de ter mensagens mostradas no console, mas somente em consoles que 
+# não utilizo.
+#
+#daemon,mail.*;\
+#       news.=crit;news.=err;news.=notice;\
+#       *.=debug;*.=info;\
+#       *.=notice;*.=warn       /dev/tty8
+
+# O pipe /dev/xconsole é usado pelo utilitário "xconsole". Para usa-lo,
+# você deve executar o "xconsole" com a opção "-file":
+# 
+#    $ xconsole -file /dev/xconsole [...]
+#
+# NOTA: ajuste as regras abaixo, ou ficará maluco se tiver um site 
+# muito movimentado...
+#
+daemon.*;mail.*;\
+        news.crit;news.err;news.notice;\
+        *.=debug;*.=info;\
+        *.=notice;*.=warn       |/dev/xconsole
+
+# A linha baixo envia mensagens importantes para o console em que 
+# estamos trabalhando logados (principalmente para quem gosta de ter 
+# controle total sobre o que está acontecendo com seu sistema).
+*.err;kern.debug;auth.notice;mail.crit	/dev/console
+</pre>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch03.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch03s03.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Capítulo 3. Arquivos e daemons de Log </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> logger</td></tr></table></div></body></html>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Restringindo o acesso ao sistema de arquivos /proc</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s10.html" title="Restringindo o uso do shutdown" /><link rel="next" href="ch06s12.html" title="Limitando o uso de espaço em disco (quotas)" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Restringindo o acesso ao sistema de arquivos /proc</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s10.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s12.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Restringindo o acesso ao sistema de arquivos /proc</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-proc"></a>Restringindo o acesso ao sistema de arquivos /proc</h2></div></div></div>
+<p>
+O patch <span class="emphasis"><em>restricted proc fs</em></span> é um dos melhores para realizar
+esta tarefa.  Restringindo o acesso ao sistema de arquivos
+<code class="filename">/proc</code> evita que o usuário normal tenha acesso aos detalhes
+sobre processos de outros (com <code class="literal">ps aux</code>) ou acesso a detalhes
+de processos de outros usuários existentes nos subdiretórios numéricos
+(equivalentes a PID) em <code class="filename">/proc</code>.  Abaixo algumas
+características do patch <span class="emphasis"><em>restricted proc fs</em></span>:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+É pequeno, rápido e faz poucas modificações no fonte do kernel.
+</p>
+</li><li class="listitem">
+<p>
+Seu método de funcionamento é baseado nas restrições de dono/grupo (nativas de
+ambiente <span class="command"><strong>Unix</strong></span>).
+</p>
+</li><li class="listitem">
+<p>
+Restringe a visualização de processos só dos usuários.  Adicionalmente será
+especificada uma GID para o diretório <code class="filename">/proc</code>, qualquer
+usuário que pertença ao grupo especificado poderá visualizar todos os processos
+e entrar em qualquer diretório do kernel (sem restrições, como se não tivesse o
+patch).
+</p>
+</li><li class="listitem">
+<p>
+Muito estável e confiável.
+</p>
+</li></ul></div>
+<p>
+Este patch deve ser baixado de <a class="ulink" href="http://noc.res.cmu.edu/proc" target="_top">http://noc.res.cmu.edu/proc</a>, existem
+versões para os kernels da série 2.2 e 2.4, baixe e aplique o patch, na
+configuração do kernel ative a opção <code class="literal">Restricted Proc fs
+support</code>.  Compile e instale seu kernel.
+</p>
+<p>
+No arquivo <code class="filename">/etc/fstab</code> inclua um grupo para a montagem do
+sistema de arquivos <code class="filename">/proc</code> (vamos usar o grupo
+<code class="literal">adm</code> com a GID 4):
+</p>
+<pre class="screen">
+# /etc/fstab: informações estáticas do sistemas de arquivos.
+#
+# &lt;Sist. Arq.&gt;    &lt;Ponto Mont.&gt;  &lt;tipo&gt;  &lt;opções&gt;       &lt;dump&gt; &lt;passo&gt;
+  proc            /proc          proc    defaults,gid=4   0       0
+</pre>
+<p>
+Após reiniciar o sistema, execute o comando <code class="literal">ls -lad /proc</code>
+note que o grupo do diretório <code class="filename">/proc</code> será modificado para
+<code class="literal">adm</code>.  Agora entre como um usuário e execute um <code class="literal">ps
+aux</code>, somente seus processos serão listados.  Para autorizar um
+usuário específico ver todos os processos (ter acesso novamente ao diretório
+<code class="filename">/proc</code>), inclua este no grupo que usou no arquivo
+<code class="filename">/etc/fstab</code>:
+</p>
+<pre class="screen">
+adduser usuario adm
+</pre>
+<p>
+Após efetuar o usuário já estará pertencendo ao grupo <code class="literal">adm</code>
+(confira digitando <code class="literal">groups</code>), e poderá ver novamente os
+processos de todos os usuários com o comando <code class="literal">ps aux</code>.
+</p>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> Incluir um usuário no grupo
+<code class="literal">adm</code> É PERIGOSO, porque este usuário poderá ter acesso a
+arquivo/diretórios que pertençam a este grupo, como os arquivos/diretórios em
+<code class="filename">/var/log</code>.  Se esta não é sua intenção, crie um grupo
+independente como <code class="literal">restrproc</code> para controlar quem terá acesso
+ao diretório <code class="filename">/proc</code>: <code class="literal">addgroup restrproc</code>.
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span> Se a opção <code class="literal">gid</code> não
+for especificada para a montagem de <code class="filename">/proc</code> no
+<code class="filename">/etc/fstab</code>, o grupo <code class="literal">root</code> será usado
+como padrão.  NUNCA adicione usuários ao grupo <code class="literal">root</code>, use o
+método da observação acima para permitir outros usuários ver todos os processos
+em execução.
+</p>
+<p>
+<span class="strong"><strong>OBS3</strong></span> Caso o servidor
+<span class="command"><strong>identd</strong></span> esteja sendo usado na máquina servidora, será
+necessário roda-lo com a mesma GID do diretório <code class="filename">/proc</code> para
+que continue funcionando.  Se ele é executado como daemon, adicione a opção
+<span class="emphasis"><em>-g GRUPO</em></span> no script que inicia o serviço em
+<code class="filename">/etc/init.d</code> e reinicie o daemon.  Caso ele seja iniciado
+via inetd, faça a seguinte modificação no arquivo
+<code class="filename">/etc/inetd.conf</code> (assumindo o uso do
+<span class="command"><strong>oidentd</strong></span>):
+</p>
+<pre class="screen">
+#:INFO: Info services
+auth		stream	tcp	nowait.40	nobody.adm	/usr/sbin/oidentd oidend -q -i -t 40
+</pre>
+<p>
+Veja <a class="xref" href="">???</a> para detalhes sobre este serviço.
+</p>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s10.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s12.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Restringindo o uso do shutdown </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Limitando o uso de espaço em disco (quotas)</td></tr></table></div></body></html>

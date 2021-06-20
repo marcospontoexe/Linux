@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Sniffer</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch10.html" title="Capítulo 10. Segurança de Rede" /><link rel="prev" href="ch10.html" title="Capítulo 10. Segurança de Rede" /><link rel="next" href="ch11.html" title="Capítulo 11. Apêndice" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Sniffer</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch10.html">Anterior</a> </td><th width="60%" align="center">Capítulo 10. Segurança de Rede</th><td width="20%" align="right"> <a accesskey="n" href="ch11.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch10.html">Segurança de Rede</a></span> &gt; <span class="breadcrumb-node">Sniffer</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-cripto-sniffer"></a>Sniffer</h2></div></div></div>
+<p>
+O sniffer (farejador) é um programa que monitoram/registram a passagem de dados
+entre as interfaces de rede instaladas no computador.  Os dados coletados por
+sniffers são usados para obtenção de detalhes úteis para solução de problemas
+em rede (quando usado com boas intenções pelo administrador do sistema) ou para
+ataques ao sistema (quando usado pelo cracker para obter nomes/senhas e outros
+detalhes úteis para espionagem).
+</p>
+<p>
+Os sniffers mais conhecidos para sistemas <span class="command"><strong>Linux</strong></span> são
+<span class="command"><strong>tcpdump</strong></span>, <span class="command"><strong>ethereal</strong></span>.  Este último apresenta
+uma interface gráfica GTK para fácil operação em máquinas que executam o
+servidor X.  Para explicar o funcionamento de um sniffer, vou assumir o
+<span class="command"><strong>ethereal</strong></span> instalado (ele não requer modificações no sistema
+além de ser fácil de executar e fazer pesquisa de expressões específicas).
+Instale o <span class="command"><strong>ethereal</strong></span> com o comando <code class="literal">apt-get install
+ethereal</code>.
+</p>
+<p>
+Agora vamos a prática para entender como o sniffer funciona e a importância da
+criptografia de dados (só assim mesmo, não da para entender falando muita
+teoria :-):
+</p>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+<p>
+Conecte-se a Internet
+</p>
+</li><li class="listitem">
+<p>
+Execute o <span class="command"><strong>ethereal</strong></span> como usuário <code class="literal">root</code>.
+</p>
+</li><li class="listitem">
+<p>
+Pressione <code class="literal">CTRL+K</code> para abrir a tela de captura de pacotes.
+Em <code class="literal">Interface</code> selecione sua interface de internet.  Nesta
+tela clique no botão "FILE" e coloque um nome de arquivo que a captura será
+gravada.  Opcionalmente marque a opção "Update list of packets in real time"
+para monitorar a passagem de pacotes em tempo real.
+</p>
+</li><li class="listitem">
+<p>
+Clique em "OK".  A captura de pacotes será iniciada
+</p>
+</li><li class="listitem">
+<p>
+Conecte-se a um site ftp qualquer (digamos ftp.debian.org.br).  Entre com o
+usuário "anonymous" e senha "minhasenha@segura.com.br"
+</p>
+</li><li class="listitem">
+<p>
+Finalize a captura de pacotes clicando no botão "STOP"
+</p>
+</li></ol></div>
+<p>
+Agora vá em "File"/"Open" e abra o arquivo capturado.  Ele está no formato
+usado pelo sniffer <span class="command"><strong>tcpdump</strong></span> como padrão.  Procure no campo
+"INFO" a linha "Request: USER anonymous", logo abaixo você verá a senha
+digitada pelo usuário.  Entendeu agora a importância da criptografia na
+transferência segura de dados?  não só o nome/senha pode ser capturado mas toda
+a seções feitas pelo usuário.  Scanners como o <span class="command"><strong>tcpdump</strong></span> e
+<span class="command"><strong>ethereal</strong></span> são flexivelmente configuráveis para procurar por
+dados específicos nas conexões e salva-los para posterior recuperação.
+</p>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-sniffer-detect"></a>Detectando a presença de sniffers</h3></div></div></div>
+<p>
+Uma característica comum de sniffers é mudar o modo de operação das interfaces
+monitoradas para o "Modo Promíscuo" com o objetivo de analisar todo o tráfego
+que passa por aquele segmento de rede (mesmo não sendo destinados para aquela
+máquina).
+</p>
+<p>
+A entrada/saída de interfaces no modo promíscuo é monitorada nos logs do
+sistema:
+</p>
+<pre class="screen">
+Sep 25 16:53:37 myserver kernel: device eth0 left promiscuous mode
+Sep 25 16:53:56 myserver kernel: device eth0 entered promiscuous mode
+Sep 25 16:54:18 myserver kernel: device eth0 left promiscuous mode
+Sep 25 16:54:31 myserver kernel: device eth0 entered promiscuous mode
+</pre>
+<p>
+O <span class="command"><strong>logcheck</strong></span> monitora estas atividades e classificam esta
+mensagem como prioridade "Violação" (dependendo da configuração dos seus
+filtros em <code class="filename">/etc/logcheck</code>.  Veja <a class="xref" href="ch03s04.html#log-uteis-logcheck" title="logcheck">“logcheck”</a> para detalhes sobre este programa.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> A utilização de
+<code class="literal">switches</code> dificulta a captura de pacotes em redes
+distribuídas porque somente os dados destinados a máquina onde o sniffer está
+instalado poderão ser capturados.
+</p>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch10.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch10.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch11.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Capítulo 10. Segurança de Rede </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Capítulo 11. Apêndice</td></tr></table></div></body></html>

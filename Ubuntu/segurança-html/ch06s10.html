@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Restringindo o uso do shutdown</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s09.html" title="Evitando o uso de hosts.equiv e .rhosts" /><link rel="next" href="ch06s11.html" title="Restringindo o acesso ao sistema de arquivos /proc" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Restringindo o uso do shutdown</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s09.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s11.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Restringindo o uso do shutdown</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-shutdown"></a>Restringindo o uso do shutdown</h2></div></div></div>
+<p>
+Por padrão todos que tem acesso ao console do sistema podem efetuar o reinicio
+do computador pressionando CTRL+ALT+DEL.  Estas teclas de combinação são
+definidas pela linha
+</p>
+<pre class="screen">
+ca:12345:ctrlaltdel:/sbin/shutdown -r now
+</pre>
+<p>
+do arquivo <code class="filename">/etc/inittab</code>.  A opção <span class="emphasis"><em>-a</em></span>
+(access) do <span class="command"><strong>shutdown</strong></span> restringe isto, permitindo somente o
+reinicio do sistema caso um dos usuários cadastrados no arquivo
+<code class="filename">/etc/shutdown.allow</code> estejam logados no console.  Caso
+nenhum usuário autorizado esteja logado, a mensagem <code class="literal">shutdown: no
+authorized users logged in</code> é exibida no console local.
+</p>
+<p>
+O arquivo <code class="filename">/etc/shutdown.allow</code> deve conter um usuário por
+linha e 32 no máximo.
+</p>
+<p>
+A mesma linha do <code class="filename">/etc/inittab</code> pode ser modificada para a
+seguinte:
+</p>
+<pre class="screen">
+ca:12345:ctrlaltdel:/sbin/shutdown -a -t5 -r now
+</pre>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Se a opção <span class="emphasis"><em>-a</em></span> seja
+especificada e o arquivo <code class="filename">/etc/shutdown.allow</code> não existe, a
+opção <span class="emphasis"><em>-a</em></span> é ignorada.
+</p>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s09.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s11.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Evitando o uso de <code class="filename">hosts.equiv</code> e <code class="filename">.rhosts</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Restringindo o acesso ao sistema de arquivos /proc</td></tr></table></div></body></html>

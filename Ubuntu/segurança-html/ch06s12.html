@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Limitando o uso de espaço em disco (quotas)</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s11.html" title="Restringindo o acesso ao sistema de arquivos /proc" /><link rel="next" href="ch06s13.html" title="Suporte a senhas ocultas" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Limitando o uso de espaço em disco (quotas)</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s11.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s13.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Limitando o uso de espaço em disco (quotas)</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-quotas"></a>Limitando o uso de espaço em disco (quotas)</h2></div></div></div>
+<p>
+O sistema de <span class="command"><strong>quotas</strong></span> é usado para limitar o espaço em disco
+disponível a usuários/grupo.  O uso de partições independentes para o diretório
+<code class="filename">/home</code> e outros montados separadamente não é muito eficaz
+porque muitos usuários serão prejudicados se a partição for totalmente ocupada
+e alguns possuem requerimentos de uso maior do que outros.
+</p>
+<p>
+O suporte a <span class="emphasis"><em>Quotas</em></span> deve estar compilado no kernel (seção
+<span class="emphasis"><em>FileSystems</em></span>) e o sistema de arquivos deverá ser do tipo
+<span class="emphasis"><em>ext2</em></span> ou <span class="emphasis"><em>XFS</em></span> para funcionar.
+</p>
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-quotas-install"></a>Instalando o sistema de quotas</h3></div></div></div>
+<p>
+Abaixo o passo a passo para a instalação de quotas em seu sistema:
+</p>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+<p>
+Recompile seu kernel com suporte a quota.  Habilite a opção "Quota support" na
+seção "FileSystems" na configuração de recursos do seu kernel.
+</p>
+</li><li class="listitem">
+<p>
+Instale o pacote  no sistema
+(<code class="literal">apt-get install quota</code>).
+</p>
+</li><li class="listitem">
+<p>
+Habilite a quota para os sistemas de arquivos que deseja restringir no arquivo
+<code class="filename">/etc/fstab</code>:
+</p>
+<pre class="screen">
+/dev/hda1    /boot ext2     defaults                   1  1
+/dev/hda3    /     ext2     defaults,usrquota          1  2
+/dev/hda4    /usr  ext2     defaults,grpquota          1  3
+/dev/hda5    /pub  ext2     defaults,usrquota,grpquota 1  4
+</pre>
+<p>
+O sistema de arquivos <code class="filename">/dev/hda1</code> não terá suporte a quota,
+<code class="filename">/dev/hda3</code> terá suporte a quotas de usuários
+(<span class="emphasis"><em>usrquota</em></span>), <code class="filename">/dev/hda4</code> terá suporte a
+quotas de grupos (<span class="emphasis"><em>grpquota</em></span>) e
+<code class="filename">/dev/hda5</code> terá suporte a ambos.  Por padrão é assumido que
+os arquivos de controle de quota estão localizados no ponto de montagem da
+partição com os nomes <code class="filename">quota.user</code> e
+<code class="filename">quota.group</code>.
+</p>
+</li><li class="listitem">
+<p>
+Agora será necessário criar os arquivos <code class="filename">quota.user</code> e
+<code class="filename">quota.group</code> no ponto de montagem de cada partição
+<span class="emphasis"><em>ext2</em></span> acima que utilizará o recurso de quotas.  O arquivo
+<code class="filename">quota.user</code> controla as quotas de usuários e
+<code class="filename">quota.group</code> controla as quotas de grupos.
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+Crie um arquivo vazio <code class="filename">quota.user</code> em <code class="filename">/</code>
+(terá suporte somente a quota de usuários, veja a opção de montagem no
+<code class="filename">/etc/fstab</code>): <code class="literal">touch /quota.user</code> ou
+<code class="literal">echo -n &gt;/quota.user</code>.
+</p>
+</li><li class="listitem">
+<p>
+Crie um arquivo vazio <code class="filename">quota.group</code> em
+<code class="filename">/usr</code> (terá suporte somente a quota de grupos):
+<code class="literal">touch /usr/quota.group</code> ou <code class="literal">echo -n
+&gt;/usr/quota.group</code>.
+</p>
+</li><li class="listitem">
+<p>
+Crie um arquivo vazio <code class="filename">quota.user</code> e
+<code class="filename">quota.group</code> em <code class="filename">/pub</code> (este sistema de
+arquivos tem suporte a ambos os tipos de quota): <code class="literal">touch /pub/quota.user
+/pub/quota.group</code>.
+</p>
+</li></ul></div>
+<p>
+Por motivos de segurança, as permissões dos arquivos de controle de quota
+<code class="filename">quota.user</code> e <code class="filename">quota.group</code> devem ser
+leitura/gravação ao usuário <code class="literal">root</code> e sem permissões para
+grupo/outros usuários: <code class="literal">chmod 0600 /quota.user /quota.group</code>.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Se deseja utilizar o quota versão 1,
+certifique-se que não existem os arquivos chamados
+<code class="filename">aquota.user</code> e <code class="filename">aquota.group</code> no
+diretório raíz de sua partição.  Se eles estiverem disponíveis, os utilitários
+de quota utilizarão esta versão como padrão, atualmente o kernel 2.4 possui
+somente suporte a quota versão 1.
+</p>
+<p>
+A versão 2 do quota checa corrompimento dos arquivos de dados de quota e
+trabalha mais rápido em partições grandes.  São necessários patches da série
+"ac" (Alan Cox) para usar a versão 2 do quota.
+</p>
+</li><li class="listitem">
+<p>
+Entre em modo monousuário <code class="literal">init 1</code>, desmonte os sistemas de
+arquivos que utilizarão a quota e monte-os novamente (isto serve para ativar as
+opções de quota).  Alternativamente, execute <code class="literal">umount -a</code> (para
+desmontar todos os sistemas de arquivos) e <code class="literal">mount -a</code> para
+remontar todos.
+</p>
+<p>
+Se você ativou as quotas para o sistema de arquivos <code class="filename">/</code>
+(como em nosso exemplo) será necessário reiniciar o sistema.
+</p>
+</li><li class="listitem">
+<p>
+O próximo passo é scanear o disco para criar os dados para as partições com
+suporte a quota (ativadas no <code class="filename">/etc/fstab</code>):
+</p>
+<pre class="screen">
+ quotacheck -augv
+</pre>
+<p>
+O parâmetro <span class="emphasis"><em>-a</em></span> diz para checar todas as partições com
+suporte a quota no arquivo <code class="filename">/etc/mtab</code>,
+<span class="emphasis"><em>-u</em></span> para checar quotas de usuários, <span class="emphasis"><em>-g</em></span>
+para checar grupos e <span class="emphasis"><em>-v</em></span> para mostrar o progresso da
+checagem da partição.
+</p>
+<p>
+Na primeira execução é mostrado uma mensagem de erro de arquivo
+<code class="filename">quota.user</code>/<code class="filename">quota.group</code> corrompido,
+mas isto é normal porque o arquivo anterior tem tamanho zero.  Estes nomes
+também servem para o <span class="command"><strong>quotacheck</strong></span> "auto-detectar" a versão do
+sistema de quota usada no sistema de arquivos.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Certamente será necessário "forçar" a
+remontagem como somente leitura do sistema de arquivos <code class="filename">/</code>
+com a opção <span class="emphasis"><em>-m</em></span> para o <span class="command"><strong>quotacheck</strong></span> criar
+as configurações de quota nesta partição.
+</p>
+</li><li class="listitem">
+<p>
+Agora resta ativar o suporte as quotas de disco em todas as partições
+(<span class="emphasis"><em>-a</em></span>) com recurso de quota especificado (no
+<code class="filename">/etc/mtab</code>):
+</p>
+<pre class="screen">
+ quotaon -augv
+</pre>
+<p>
+As opções possuem o mesmo significado do comando <span class="command"><strong>quotacheck</strong></span>.
+O utilitário <span class="command"><strong>quotaoff</strong></span> serve para desativar quotas de
+usuários e usa as mesmas opções do <span class="command"><strong>quotaon</strong></span>.  Estes três
+utilitários somente podem ser usados pelo usuário <code class="literal">root</code>.  As
+opções de quota podem ser especificadas independente para cada sistema de
+arquivos:
+</p>
+<pre class="screen">
+# Ativa o suporte a quota em /pub (somente grupos de usuários no momento).
+quotaon -gv /pub
+
+# Ativa as quotas de usuários em /pub
+quotaon -uv /pub
+
+# Desativa as quotas de grupos em /pub (deixando somente a de usuários ativa)
+quotaoff -gv /pub
+</pre>
+</li></ol></div>
+<p>
+A atualização de quotas durante a gravação/exclusão de arquivos é feita
+automaticamente.  O utilitário <span class="command"><strong>quotacheck</strong></span> deverá ser
+executado sempre que o sistema de quotas for desativado (por não haver
+atualização automática dos dados de uso de disco) ou quando ocorrerem falhas de
+disco.
+</p>
+<p>
+Na distribuição <span class="command"><strong>Debian</strong></span> o <span class="command"><strong>quotacheck</strong></span> é
+disparado sempre que necessário após as situações de checagem de disco.  As
+quotas de todas as partições também são ativadas automaticamente pelo script
+<code class="filename">/etc/init.d/quota</code> e
+<code class="filename">/etc/init.d/quotarpc</code>.
+</p>
+<p>
+Em sistemas que utilizam NFS e possuem sistemas de arquivos exportados em
+<code class="filename">/etc/exports</code>, o daemon <span class="command"><strong>rpc.rquotad</strong></span>
+deverá ser carregado.  Sua função é fornecer os detalhes de
+<span class="command"><strong>quota</strong></span> dos sistemas de arquivos locais exportados para as
+máquinas clientes.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-quotas-editando"></a>Editando quotas de usuários/grupos</h3></div></div></div>
+<p>
+O programa <span class="command"><strong>edquota</strong></span> é usado pelo <code class="literal">root</code> para
+editar as quotas de usuários/grupos.  Por padrão, todos os usuários/grupos do
+sistema não possuem quotas.  Sua sintaxe é a seguinte
+</p>
+<p>
+<code class="literal">edquota [<span class="emphasis"><em>opções</em></span>]
+[<span class="emphasis"><em>usuário/grupo</em></span>]</code>
+</p>
+<p>
+As opções podem ser:
+</p>
+<div class="variablelist"><dl class="variablelist"><dt><span class="term">-u</span></dt><dd>
+<p>
+Edita a quota do usuário especificado (esta é a padrão).
+</p>
+</dd><dt><span class="term">-g</span></dt><dd>
+<p>
+Edita a quota de grupo especificado.
+</p>
+</dd><dt><span class="term">-r</span></dt><dd>
+<p>
+Permite editar a quota de sistemas de arquivos remotos através do daemon
+<span class="command"><strong>rpc.rquotad</strong></span>.
+</p>
+</dd><dt><span class="term">-p [usuário/grupo]</span></dt><dd>
+<p>
+Usa os valores especificados para o <span class="emphasis"><em>usuário/grupo</em></span> para
+definir a nova quota, sem necessidade de entrar no modo de edição.
+</p>
+</dd><dt><span class="term">-t</span></dt><dd>
+<p>
+Permite modificar o valor de tolerância dos limites que ultrapassam
+<span class="emphasis"><em>soft</em></span> até que sejam bloqueados.  Durante o tempo de
+tolerância, serão enviados somente avisos sobre a quota ultrapassada sem
+bloquear totalmente a gravação de arquivos (até que o limite
+<span class="emphasis"><em>hard</em></span> seja atingido ou o tempo de tolerância seja
+ultrapassado).
+</p>
+</dd></dl></div>
+<p>
+Quando a quota <span class="emphasis"><em>soft</em></span> do usuário/grupo é estourada, a
+mensagem "warning: user disk quota excedeed" será exibida.  Quando a quota
+<span class="emphasis"><em>hard</em></span> é ultrapassada, a gravação atual é interrompida e a
+mensagem "write failed, user disk limit reatched" é mostrada ao usuário.
+Nenhuma nova gravação que ultrapasse a quota <span class="emphasis"><em>hard</em></span> é
+permitida Por exemplo, para modificar a quota do usuário gleydson:
+<code class="literal">edquota gleydson</code>
+</p>
+<pre class="screen">
+Disk quotas for user gleydson (uid 1000): 
+  Filesystem                   blocks       soft       hard     inodes     soft
+    hard
+  /dev/hda5                    504944     500100     600000      10868        15000
+       20000
+</pre>
+<p>
+O editor de textos usado poderá ser modificado através da variável
+<em class="replaceable"><code>$EDITOR</code></em>.  Abaixo a explicação destes campos:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">Filesystem</code> - Sistema de arquivos que terá a quota do
+usuário/grupo editada.  As restrições se aplicam individualmente de acordo com
+o sistema de arquivos.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">blocks</code> - Número máximo de blocos (especificado em Kbytes)
+que o usuário possui atualmente.  O usuário <code class="literal">gleydson</code> está
+usando atualmente 504944 Kbytes.
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">soft</code> - Restrição mínima de espaço em disco usado.
+Atualmente 500100 Kb.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">hard</code> - Limite máximo aceitável de uso em disco para o
+usuário/grupo sendo editado.  600000 Kb atualmente.  O sistema de quotas nunca
+deixará este limite ser ultrapassado.
+</p>
+</li></ul></div>
+</li><li class="listitem">
+<p>
+<code class="literal">inodes</code> - Número máximo de arquivos que o usuário possui
+atualmente na partição especificada.  O usuário <code class="literal">gleydson</code>
+possui atualmente 10868 arquivos na partição <code class="filename">/pub</code>.
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">soft</code> - Restrição mínima de número de arquivos que o
+usuário/grupo possui no disco.  Atualmente em 15.000.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">hard</code> - Restrição máxima de número de arquivos que o
+usuário/grupo possui no disco.  Atualmente em 20.000.
+</p>
+</li></ul></div>
+</li></ul></div>
+<p>
+Para desativar as restrições coloque "0" no campo <span class="emphasis"><em>soft</em></span> ou
+<span class="emphasis"><em>hard</em></span>.  Quando o limite <span class="emphasis"><em>soft</em></span> é
+atingido, o usuário é alertado por ter ultrapassado sua quota com a mensagem
+"warning: user quota excedeed" (quota do usuário excedida).  O programa
+<span class="command"><strong>setquota</strong></span> é uma programa não-interativo para edição de quotas
+para ser usado diretamente na linha de comando ou em shell scripts.
+</p>
+<p>
+Após ultrapassar o limite <span class="emphasis"><em>soft</em></span>, começa a contagem do tempo
+para que este passe a valer como limite <span class="emphasis"><em>hard</em></span> (o máximo
+aceitável e que nunca poderá ser ultrapassado).  O comando <code class="literal">edquota
+-t</code> serve para modificar estes valores na partição especificada:
+</p>
+<pre class="screen">
+Grace period before enforcing soft limits for users: 
+Time units may be: days, hours, minutes, or seconds
+  Filesystem             Block grace period     Inode grace period
+  /dev/hda5                  2days                  7days
+</pre>
+<p>
+Abaixo a explicação destes campos:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">Filesystem</code> - Sistema de arquivos que terá o período de
+tolerância modificado.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Block grade period</code> - Tempo máximo de tolerância para
+usuários/grupos que ultrapassaram sua quota <span class="emphasis"><em>soft</em></span> de espaço
+em disco antes de passar a valer como <span class="emphasis"><em>hard</em></span>.  No exemplo, o
+usuário tem 2 dias para excluir possíveis arquivos ou contactar o administrador
+para redimensionar o tamanho de quota.  O valor padrão é 7 dias.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Inode grade period</code> - Tempo máximo de tolerância para
+usuários/grupos que ultrapassaram sua quota <span class="emphasis"><em>soft</em></span> de número
+de arquivos gravados antes de passar a valer como <span class="emphasis"><em>hard</em></span>.
+No exemplo, o usuário tem 7 dias para excluir possíveis arquivos ou contactar o
+administrador para analisar seu tamanho de quota.  O valor padrão é 7 dias.
+</p>
+</li></ul></div>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> - O comando
+<span class="command"><strong>quotacheck</strong></span> deverá ser executado na partição sempre que novas
+restrições/limites forem editados com o <span class="command"><strong>edquota</strong></span>.  Isto
+atualiza os arquivos <code class="filename">quota.user</code> e
+<code class="filename">quota.group</code>.  Lembre-se de desativar o sistema de quotas
+(<code class="literal">quotaoff -ugv /partição</code>) antes de executar este comando
+(para liberar totalmente a partição, <span class="command"><strong>quotacheck</strong></span> remonta a
+partição somente para leitura quando é executado).  Por este motivo é
+recomendável fazer isso em modo monousuário.
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span> Quando o limite
+<span class="emphasis"><em>soft</em></span> (suave) é excedido, o sistema começará a lhe mostrar
+mensagens alertando a passagem do limite (para lhe dar tempo de eliminar
+arquivos ou não ser pego desprevenido com o bloqueio de gravação) porque o
+limite <span class="emphasis"><em>hard</em></span> (rígido) nunca poderá ser ultrapassado.
+</p>
+<p>
+<span class="strong"><strong>OBS3:</strong></span> - O tempo de tolerância restante ao
+usuário/grupo quando a quota é ultrapassada poder ser visualizada com o comando
+<span class="command"><strong>quota</strong></span> (veja <a class="xref" href="ch06s12.html#d-restr-quotas-checando" title="Verificando a quota disponível ao usuário">“Verificando a quota disponível ao usuário”</a>).
+</p>
+<p>
+<span class="strong"><strong>OBS4:</strong></span> - Quando o usuário exclui seus
+arquivos e volta a ficar abaixo dos limites <span class="emphasis"><em>soft</em></span> da quota,
+o tempo de tolerância é resetado aos valores padrões (especificados por
+<code class="literal">edquota -t</code>.
+</p>
+<p>
+<span class="strong"><strong>OBS5:</strong></span> - As quotas de espaço em disco podem
+ser definidas automaticamente para os novos usuários adicionados ao sistema
+colocando o espaço em disco na variável
+<em class="replaceable"><code>QUOTAUSER=numero</code></em> do arquivo
+<code class="filename">/etc/adduser.conf</code>.  Isto será equivalente a digitar o
+comando <code class="literal">edquota -q QUOTA novo_usuário</code>.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-quotas-mudtodos"></a>Modificando a quota de todos os usuários de uma vez</h3></div></div></div>
+<p>
+Editar manualmente a quota de cada usuário é uma tarefa trabalhosa quando se
+está instalando quotas e possui muitos usuários, existe uma maneira mais fácil
+de fazer isso usando o próprio <span class="command"><strong>edquota</strong></span> e um usuário com a
+quota já definida.  Por exemplo, instalamos quota em nosso sistema e queremos
+que todos os 300 usuários tenham a quota de usuário de 10MB e de grupo de 15MB:
+</p>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+<p>
+Criamos um usuário com esta quota usando o <span class="command"><strong>edquota</strong></span> (como
+descrito em <a class="xref" href="ch06s12.html#d-restr-quotas-editando" title="Editando quotas de usuários/grupos">“Editando quotas de usuários/grupos”</a>).  Como exemplo usaremos
+o usuário <code class="literal">teste_user</code>.  Use o comando <code class="literal">quota
+teste_user</code> para verificar se as quotas para este usuário está
+correta.
+</p>
+</li><li class="listitem">
+<p>
+Criamos um script que modifique a quota padrão de todos os usuários do sistema
+de uma só vez:
+</p>
+<pre class="screen">
+#!/bin/sh
+cd /home
+for USUARIO in *
+do
+edquota -u ${USUARIO} -p teste_user
+
+done
+</pre>
+<p>
+Pronto, verifique a quota de todos os usuários com o comando <code class="literal">repquota
+-a</code>.
+</p>
+</li></ol></div>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-quotas-checando"></a>Verificando a quota disponível ao usuário</h3></div></div></div>
+<p>
+Execute o comando <span class="command"><strong>quota</strong></span> mostra os limites de usuários/grupos
+e a tolerância restante antes do limite <span class="emphasis"><em>soft</em></span> se tornar
+rígido.  Abaixo alguns exemplos descritivos deste comando:
+</p>
+<pre class="screen">
+quota
+
+Disk quotas for user gleydson (uid 1234): 
+     Filesystem  blocks   quota   limit   grace   files   quota   limit   grace
+      /dev/hda5  504944* 500100  600000   00:05   10868       0       0
+</pre>
+<p>
+Os campos tem o seguinte significado:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">Filesystem</code> - Sistema de arquivos.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">blocks</code> - Número de blocos usados atualmente na partição (em
+Kb).  O "*" indica que o limite foi ultrapassado.  Atualmente em 504944.
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">quota</code> - Limite suave (<span class="emphasis"><em>soft</em></span>) de espaço
+na partição que o usuário/grupo possui.  Atualmente 500100.  O valor 0 indica
+que o usuário/grupo não possui restrições.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">limit</code> - Limite máximo (<span class="emphasis"><em>hard</em></span>) de espaço
+na partição que o usuário/grupo possui.  Atualmente em 600000.  O valor 0
+indica que o usuário/grupo não possui restrições.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">grace</code> - Tolerância antes que o limite
+<span class="emphasis"><em>soft</em></span> passe a valer como <span class="emphasis"><em>hard</em></span> quando o
+espaço em disco é ultrapassado.  Este usuário tem 5 minutos restantes para que
+isto ocorra.  Quando o valor <span class="emphasis"><em>soft</em></span> volta a ficar abaixo da
+quota, a tolerância é resetada.
+</p>
+<p>
+O parâmetro "none" indica que o tempo de tolerância expirou (caso existam
+limitações de quota que foram ultrapassadas) ou que o usuário/grupo não possui
+restrições.  Veja se existe um "*" no campo <code class="literal">blocks</code>.
+</p>
+</li></ul></div>
+</li><li class="listitem">
+<p>
+<code class="literal">files</code> - Número máximo de arquivos que usuário/grupo possui
+atualmente na partição.  Um "*' indica que o limite foi ultrapassado.
+Atualmente em 10868.
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+<code class="literal">quota</code> - Limite suave (<span class="emphasis"><em>soft</em></span>) de número
+de arquivos na partição que o usuário/grupo possui.  Atualmente ilimitado.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">limit</code> - Limite máximo (<span class="emphasis"><em>hard</em></span>) de número
+de arquivos na partição que o usuário/grupo possui.  Atualmente ilimitado.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">grace</code> - Tolerância antes que o limite
+<span class="emphasis"><em>soft</em></span> passe a valer como <span class="emphasis"><em>hard</em></span> para o
+número de arquivos ultrapassados.  Como não existe quota para número de
+arquivos, não existe tolerância.  A tolerância é resetada aos valores padrões
+quando o valor <span class="emphasis"><em>soft</em></span> volta a ficar abaixo da quota.
+</p>
+</li></ul></div>
+</li></ul></div>
+<p>
+A quota de outros usuários/grupos podem ser visualizadas especificando as
+opções <span class="emphasis"><em>-u</em></span> (padrão) e <span class="emphasis"><em>-g</em></span> na linha de
+comando respectivamente.  A opção <span class="emphasis"><em>-v</em></span> permite visualizar
+quotas em sistemas de arquivos não alocados e <span class="emphasis"><em>-q</em></span> mostra
+somente uma mensagem dizendo se o usuário está ou não dentro de sua quota:
+</p>
+<pre class="screen">
+quota -u usuario
+
+quota -uq usuario
+
+quota -g users
+</pre>
+<p>
+Por motivos de segurança, você não poderá visualizar as quotas de outros
+usuários e grupos que não pertence (exceto para o usuário
+<code class="literal">root</code>).
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-quotas-todas"></a>Verificando a quota de todos os usuários/grupos do sistema</h3></div></div></div>
+<p>
+Quando precisamos verificar o uso de quotas de todos os usuários/grupos do
+sistema o <span class="command"><strong>quota</strong></span> se torna incômodo e pouco prático.  O
+comando <span class="command"><strong>repquota</strong></span> lista está disponível ao administrador para
+facilitar esta tarefa.  Sua listagem é organizada por partições listando dados
+adicionais como <code class="literal">grace time</code> e aceita as mesmas opções dos
+utilitários <span class="command"><strong>quotaon</strong></span> e <span class="command"><strong>quotaoff</strong></span>.  Primeiro
+são listados as restrições de usuários e depois de grupos para a partição.
+(tolerância) As opções aceitas por este utilitário tem o mesmo significado das
+opções do <span class="command"><strong>quotaon</strong></span> e <span class="command"><strong>quotaoff</strong></span>:
+</p>
+<pre class="screen">
+repquota -aug
+
+*** Report for user quotas on device /dev/hda3
+Block grace time: 7days; Inode grace time: 7days
+                        Block limits                File limits
+User            used    soft    hard  grace    used  soft  hard  grace
+----------------------------------------------------------------------
+root      --   29160       0       0   none    9970     0     0   none
+daemon    --      64       0       0             22     0     0       
+man       --     944       0       0             65     0     0       
+mail      --    4960       0       0            823     0     0       
+news      --       4       0       0              1     0     0       
+gleydson  --   31032       0       0           6956     0     0       
+testuser  --      16       0       0              4     0     0       
+anotheruser --    16       0       0              4     0     0       
+nobody    --    2344       0       0              2     0     0       
+
+*** Report for user quotas on device /dev/hda5
+Block grace time: 2days; Inode grace time: 7days
+                        Block limits                File limits
+User            used    soft    hard  grace    used  soft  hard  grace
+----------------------------------------------------------------------
+root      --   16052       0       0   none    6443     0     0   none
+gleydson  +-    4944  500100  600000   none   10868     0     0       
+
+*** Report for group quotas on device /dev/hda5
+Block grace time: 7days; Inode grace time: 7days
+                        Block limits                File limits
+Group           used    soft    hard  grace    used  soft  hard  grace
+----------------------------------------------------------------------
+root      --   20308       0       0   none     636     0     0   none
+src       --   11404       0       0            660     0     0       
+users     --    1756       0       0           6561     0     0       
+gleydson  --    3452       0       0           9307     0     0
+</pre>
+<p>
+Um sinal de "+-" no segundo campo indica quota ultrapassada ou no espaço em
+disco, "-+' em número de arquivos e "++" em ambos.  Como vimos acima, o este
+comando também lista o número de arquivos e bytes pertencentes a cada usuário
+na partição (mesmo não sendo monitorado pelas restrições de quota), isto ajuda
+a monitorar ações suspeitas com a excedência de espaço em disco de determinados
+usuários/grupos do sistema.  Um exemplo é alguém que esteja fora da quota e
+abusando de seu usuário/grupo para uso excessivo de espaço em disco sem seu
+conhecimento.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Este utilitário pode ser executado por
+qualquer usuário no sistema e mostrar o uso de quotas de usuários/grupos que
+não deveria ter acesso.  É recomendado deve ter permissões de leitura/gravação
+somente para o usuário <code class="literal">root</code> e sem permissões para
+grupo/outros usuários.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-restr-quotas-warn"></a>Avisando usuários sobre o estouro de quota</h3></div></div></div>
+<p>
+Avisos sobre quota ultrapassada podem ser enviadas automaticamente a todos os
+usuários pelo utilitário <span class="command"><strong>warnquota</strong></span>.  Ele poderá ser
+executado periodicamente através do <span class="command"><strong>cron</strong></span> (por padrão isto é
+feito diariamente na distribuição <span class="command"><strong>Debian</strong></span> pelo script
+<code class="filename">/etc/cron.daily/quota</code>).  Dados adicionais sobre o envio
+das mensagens devem ser especificados no arquivo
+<code class="filename">/etc/warnquota.conf</code> seu formato é o seguinte:
+</p>
+<pre class="screen">
+# Programa usado para enviar as mensagens
+MAIL_CMD 	= "/usr/sbin/sendmail -t"
+# Campo de origem da mensagem
+FROM 		= "root@localhost"
+# but they don't have to be:
+SUBJECT 	= Quota excedida
+CC_TO 		= "root@localhost"
+SUPPORT 	= "root@localhost"
+PHONE 		= "5555-2525"
+#
+</pre>
+<p>
+O e-mail é enviado aos usuários (e usuários que pertencem a grupos com a quota
+excedida) com o seguinte formato:
+</p>
+<pre class="screen">
+From: root@localhost
+To: gleydson@debian.gms.com.br
+Cc: root@localhost
+Reply-To: root@localhost
+Subject: Quota Excedida
+Date: Sat, 22 Sep 2001 14:27:38 -0400
+
+Hi,
+
+We noticed that you are in violation with the quotasystem
+used on this system. We have found the following violations:
+
+
+                        Block limits               File limits
+Filesystem           used    soft    hard  grace    used  soft  hard  grace
+/dev/hda5      +-  504944  500100  600000   none   10868     0     0       
+
+
+We hope that you will cleanup before your grace period expires.
+
+Basically, this means that the system thinks you are using more disk space
+on the above partition(s) than you are allowed.  If you do not delete files
+and get below your quota before the grace period expires, the system will
+prevent you from creating new files.
+
+For additional assistance, please contact us at root@localhost
+or via phone at 5555-2525.
+</pre>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s11.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s13.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Restringindo o acesso ao sistema de arquivos /proc </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Suporte a senhas ocultas</td></tr></table></div></body></html>

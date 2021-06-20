@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Alternativas seguras a serviços sem criptografia</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s09.html" title="Certificados com extensões X509 V3" /><link rel="next" href="ch07s11.html" title="Usando o GPG para Autenticação e Criptografia" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Alternativas seguras a serviços sem criptografia</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s09.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s11.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Alternativas seguras a serviços sem criptografia</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-cripto-alt"></a>Alternativas seguras a serviços sem criptografia</h2></div></div></div>
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-http"></a>http</h3></div></div></div>
+<p>
+O uso de alternativas seguras é indispensável em servidores que servem páginas
+de comércio eletrônico, banco de dados, sistemas bancários, administração via
+web ou que tenham dados que oferecem risco, se capturados.
+</p>
+<p>
+Existem duas alternativas: instalar o servidor Apache-ssl (pacote  ou adicionar o módulo
+<code class="filename">mod-ssl</code> na instalação padrão do <span class="command"><strong>Apache</strong></span>.
+Esta segunda é a preferida por ser mais rápida e simples de se administrar, por
+usar o servidor Web <span class="command"><strong>Apache</strong></span> padrão e sua configuração.  Veja
+<a class="xref" href="">???</a> para detalhes de como configurar um servidor Web
+para transmissão de dados criptografados.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-emails"></a>Transmissão segura de e-mails</h3></div></div></div>
+<p>
+A codificação padrão usada para o envio de mensagens em muitos clientes de
+e-mail é o MIME/base64.  Isto não oferece muita segurança porque os dados podem
+ser facilmente descriptografados se pegos por sniffers (veja <a class="xref" href="ch10s02.html" title="Sniffer">“Sniffer”</a>) ou abertos por administradores não confiáveis no
+diretório de spool do servidor.
+</p>
+<p>
+Existem uma diversidade de servidores SMTP, POP, IMAP do
+<span class="command"><strong>Linux</strong></span> que já implementam o protocolo de autenticação
+<span class="emphasis"><em>SSL</em></span>/<span class="emphasis"><em>TLS</em></span>, exigindo login/senha para o
+envio/recepção de mensagens, cabeçalhos de autenticação (aumentando um pouco
+mais a confiança sobre quem enviou a mensagem).  Em especial, a autenticação é
+útil quando desejamos abrir nossas contas de e-mail para a Internet, por algum
+motivo, e não queremos que outros façam relay sem nossa autorização.
+</p>
+<p>
+Outra forma de garantir a segurança da mensagem/arquivos através do correio
+eletrônico é usando o PGP (veja <a class="xref" href="ch07s11.html" title="Usando o GPG para Autenticação e Criptografia">“Usando o <span class="command"><strong>GPG</strong></span> para Autenticação e Criptografia”</a>) em conjunto com
+um MUA (Mail User Agent - cliente de e-mails) que suporte o envio de mensagens
+criptografadas/assinadas usando PGP.  A vantagem do GPG em cima da autenticação
+SSL é que você tem garantidas da autenticidade da mensagem e você pode
+verificar sua integridade.  Os dois programas mais usados em sistemas
+<span class="command"><strong>Unix</strong></span> são o <span class="command"><strong>mutt</strong></span> e o
+<span class="command"><strong>sylpheed</strong></span>.  O <span class="command"><strong>mutt</strong></span> é um MUA para modo
+texto e o <span class="command"><strong>sylpheed</strong></span> para modo gráfico.  Ambos são muito
+flexíveis, permitem uma grande variedade de configurações, personalizações,
+possuem agenda de endereços e gerenciam diversas contas de e-mails em um só
+programa.
+</p>
+<p>
+Para encriptar/assinar uma mensagem no <span class="command"><strong>mutt</strong></span> escreva/responda
+seu e-mail normalmente, quando aparecer a tela onde você tecla "y" para enviar
+a mensagem, tecle "p" e selecione uma das opções para criptografar/assinar uma
+mensagem.
+</p>
+<p>
+Para fazer a mesma operação no <span class="command"><strong>sylpheed</strong></span>, escreva/responda
+seu e-mail normalmente e clique no menu "Mensagem" e marque "assinar",
+"criptografar" ou ambos.  A chave pública deverá estar disponível para tal
+operação (veja <a class="xref" href="ch07s11.html#d-cripto-gpg-c-a" title="Adicionando chaves públicas ao seu chaveiro pessoal">“Adicionando chaves públicas ao seu chaveiro pessoal”</a> e <a class="xref" href="ch07s11.html#d-cripto-gpg-c-e" title="Extraindo sua chave pública do chaveiro">“Extraindo sua chave pública do chaveiro”</a>).
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-pop3"></a>Servidor pop3</h3></div></div></div>
+<p>
+A alternativa mais segura é a utilização do protocolo <span class="command"><strong>IMAP</strong></span>
+com suporte a ssl.  Nem todos os clientes de e-mail suportam este protocolo.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-ftp"></a>Transferência de arquivos</h3></div></div></div>
+<p>
+Ao invés do <span class="command"><strong>ftp</strong></span>, use o <span class="command"><strong>scp</strong></span> ou o
+<span class="command"><strong>sftp</strong></span> para transferência segura de arquivos.  Veja <a class="xref" href="">???</a> e <a class="xref" href="">???</a>.  Uma
+outra alternativa é a configuração de uma VPN entre redes para garantir não só
+a transferência de arquivos, mas uma seção em cima de um tunel seguro entre
+duas pontas.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-rlogin"></a>login remoto</h3></div></div></div>
+<p>
+Ao invés do uso do <span class="command"><strong>rlogin</strong></span>, <span class="command"><strong>telnet</strong></span> e
+<span class="command"><strong>rsh</strong></span> utilize o <span class="command"><strong>ssh</strong></span> (veja <a class="xref" href="">???</a>) ou o telnet com suporte a ssl (veja <a class="xref" href="">???</a>).
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-irc"></a>Bate papo via IRC</h3></div></div></div>
+<p>
+O programa <span class="command"><strong>SILC</strong></span> (Secure Internet Live Conference) realiza a
+criptografia de dados durante o bate papo entre diversos usuários conectados
+via rede.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-icq"></a>Transmissão de mensagens via ICQ</h3></div></div></div>
+<p>
+O protocolo ICQ trabalha de forma plana para transmissão de suas mensagens,
+inclusive as senhas.  Clientes anteriores ainda usavam o UDP (até a versão 7)
+para envio de mensagens, piorando um pouco mais a situação e deixando o cliente
+mais vulnerável a falsificações de pacotes.  Outro ponto fraco é que se alguma
+coisa acontecer com os pacotes UDP, eles serão simplesmente descartados
+perdendo a mensagem.
+</p>
+<p>
+Ao invés do ICQ, você poderá usar algum cliente do protocolo
+<span class="command"><strong>Jabber</strong></span> (como o <span class="command"><strong>gaim</strong></span>,
+<span class="command"><strong>gaber</strong></span> ou <span class="command"><strong>gossip</strong></span>) ou o LICQ mais atual com
+suporte a ssl compilado.  O problema do LICQ com ssh, é que as duas pontas
+deverão ter este suporte compilado e funcionando.
+</p>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s09.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s11.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Certificados com extensões X509 V3 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Usando o <span class="command"><strong>GPG</strong></span> para Autenticação e Criptografia</td></tr></table></div></body></html>

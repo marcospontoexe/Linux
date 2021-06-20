@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chroot, Container e Virtualização</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch08.html" title="Capítulo 8. Segurança de Host" /><link rel="prev" href="ch08.html" title="Capítulo 8. Segurança de Host" /><link rel="next" href="ch08s03.html" title="Desativando softwares e serviços desnecessários" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chroot, Container e Virtualização</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch08.html">Anterior</a> </td><th width="60%" align="center">Capítulo 8. Segurança de Host</th><td width="20%" align="right"> <a accesskey="n" href="ch08s03.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch08.html">Segurança de Host</a></span> &gt; <span class="breadcrumb-node">Chroot, Container e Virtualização</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-hostsecurity-vt"></a>Chroot, Container e Virtualização</h2></div></div></div><p>
+Esta seção documenta características técnicas, vantagens e desvantagens de cada
+uma das respectivas tecnologias. 
+</p><p>
+Versão em vídeo desta seção pode estar disponível no canal do <span class="emphasis"><em>Guia Foca</em></span> no YouTube: 
+<a class="link" href="https://rdr.guiafoca.org/gf-segur-hostsec-vt" target="_top">Entenda Chroot, Container e Virtualização</a>.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-vt-chroot"></a>Chroot</h3></div></div></div><p>
+Chroot é uma das tecnologias mais antigas entre todas, veio inspirada no 
+<span class="emphasis"><em>BSD Jail</em></span>. 
+</p><p>
+<span class="emphasis"><em>Vantagens</em></span>
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+O programa executa em um espaço separado do sistema de arquivos principal 
+da máquina.
+  </li><li class="listitem">
+Não possui perda de performance, pois é como uma pasta local no sistema
+  </li><li class="listitem">
+Possibilita testes mais arriscados na máquina, inclusive testes com versões diferentes do SO (ou até de 
+arquiteturas retro-compatíveis com o kernel, como testar um sistema <span class="emphasis"><em>i386</em></span> em um <span class="emphasis"><em>x86_64</em></span>).
+  </li><li class="listitem">
+Possibilita testes mais arriscados na máquina
+  </li></ol></div><p>
+<span class="emphasis"><em>Desvantagens</em></span>
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+O espaço do kernel é o mesmo da máquina física (não possui qualquer isolamento)
+  </li><li class="listitem">
+Usa a mesma memória RAM (podendo lotar a memória)
+  </li><li class="listitem">
+Separação de dispositivos físicos é deficiente, com isso o disco raíz pode ser
+acessado pelo chroot (escapar da jaula).
+  </li></ol></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-vt-container"></a>Container</h3></div></div></div><p>
+Container é o que há de mais performático em termo de isolação de privilégios. Basicamente 
+é um <span class="emphasis"><em>Chroot</em></span> que deu certo :-D 
+</p><p>
+<span class="emphasis"><em>Vantagens</em></span>
+</p><p>
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Permite isolar totalmente os recursos de CPU, memória, disco da máquina host
+   </p></li><li class="listitem"><p>
+Atachar isoladamente placas de redes do host físico direto para o container
+   </p></li><li class="listitem"><p>
+Alta performance de funcionamento, identico a máquina física
+   </p></li><li class="listitem"><p>
+Não 'perde' espaço em disco, devido a alocação prévia de disco ou memória. Apenas o espaço requerido ou 
+sendo executado serão efetivamente utilizados em máquina física. 
+   </p></li><li class="listitem"><p>
+Inicialização muito rápida. É possível iniciar 250 containers em questão de segundos em uma máquina razoável. 
+   </p></li></ol></div><p>
+
+<span class="emphasis"><em>Desvantagens</em></span>
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Somente é possível utilizar o kernel da máquina hospedeira. A virtualização permite utilizar kernels 
+de diferentes versões
+   </p></li><li class="listitem"><p>
+Como executa no mesmo espaço de memória do kernel da máquina física, existe a possibilidade de alguns tipos
+de vulnerabilidades escalarem privilégios para a máquina host (um pouco raras hoje em dia, mas já ocorreu
+no passado).
+   </p></li></ol></div><p>
+Exemplos de tecnologias de containers: <span class="command"><strong>lxc</strong></span>,<span class="command"><strong>vserver</strong></span>, 
+<span class="command"><strong>openvz</strong></span>, <span class="command"><strong>containerd</strong></span>, <span class="command"><strong>Docker</strong></span>.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-vt-virt"></a>Vantagens da Virtualização</h3></div></div></div><p>
+Virtualização consiste em emular totalmente uma máquina (com memória RAM, disco, processador, video, arquitetura)
+com recursos alocados para sua máquina.
+</p><p>
+<span class="emphasis"><em>Vantagens da Virtualização</em></span>
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Mesmas vantagens do chroot, exceto perda de performance (pode perder até 5% de
+  performance da máquina, mesmo nos melhores sistemas de virtualização via hardware)
+  </li><li class="listitem">
+Separação de kernel: O sistema host (o que roda a virtualização) pode rodar um kernel <span class="emphasis"><em> 5.4</em></span> e a máquina 
+virtual (convidado) um kernel <span class="emphasis"><em>6.0</em></span>.
+  </li><li class="listitem">
+Separação de Memória
+  </li><li class="listitem">
+Separação de CPU
+  </li><li class="listitem">
+Separação de Rede
+  </li><li class="listitem">
+Permite emular outra arquiteturas (para desenvolvimento, homologação, testes, etc)
+  </li></ol></div><p>
+<span class="emphasis"><em>Desvantagens</em></span>
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+Disco e Memória precisam ser pré-alocados 
+  </li><li class="listitem">
+Perda de performance em comparação com chroot
+  </li><li class="listitem">
+Pode haver grnade competição de recursos levando a máquina virtual a um starvation
+  </li></ol></div><p>
+Além de virtualização full, temos sistemas chamados <span class="emphasis"><em>Para-virtualização</em></span>, que carrega
+todas as vantagens e desvantagens da <code class="literal">virtualização tradicional</code> acima, mas 
+utiliza um kernel específicado pelo <code class="literal">host</code> (podendo ser ou não a mesma versão ou arquitetura
+ executada no host de virtualização). Um exemplo de sistema que suporta para-virtualização é o <span class="emphasis"><em>XEN</em></span>.
+ </p><p>
+Exemplos de sistema de virtualização convencional/para-virtualização: <span class="emphasis"><em>KVM</em></span>, 
+<span class="emphasis"><em>XEN</em></span>, <span class="emphasis"><em>Vmware</em></span>, <span class="emphasis"><em>Hyperv</em></span>.
+
+</p></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch08.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch08.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch08s03.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Capítulo 8. Segurança de Host </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Desativando softwares e serviços desnecessários</td></tr></table></div></body></html>

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Criação, monitoramento e segurança de contas</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch04.html" title="Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas" /><link rel="prev" href="ch04.html" title="Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas" /><link rel="next" href="ch04s03.html" title="Tipos de ataques mais comuns para se conseguir uma senha." /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Criação, monitoramento e segurança de contas</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04.html">Anterior</a> </td><th width="60%" align="center">Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas</th><td width="20%" align="right"> <a accesskey="n" href="ch04s03.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch04.html">Gerenciamento de contas e cuidados para a proteção de senhas</a></span> &gt; <span class="breadcrumb-node">Criação, monitoramento e segurança de contas</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-contas-cms"></a>Criação, monitoramento e segurança de contas</h2></div></div></div>
+<p>
+Para adicionar uma conta de usuário ao sistema é simples, basta um comando
+<code class="literal">adduser [usuário]</code> e alguns poucos segundos para responder as
+questões do programa.  Quando criamos contas para outros usuários temos 2
+alternativas: deixarmos a senha em branco ou escolher uma senha que será
+passada ao usuário para que ele possa fazer a troca mais tarde.  A primeira
+alternativa é muito perigosa, pois uma pessoa com acesso a
+<code class="filename">/etc/passwd</code> poderá facilmente descobrir sua lista de
+usuários (principalmente em uma grande empresa quando conhecemos as políticas
+de criação de novas contas).  Um funcionário notaria a presença do novato e
+poderia aproveitar esta oportunidade para tentar incriminar este usando a conta
+recém criada ou tentar outras coisas para obter benefício próprio através do
+descuido de outros.
+</p>
+<p>
+O segundo método de senha inicial é um pouco mais seguro e de preferência a
+senha deve ser escolhida pelo usuário para que pessoas que conhecem o estilo de
+senhas iniciais escolhidas pelo administrador não possam deduzir a nova senha
+criada.  É comum vermos senhas como "novo1234", "123456", "abcdef", "a1b3c3", o
+"nome do usuário" como senhas iniciais, pois é fácil de lembrar.  Senhas deste
+tipo são as primeiras a ser tentadas por crackers e programas específicos para
+este fim.  Mas se o o usuário esquecer de trocar sua senha provisória?
+</p>
+<p>
+O programa <span class="command"><strong>chage</strong></span> e <span class="command"><strong>passwd</strong></span> possui recursos
+que permitem definir limites mínimos e máximo do tempo para troca de senha de
+acesso, número máximo de dias após expirar o tempo de troca da senha em que a
+conta será permanentemente desabilitada (até que o administrador a reative) e o
+período mínimo entre troca de senhas.  Alguns exemplos:
+</p>
+<pre class="screen">
+passwd -x 10 -w 3 teste
+</pre>
+<p>
+A senha do usuário teste expirará após 10 dias (-x 10) e ele será avisado com 3
+dias de antecedência (-w 3) para trocar sua senha.  Após o período máximo o
+usuário será obrigado a trocar a senha.
+</p>
+<p>
+Quando o usuário efetuar o login receberá a seguinte mensagem:
+<code class="literal">Warning: your password will expire in 3 days</code>.
+</p>
+<pre class="screen">
+passwd -x 10 -w 3 -i 2 teste
+</pre>
+<p>
+A senha do usuário teste expirará após 10 dias (-x 10) e ele será avisado com 3
+dias de antecedência (-w 3) para trocar sua senha, após a expiração da senha, o
+usuário tem 2 dias antes da conta ser desativada (-i 2).  Se o período expirar
+e o usuário tentar um novo login será mostrada a mensagem:
+</p>
+<p>
+<code class="literal">Your account has expired: Please contact your system
+administrator</code>
+</p>
+<p>
+Para reativar a conta acima, remova totalmente o bloqueio da conta do usuário
+<code class="literal">teste</code> com <code class="literal">passwd -x 0 teste</code>,
+<code class="literal">passwd -x 99999 -w 7 -i 0 teste</code> ou especifique um período de
+dias maior em adição àqueles especificados para que ele possa trocar a senha.
+</p>
+<p>
+Por exemplo, caso tenha passado 3 dias desde que a conta acima expirou e deseje
+dar mais 2 dias para o usuário trocar a conta: <code class="literal">passwd -x 17 -i 0
+teste</code> A conta será reativada por mais 2 dias dando a oportunidade do
+usuário trocar a senha.  Preste atenção neste exemplo para entender bem a
+situação e prazos.
+</p>
+<pre class="screen">
+passwd -x 90 -n 60 -w 15 -i 0 teste
+</pre>
+<p>
+A senha do usuário teste expirará após 90 dias (-x 90), ele será avisado para
+trocar sua senha com 15 dias antes do prazo final (-w 15) e a conta será
+imediatamente desativada caso o prazo máximo para troca da senha expire (-i 0).
+O usuário também não poderá trocar sua senha durante os primeiros 60 dias desde
+a última troca de senha (-n 60).
+</p>
+<p>
+Em sistemas onde precisa adicionar restrições a muitos usuários na criação da
+conta, é recomendável seguir os métodos descritos em <a class="xref" href="ch04s02.html#d-contas-cms-padroes" title="Definindo valores padrões de restrição">“Definindo valores padrões de restrição”</a>.
+</p>
+<p>
+<span class="strong"><strong>OBS1:</strong></span> Em sistemas com senhas ocultas
+ativadas (veja <a class="xref" href="ch04s04.html#d-contas-segsenhas-shadow" title="Shadow Passwords">“Shadow Passwords”</a>) as restrições acima
+serão especificadas no arquivo <code class="filename">/etc/shadow</code>, isto garante
+que só o usuário <code class="literal">root</code> tenha acesso aos detalhes fornecidos
+neste arquivo.
+</p>
+<p>
+<span class="strong"><strong>OBS2:</strong></span> A <span class="emphasis"><em>-d</em></span> do
+<span class="command"><strong>passwd</strong></span> serve para remover a senha do usuário especificado ou
+seja somente será necessário fornecer o nome de usuário para ter acesso ao
+sistema.
+</p>
+<p>
+<span class="strong"><strong>OBS3:</strong></span> Leve em consideração que o uso do
+recursos de senhas de grupo é um risco de segurança, pois a mesma senha será
+compartilhada entre diversas pessoas.
+</p>
+<p>
+<span class="strong"><strong>OBS4:</strong></span> O programa <span class="command"><strong>useradd</strong></span>
+combina as funções do <span class="command"><strong>adduser</strong></span> e <span class="command"><strong>passwd</strong></span>
+para garantir que a conta seja criada com as restrições apropriadas.  O único
+inconveniente é que o <span class="command"><strong>useradd</strong></span> quebra o <span class="emphasis"><em>Debian
+Policy</em></span> e precisa de todos todos os parâmetros para a criação correta
+da conta (como o diretório home, senha criptografada, e UID numérico).  Seu uso
+é indicado em shell scripts que cuidam automaticamente da tarefa de adicionar
+usuários ao sistema.
+</p>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-cms-padroes"></a>Definindo valores padrões de restrição</h3></div></div></div>
+<p>
+Isto é muito útil quando precisa criar diversos usuários com as mesmas
+restrições de contas, isto tornará o gerenciamento do sistema muito mais
+prático (tudo em Unix é feito para ser mais prático, só devemos saber onde
+mexer).  O arquivo <code class="filename">/etc/defaults/useradd</code> contém valores
+padrões que serão usados pelo <span class="command"><strong>useradd</strong></span> e
+<span class="command"><strong>adduser</strong></span> para definir valores de restrições de contas.  Estes
+valores são gerados usando a opção <span class="emphasis"><em>-D</em></span> em combinação com as
+seguintes opções do <span class="command"><strong>useradd</strong></span>:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">-b [home]</code> - Especificar o diretório home de usuário.  O
+padrão é <code class="filename">/home</code>.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">-e [data]</code> - Data padrão de expiração de contas, especificada
+no formato AnoMesDia.  Por exemplo, 20010920.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">-f [dias]</code> - Número máximo de dias que a conta permanece
+válida após a data de expiração até ser desativada.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">-g [gid/grupo]</code> - ID do grupo ou nome do grupo que o usuário
+pertencerá inicialmente.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">-s [shell]</code> - Shell do usuário.  O padrão é
+<code class="filename">/bin/bash</code>.
+</p>
+</li></ul></div>
+<p>
+<span class="strong"><strong>OBS:</strong></span> Note que nem todas as opções acima
+terão efeito com o <span class="command"><strong>adduser</strong></span> (principalmente as opções
+<span class="emphasis"><em>-f</em></span>, <span class="emphasis"><em>-g</em></span> e <span class="emphasis"><em>-s</em></span> que
+são especificadas no seu arquivo de configuração
+<code class="filename">/etc/adduser.conf</code>).
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-cms-senhas"></a>Senhas fáceis de adivinhar e a escolha de boas senhas</h3></div></div></div>
+<p>
+A senha lhe identifica como o verdadeiro dono de uma conta em um sistema para
+garantir acesso a seus recursos.  A senha de um sistema é tão importante quanto
+uma senha de sua conta bancária, caso caia em mãos erradas as conseqüências
+poderão ser catastróficas, todo cuidado é pouco na hora de escolher uma senha.
+</p>
+<p>
+Senhas fáceis de adivinhar são o primeiro motivo de sucesso de crackers no
+acesso a sistemas de computadores (veja <a class="xref" href="ch04s03.html#d-contas-ataques-deducao" title="Dedução">“Dedução”</a> e <a class="xref" href="ch04s03.html#d-contas-ataques-engsocial" title="Engenharia Social">“Engenharia Social”</a>), o administrador pode forçar o usuário
+a fazer trocas periódicas de senhas através dos recursos citados em <a class="xref" href="ch04s02.html" title="Criação, monitoramento e segurança de contas">“Criação, monitoramento e segurança de contas”</a>, mas quem vai garantir que ele esteja escolhendo boas
+senhas para que ninguém as descubra com facilidade?  Abaixo uma lista de senhas
+ruins (que deverá evitar a todo custo usa-las) e boas:
+</p>
+<p>
+<span class="emphasis"><em>Senhas Ruins</em></span>
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+O uso da palavra <code class="literal">senha</code> como senha!  Isto parece idiota mais
+existe...
+</p>
+</li><li class="listitem">
+<p>
+Senhas com o mesmo nome do login (joao/joao).
+</p>
+</li><li class="listitem">
+<p>
+Compostas por letras ou números em seqüencia crescente ou decrescente (abcdef,
+123456, 654321, etc, etc).  Este tipo de senha pode ser adivinhada por dedução
+e são uma das primeiras combinações que crackers usam para acertar senhas.
+</p>
+</li><li class="listitem">
+<p>
+palavras relacionadas com o gosto pessoal.  Por exemplo "volks", "aston",
+"ferrari" se a pessoa é amante de carros.
+</p>
+</li><li class="listitem">
+<p>
+Nome da esposa, filhos, familiares, animal de estimação, time de futebol, ídolo
+da TV/filmes ou qualquer coisa relacionada a familiares ou indiretamente ao
+usuário.
+</p>
+</li><li class="listitem">
+<p>
+Idade, data de aniversário, data de casamento, número de identidade, título de
+eleitor, placa de carro ou qualquer coisa que seja característica do usuário.
+</p>
+</li><li class="listitem">
+<p>
+Palavras existentes, algo que existe em alguma literatura. Um ataque de dicionário / brute force
+poderá quebrar facilmente sua senha, ou o tempo de dedução será fortemente reduzido.
+</p>
+</li><li class="listitem">
+<p>
+Senhas com menos de 12 caracteres
+</p>
+</li><li class="listitem">
+<p>
+Senhas apenas em minúsculas ou MAIÚSCULAS.
+</p>
+</li></ul></div>
+<p>
+<span class="emphasis"><em>Senhas Boas</em></span>
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+Uma boa senha nunca deverá ser lida mas fácil de lembrar.  Por exemplo pense em
+uma frase importante para você "meu sistema operacional preferido é o Linux" e
+pegue a primeira letra de cada palavra: "msopeol".  PRONTO esta escolhida uma
+boa senha que é fácil de se lembrar e difícil de ser quebrada por ataques de
+dicionário, e além disso, fácil de digitar! 
+</p>
+</li><li class="listitem">
+<p>
+Uma boa senha deve conter números e letras.  A senha acima poderia ser
+modificada para "msopeol1"
+</p>
+</li><li class="listitem">
+<p>
+Conter letras maiúsculas, minúsculas, números, pontuação e caracteres especiais:  "msopeoL1@!.".
+</p>
+</li><li class="listitem">
+<p>
+Conter no mínimo 12 caracteres sempre que possível. Com o aumento do poder de processamento
+das máquinas e sistemas de cálculo criptográficos (usados principalmente em mineração de 
+BitCoins, este é o tamanho mínimo de senha recomendável. Isto aumenta bastante o número de
+combinações necessárias para se quebrar uma senha em um ataque brute force
+(veja <a class="xref" href="ch04s03.html#d-contas-ataques-bruteforce" title="Brute Force">“Brute Force”</a>).  Mesmo que a senha
+escolhida não chegue a 8 caracteres mínimos, você poderá combina-la com
+números.
+</p>
+</li><li class="listitem">
+ <p>
+Não reutilize a senha entre sites; caso a segurança de um site for comprometida, e sua senha
+vazar, outras contas serão igualmente comprometidas.
+ </p>
+</li></ul></div>
+<p>
+Com as dicas acima, a possibilidade de alguém conseguir quebrar uma senha
+criptografada em seu sistema usando os ataques descritos em <a class="xref" href="ch04s03.html" title="Tipos de ataques mais comuns para se conseguir uma senha.">“Tipos de ataques mais comuns para se conseguir uma senha.”</a> é praticamente nula! 
+Além do impacto de uma senha vazada em um site (quando usado em sistemas na internet), não impactar
+outros sites que utiliza a mesma conta. Para os paranóicos de
+plantão, o utilitário <span class="command"><strong>makepasswd</strong></span> pode criar uma senha com
+caracteres completamente aleatórios:
+</p>
+<pre class="screen">
+makepasswd --chars 12
+4y0sBdwMd3#f
+</pre>
+<p>
+Este comando retorna uma string com 12 caracteres (--) "4y0sBdwMd3#f".  Se
+você entendeu boa parte deste guia tenho certeza que 1 ou 2 dias de treino e se
+acostuma com uma senha como esta ;-)
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> NUNCA NUNCA dê pistas sobre sua senha!
+Para você isto pode ser um desafio lançado a outras pessoas quase impossível de
+ser resolvido, mas não se esqueça que muita gente é especializada neste tipo de
+dedução.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-cms-multipasswd"></a>Atualização de senhas de múltiplas contas</h3></div></div></div>
+<p>
+O programa <span class="command"><strong>chpasswd</strong></span> é usado para tal operação.  Deve ser
+especificado um arquivo que contém os campos <code class="literal">usuário:senha</code>
+por linha.  Caso as senhas estejam encriptadas deverá ser especificada a opção
+<span class="emphasis"><em>-e</em></span> ao programa.
+</p>
+<pre class="screen">
+chpasswd -e /localadmin/contas/contas.db
+</pre>
+<p>
+O comando acima atualiza a senha de todos os usuários especificados no arquivo
+<code class="filename">contas.db</code> de uma só vez.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-cms-senharoot"></a>A senha do usuário root</h3></div></div></div>
+<p>
+<span class="emphasis"><em>Esta seção foi retirada do Manual de Instalação da Debian</em></span>.
+</p>
+<p>
+A conta root é também chamada de <span class="emphasis"><em>super usuário</em></span>, este é um
+login que não possui restrições de segurança.  A conta root somente deve ser
+usada para fazer a administração do sistema, e usada o menor tempo possível.
+</p>
+<p>
+Qualquer senha que criar deverá conter de 6 a 8 caracteres, e também poderá
+conter letras maiúsculas e minúsculas, e também caracteres de pontuação.  Tenha
+um cuidado especial quando escolher sua senha root, porque ela é a conta mais
+poderosa.  Evite palavras de dicionário ou o uso de qualquer outros dados
+pessoais que podem ser adivinhados.
+</p>
+<p>
+Se qualquer um lhe pedir senha root, seja extremamente cuidadoso.  Você
+normalmente nunca deve distribuir sua conta root, a não ser que esteja
+administrando um computador com mais de um administrador do sistema.
+</p>
+<p>
+Utilize uma conta de usuário normal ao invés da conta root para operar seu
+sistema.  Porque não usar a conta root?  Bem, uma razão para evitar usar
+privilégios root é por causa da facilidade de se cometer danos irreparáveis
+como root.  Outra razão é que você pode ser enganado e rodar um programa
+<span class="emphasis"><em>Cavalo de Tróia</em></span> -- que é um programa que obtém poderes do
+<span class="emphasis"><em>super usuário</em></span> para comprometer a segurança do seu sistema
+sem que você saiba.
+</p>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04s03.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Tipos de ataques mais comuns para se conseguir uma senha.</td></tr></table></div></body></html>

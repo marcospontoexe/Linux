@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>openssl</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s04.html" title="Cadeia de confiança de certificados" /><link rel="next" href="ch07s06.html" title="Gerenciamento de uma CA e de chaves publicas e privadas" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">openssl</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s04.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s06.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">openssl</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-x509-openssl"></a>openssl</h2></div></div></div><p>
+O <span class="command"><strong>openssl</strong></span> é uma ferramenta que permite criar/remover/alterar certificados, 
+assim como exibir dados de certificados já criados. Assim você poderá obter facilmente dados sobre
+expiração de certificados, CA emissora, dados do utilizador, etc.
+</p><p>
+O <span class="command"><strong>openssl</strong></span> também pode ser usado como ferramenta proxy, adicionando encriptação 
+a serviços não criptografados existentes.
+</p><p>
+As seguintes opções podem ser usadas no <span class="command"><strong>openssl</strong></span>:
+</p><div class="variablelist"><dl class="variablelist"><dt><span class="term"><span class="emphasis"><em>-in [arquivo]</em></span></span></dt><dd><p>
+Especifica o arquivo de origem (entrada)
+</p></dd><dt><span class="term"><span class="emphasis"><em>-out [arquivo]</em></span></span></dt><dd><p>
+Especifica o arquivo de destino (saída). Caso nao seja especificado, o 
+    certificado será enviado para a saída padrão.
+</p></dd><dt><span class="term"><span class="emphasis"><em>-keyout</em></span></span></dt><dd><p>
+Especifica o arquivo destino da chave privada quando estiver sendo gerado um CSR.
+</p></dd><dt><span class="term"><span class="emphasis"><em>-nodes</em></span></span></dt><dd><p>
+Remove a senha do certificado. Utilizado principalmente em exportações e conversões
+</p></dd><dt><span class="term"><span class="emphasis"><em>-topk8</em></span></span></dt><dd><p>
+Grava o formato de chave de privada no formato PKCS #8
+</p></dd><dt><span class="term"><span class="emphasis"><em>-inform [formato]</em></span></span></dt><dd><p>
+Especifica o formato de entrada. Válidos PEM (Privacy Enhanced mail) ou DER (binário)
+</p></dd><dt><span class="term"><span class="emphasis"><em>-outform [formato]</em></span></span></dt><dd><p>
+Especifica o formato de saída. Válidos DER/PEM.
+</p></dd><dt><span class="term"><span class="emphasis"><em>-sha256</em></span></span></dt><dd><p>
+Especifica o uso do algoritmo sha256 para certificados recém gerados
+</p></dd><dt><span class="term"><span class="emphasis"><em>-nocrypt</em></span></span></dt><dd><p>
+Não adiciona criptografia na geração da chave privada no formato PrivateKeyInfo
+</p></dd><dt><span class="term"><span class="emphasis"><em>-nocrl</em></span></span></dt><dd><p>
+Não cria um certificado de revogação (CRL) durante a operação
+</p></dd><dt><span class="term"><span class="emphasis"><em>-pubout</em></span></span></dt><dd><p>
+Especifica que deve ser escolhida a chave publica para saída (por padrão será usada a privada).
+</p></dd><dt><span class="term"><span class="emphasis"><em>-CA</em></span></span></dt><dd><p>
+Especifica o certificado de CA
+</p></dd><dt><span class="term"><span class="emphasis"><em>-CAkey</em></span></span></dt><dd><p>
+Especifica a chave privada da CA para assinar o certificado
+</p></dd></dl></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-openssl-opensslcnf"></a>O arquivo de configuração <code class="filename">/etc/ssl/openssl.cnf</code></h3></div></div></div><p>
+Possui valores padrões para os certificados gerados e comportamento geral do Openssl.
+Pode ser modificado conforme necessidade:
+</p><pre class="screen">
+signer_digest  = sha256                 # Signing digest to use. (Optional)
+default_policy  = tsa_policy1           # Policy if request did not specify it
+                                        # (optional)
+other_policies  = tsa_policy2, tsa_policy3      # acceptable policies (optional)
+digests     = sha1, sha256, sha384, sha512  # Acceptable message digests (mandatory)
+
+Sessões do arquivo:
+[new_oids]
+[ca]
+default_ca      = CA_default
+
+# Configuracao especificando uma CA default
+[CA_default]
+policy          = policy_match
+
+# Configuracao de include para uma policy externa
+[policy_match]
+
+[policy_anything]
+
+[req]
+distinguished_name      = req_distinguished_name
+attributes              = req_attributes
+x509_extensions = v3_ca # The extensions to add to the self signed cert
+
+[req_distinguished_name]
+countryName                     = Country Name (2 letter code)
+countryName_default             = AU
+countryName_min                 = 2
+countryName_max                 = 2
+
+stateOrProvinceName             = State or Province Name (full name)
+stateOrProvinceName_default     = Some-State
+
+localityName                    = Locality Name (eg, city)
+
+0.organizationName              = Organization Name (eg, company)
+0.organizationName_default      = Internet Widgits Pty Ltd
+
+# we can do this but it is not needed normally :-)
+#1.organizationName             = Second Organization Name (eg, company)
+#1.organizationName_default     = World Wide Web Pty Ltd
+
+organizationalUnitName          = Organizational Unit Name (eg, section)
+#organizationalUnitName_default =
+
+commonName                      = Common Name (e.g. server FQDN or YOUR name)
+commonName_max                  = 64
+
+emailAddress                    = Email Address
+emailAddress_max                = 64
+
+[ req_attributes ]
+challengePassword               = A challenge password
+challengePassword_min           = 4
+challengePassword_max           = 20
+
+[usr_cert]
+# usado para assinatura de requisições da 'ca'
+# Se definido para 'server' o certificado gerado pode ser usado para assinar
+# outros certificados
+nsCertType = server
+
+nsCertType = client, email, objsign
+
+nsComment = "Openssl Generated Certificate"
+
+[v3_req]
+[v3_ca]
+[crl_ext]
+[proxy_cert_ext]
+[tsa]
+default_tsa = tsa_config1       # the default TSA section
+
+[tsa_config1]
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-openssl-viewcert"></a>Visualizando conteúdo de um certificado existente</h3></div></div></div><p>
+Para visualizar o conteúdo, execute o seguinte comando:
+</p><span class="command"><strong>
+openssl x509 -in certificado.pem -text -noout
+</strong></span><p>
+</p>
+A saída será algo como essa (utilizando o certificado antigo da <span class="command"><strong>SpiritSec</strong></span>, que expirou no dia 10/Julho
+de 2020 como exemplo). Note principalmente a validade (Validity) do certificado, e que se trata de um
+certificado Wildcard (devido conter <code class="literal">*</code> no campo <span class="emphasis"><em>Subject</em></span>):
+<pre class="screen">
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            01:50:c8:79:b1:65:8c:85:5a:ec:b8:fd
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C = BE, O = GlobalSign nv-sa, CN = AlphaSSL CA - SHA256 - G2
+        Validity
+            Not Before: Jul 10 00:20:36 2019 GMT
+            Not After : Jul 10 00:20:36 2020 GMT
+        Subject: OU = Domain Control Validated, CN = *.spiritsec.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:c1:6a:fd:06:af:cf:d2:36:f3:e3:92:9f:c8:20:
+                    36:9a:90:c0:a5:eb:7e:14:dd:a9:b4:28:c0:23:f2:
+                    de:0b:38:5c:bd:79:23:5c:ab:5b:00:c8:3c:a2:0d:
+                    29:e4:0f:8a:34:46:ea:44:48:69:59:78:b9:fa:39:
+                    fd:2c:44:19:34:6e:49:94:3b:74:5b:03:63:2a:ac:
+                    33:82:4e:0d:8f:31:d0:05:5c:7e:29:a7:13:9e:2c:
+                    3c:c3:90:a4:ba:de:f3:47:c2:81:95:99:ce:5f:21:
+                    e3:6c:63:1b:0b:25:64:f4:f5:60:cc:da:0d:43:9f:
+                    fc:87:60:a1:00:fd:ef:6d:77:d9:8d:4f:ef:56:93:
+                    20:f2:18:26:2b:0b:42:89:33:15:a4:e9:e8:e5:e4:
+                    03:79:4b:a2:e5:ec:87:88:d1:7c:60:3a:1e:03:d1:
+                    83:2b:46:06:36:71:d8:2b:9a:eb:e9:b7:c9:eb:9f:
+                    ef:d0:fe:3b:b1:05:0d:9f:19:b2:92:8d:39:9f:f1:
+                    32:4c:1b:99:c5:2d:e7:57:4e:d0:54:82:8a:c5:33:
+                    02:9c:92:32:15:30:18:b1:09:f7:c7:9d:5f:9d:58:
+                    27:9b:9e:af:92:5d:4a:16:da:bd:44:2e:3e:e1:4b:
+                    8e:19:07:ec:51:3f:c1:a3:c8:e0:7c:ad:42:df:99:
+                    17:17
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment
+            Authority Information Access: 
+                CA Issuers - URI:http://secure2.alphassl.com/cacert/gsalphasha2g2r1.crt
+                OCSP - URI:http://ocsp2.globalsign.com/gsalphasha2g2
+
+            X509v3 Certificate Policies: 
+                Policy: 1.3.6.1.4.1.4146.1.10.10
+                  CPS: https://www.globalsign.com/repository/
+                Policy: 2.23.140.1.2.1
+
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 CRL Distribution Points: 
+
+                Full Name:
+                  URI:http://crl2.alphassl.com/gs/gsalphasha2g2.crl
+
+            X509v3 Subject Alternative Name: 
+                DNS:*.spiritsec.com, DNS:spiritsec.com
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication, TLS Web Client Authentication
+            X509v3 Authority Key Identifier: 
+                keyid:F5:CD:D5:3C:08:50:F9:6A:4F:3A:B7:97:DA:56:83:E6:69:D2:68:F7
+
+            X509v3 Subject Key Identifier: 
+                0B:98:A0:CD:B3:93:41:61:A5:37:0E:05:D9:AA:0B:53:5F:92:86:6D
+            CT Precertificate SCTs: 
+                Signed Certificate Timestamp:
+                    Version   : v1 (0x0)
+                         Log ID    : BB:D9:DF:BC:1F:8A:71:B5:93:94:23:97:AA:92:7B:47:
+                                38:57:95:0A:AB:52:E8:1A:90:96:64:36:8E:1E:D1:85
+                    Timestamp : Jul 10 00:20:39.213 2019 GMT
+                    Extensions: none
+                    Signature : ecdsa-with-SHA256
+                                30:45:02:20:75:92:F7:4B:D0:27:02:91:FF:7E:5A:29:
+                                04:8B:6A:62:9A:8F:0B:EF:84:CB:1D:72:5D:44:94:1D:
+                                EA:D2:35:CB:02:21:00:FB:26:85:E1:1F:B7:99:83:A6:
+                                13:D0:68:17:2C:35:A3:9E:B6:77:F1:D0:30:6C:F8:74:
+                                A6:41:E8:08:42:99:09
+                Signed Certificate Timestamp:
+                    Version   : v1 (0x0)
+                    Log ID    : 87:75:BF:E7:59:7C:F8:8C:43:99:5F:BD:F3:6E:FF:56:
+                                8D:47:56:36:FF:4A:B5:60:C1:B4:EA:FF:5E:A0:83:0F
+                    Timestamp : Jul 10 00:20:39.109 2019 GMT
+                    Extensions: none
+                    Signature : ecdsa-with-SHA256
+                                30:45:02:20:17:E9:CC:4F:6D:03:54:B0:CC:45:C4:86:
+                                2E:AD:E5:E2:66:3C:97:3A:0D:19:0D:4C:4A:51:6D:3F:
+                                27:17:B9:D3:02:21:00:CB:B5:FF:AF:49:E0:9A:7E:A1:
+                                D0:20:6C:76:65:78:73:9D:A4:5A:4E:3A:2C:43:3D:0C:
+                                1D:62:90:70:67:87:5E
+    Signature Algorithm: sha256WithRSAEncryption
+         7c:4a:8b:00:b9:39:c8:c6:eb:ae:57:45:d0:6e:00:71:e1:92:
+         8e:16:f2:88:ae:36:59:1b:9c:45:e6:10:30:b2:75:e4:bd:01:
+         0e:df:58:1e:cd:86:7a:4b:c7:a4:75:82:36:cd:8c:f7:02:81:
+         c8:92:4f:50:94:0f:8e:20:e7:fd:90:25:74:60:e2:e2:c6:df:
+         f5:a9:fd:35:4a:39:a4:22:6d:d4:08:3c:e5:83:5d:80:07:e7:
+         e1:e2:09:b6:f4:37:6b:06:29:60:a3:29:41:9c:08:b1:75:73:
+         db:a9:c3:92:7a:55:3e:76:6c:66:b1:17:30:97:63:77:f6:a3:
+         9c:6c:5b:90:37:75:0b:58:98:49:de:8a:b5:0b:5e:79:50:70:
+         76:1d:cc:4e:be:7a:bf:9a:69:d8:fa:12:73:bd:7d:2b:52:ba:
+         0d:fa:04:9a:ba:fd:d9:07:eb:5c:62:ab:01:34:21:49:59:bc:
+         3a:f2:0a:2e:62:84:1b:e8:a7:b0:bb:da:2c:0c:05:0f:4d:ea:
+         a8:6b:b1:6a:e9:90:36:86:8f:fd:e2:20:a3:ca:4b:b9:7d:73:
+         d3:00:3c:c6:a5:ad:e6:45:eb:d1:6c:ac:1f:12:99:68:4d:86:
+         70:a7:d4:ee:5c:dd:47:a4:3a:3f:1c:f1:36:53:e5:b8:ee:b6:
+         34:b5:71:2a
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-openssl-convert"></a>Convertendo entre formatos de certificados</h3></div></div></div><p>
+Geralmente quando cria, ou compra um certificado, você receberá ele no formato apropriado para usado 
+em seu servidor web ou aplicação, por exemplo, crt, e key para servidor web <span class="command"><strong>Apache</strong></span>
+e <span class="command"><strong>NGINX</strong></span>. Mas se você trocar de servidor web para algo que rode <span class="command"><strong>Java</strong></span>?
+o que faria?
+</p><p>
+Geralmente a conversão é feita usando o <span class="emphasis"><em>PEM</em></span> como formato base. Por exemplo, para 
+converter de <span class="emphasis"><em>PFX</em></span> para <span class="emphasis"><em>DER</em></span>, deve ser convertido primeiro o 
+<span class="emphasis"><em>PFX</em></span> para <span class="emphasis"><em>PEM</em></span> e depois convertido o <span class="emphasis"><em>PEM</em></span> 
+para <span class="emphasis"><em>DER</em></span>, obtendo o resultado final.
+</p><p>
+Esta sessão documenta extamente os procedimento usado para a conversão entre cada formato de
+certificado.
+</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-pem2der"></a>PEM para DER</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>PEM</em></span> para <span class="emphasis"><em>DER</em></span>:
+</p><span class="command"><strong>
+ $ openssl x509 -outform der -in certificado.pem -out certificado.der
+</strong></span></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-pem2p7b"></a>PEM para P7B (PKCS7)</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>PEM</em></span> para <span class="emphasis"><em>P7B</em></span> (PKCS7)
+</p><span class="command"><strong>
+ $ openssl crl2pkcs7 -nocrl -certfile certificado.cer -out certificado.p7b -certfile CAcert.cer
+</strong></span></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-pem2pfx"></a>PEM para PFX (PKCS12)</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>PEM</em></span> para <span class="emphasis"><em>PFX</em></span> (PKCS12)
+</p><span class="command"><strong>
+ $ openssl pkcs12 -export -out certificado.pfx -inkey privateKey.key -in certificado.crt -certfile CAcert.crt
+</strong></span></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-der2pem"></a>DER para PEM</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>DER</em></span> para <span class="emphasis"><em>PEM</em></span>
+</p><span class="command"><strong>
+ $ openssl x509 -inform der -in certificado.cer -out certificado.pem
+</strong></span></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-p7b2pem"></a>P7B (PKCS7) para PEM</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>P7B</em></span> (PKCS7) para <span class="emphasis"><em>PEM</em></span>
+</p><span class="command"><strong>
+ $ openssl pkcs7 -print_certs -in certificado.p7b -out certificado.pem
+</strong></span></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-p7b2pfx"></a>P7B (PKCS7) para PFX</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>P7B</em></span> (PKCS7) para <span class="emphasis"><em>PFX</em></span>
+</p><p>
+<span class="command"><strong>
+ $ openssl pkcs7 -print_certs -in certificado.p7b -out certificado.pem
+ </strong></span>
+</p><p>
+ <span class="command"><strong>
+ $ openssl pkcs12 -export -in certificado.pem -inkey privateKey.key -out certificado.pfx -certfile CAcert.cer
+</strong></span>
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-pfx2pem"></a>PFX para PEM</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>PFX</em></span> para <span class="emphasis"><em>PEM</em></span>
+</p><span class="command"><strong>
+ $ openssl pkcs12 -in certificado.pfx -out certificado.cer -nodes
+</strong></span></div><p>
+<span class="emphasis"><em>OBS:</em></span> - Durnate a conversão para o formato <span class="emphasis"><em>PEM</em></span>, o 
+<span class="command"><strong>openssl</strong></span> colocará todos os certificados e também a chave privada em 
+um mesmo arquivo. Você precisará separar o conteúdo para arquivos individuais
+(removendo as linhas que começan com <code class="literal">BEGIN</code> e <code class="literal">END</code>) 
+para arquivos separados, salvando-os com certificado.pem, CAcert.crt e privatekey.key.
+</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-pfx2der"></a>PFX para DER</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>PFX</em></span> para <span class="emphasis"><em>DER</em></span>, siga os passos
+em <a class="xref" href="ch07s05.html#s-criptografia-x509-openssl-convert-pfx2pem" title="PFX para PEM">“PFX para PEM”</a> e em seguida os passos de 
+<a class="xref" href="ch07s05.html#s-criptografia-x509-openssl-convert-pem2der" title="PEM para DER">“PEM para DER”</a>.
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-openssl-convert-der2pfx"></a>DER para PFX</h4></div></div></div><p>
+Para converter de <span class="emphasis"><em>DER</em></span> para <span class="emphasis"><em>PFX</em></span>, siga os passos
+em <a class="xref" href="ch07s05.html#s-criptografia-x509-openssl-convert-der2pem" title="DER para PEM">“DER para PEM”</a> e em seguida os passos de 
+<a class="xref" href="ch07s05.html#s-criptografia-x509-openssl-convert-pem2pfx" title="PEM para PFX (PKCS12)">“PEM para PFX (PKCS12)”</a>.
+</p></div></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s04.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s06.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Cadeia de confiança de certificados </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Gerenciamento de uma CA e de chaves publicas e privadas</td></tr></table></div></body></html>

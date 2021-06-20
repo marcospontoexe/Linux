@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Capítulo 3. Arquivos e daemons de Log</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="index.html" title="Guia Foca - Segurança" /><link rel="prev" href="ch02s03.html" title="LPI 303" /><link rel="next" href="ch03s02.html" title="Daemon de log do sistema" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Capítulo 3. Arquivos e daemons de Log</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch02s03.html">Anterior</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch03s02.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-node">Arquivos e daemons de Log</span></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="log"></a>Capítulo 3. Arquivos e daemons de Log</h1></div></div></div><div class="toc"><p><strong>Índice</strong></p><dl class="toc"><dt><span class="section"><a href="ch03.html#s18.1">Formato do arquivo de log</a></span></dt><dt><span class="section"><a href="ch03s02.html">Daemon de log do sistema</a></span></dt><dd><dl><dt><span class="section"><a href="ch03s02.html#log-rsyslogd">rsyslogd</a></span></dt><dt><span class="section"><a href="ch03s02.html#log-rsyslogd-exemplo">Arquivo de configuração <code class="filename">rsyslog.conf</code></a></span></dt></dl></dd><dt><span class="section"><a href="ch03s03.html">logger</a></span></dt><dt><span class="section"><a href="ch03s04.html">Programas úteis para monitoração e gerenciamento de arquivos de logs</a></span></dt><dd><dl><dt><span class="section"><a href="ch03s04.html#log-uteis-logcheck">logcheck</a></span></dt><dt><span class="section"><a href="ch03s04.html#log-uteis-logrotate">logrotate</a></span></dt></dl></dd><dt><span class="section"><a href="ch03s05.html">Configurando um servidor de logs</a></span></dt></dl></div>
+<p>
+A atividade dos programas são registradas em arquivos localizados em
+<code class="filename">/var/log</code> .  Estes arquivos de registros são chamados de
+<span class="emphasis"><em>logs</em></span> e contém a data, hora e a mensagem emitida pelo
+programa (violações do sistema, mensagens de erro, alerta e outros eventos)
+entre outros campos.  Enfim, muitos detalhes úteis ao administrador tanto para
+acompanhar o funcionamento do seu sistema, comportamento dos programas ou
+ajudar na solução e prevenção de problemas.
+</p>
+<p>
+Alguns programas como o <span class="command"><strong>Apache</strong></span>, <span class="command"><strong>exim</strong></span>,
+<span class="command"><strong>ircd</strong></span> e <span class="command"><strong>squid</strong></span> criam diversos arquivos de
+log e por este motivo estes são organizados em sub-diretórios (a mesma técnica
+é usada nos arquivos de configuração em <code class="filename">/etc</code>, conforme a
+padrão FHS atual).
+</p>
+
+<div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s18.1"></a>Formato do arquivo de log</h2></div></div></div>
+<p>
+Um arquivo de log é normalmente composto pelos seguintes campos:
+</p>
+<pre class="screen">
+Data|Hora|Máquina|daemon|mensagem
+</pre>
+<p>
+O campo <span class="emphasis"><em>máquina</em></span> é o nome do computador que registrou a
+mensagem (a máquina pode atuar como um servidor de logs registrando mensagens
+de diversos computadores em sua rede).  O campo <span class="emphasis"><em>daemon</em></span>
+indica qual programa gravou a <span class="emphasis"><em>mensagem</em></span>.
+</p>
+<p>
+O uso dos utilitários do console pode ajudar muito na pesquisa e monitoração
+dos logs, por exemplo, para obter todas as mensagens do daemon
+<span class="command"><strong>kernel</strong></span> da estação de trabalho <code class="literal">wrk1</code>,
+eliminando os campos "wrk1" e "kernel":
+</p>
+<pre class="screen">
+grep 'wrk1' /var/log/* | grep 'kernel' | cut -d ' ' -f 1,2,3,6-11
+</pre>
+<p>
+Os parâmetros "$1", "$2" do comando <span class="command"><strong>awk</strong></span> indica que campos
+serão listados, (omitimos $4 e $5 que são respectivamente "wrk1" e "kernel").
+Um bom utilitário para monitoração de logs está documentado em <a class="xref" href="ch03s04.html#log-uteis-logcheck" title="logcheck">“logcheck”</a>.
+</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch02s03.html">Anterior</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch03s02.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">LPI 303 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Daemon de log do sistema</td></tr></table></div></body></html>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Introdução a Certificados</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s02.html" title="Introdução aos protocolos SSL e TLS" /><link rel="next" href="ch07s04.html" title="Cadeia de confiança de certificados" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Introdução a Certificados</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s02.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s04.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Introdução a Certificados</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-x509-intro"></a>Introdução a Certificados</h2></div></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-intro-x509"></a>Certificados X509</h3></div></div></div><p>
+Certificados X509 tem basicamente a função de permitir a navegação segura de protocolos 
+de internet (como web, email, XMPP, VPN, etc). Certificados podem também garantir a segurança 
+de documentos (via assinatura digital) e da comunicação de aplicativos que também ficam 
+desconectados da internet (como entre microserviços).
+ </p><p>
+Certificados também podem identificar a validade de usuários (ao invés de hosts), permitindo
+que os mesmos tenham a identidade confirmada (equivalente a um CPF digital). Ele basicamente
+opera segundo o padrão de chave pública e chave privada: A chave privada fica de posse do usuário
+ou servidor, e a pública pode ser distribuida a sistemas na internet ou carregada pelo cliente
+para garantir uma segura negociação de conexão entre o cliente e servidor.
+ </p><p>
+ De onde vem os certificados? eles podem ser emitidos por uma entidade certificadora 
+ credenciada (que chamamos de CA) ou eles podem ser gerados por você (neste caso chamados
+ de certificados auto-assinados). Toda emissão de certificado passa por um criterioso 
+ processo de validação e emissão (conforme o tipo de certificado comprado) desta forma, quando 
+ um certificado é assinado por uma CA confiável,  seu site, e-mail, etc nao emitirão qualquer 
+ alerta sobre a identidade do sistema que  está acessando, pois ele validará a autenticidade 
+ de quem emitiu e do certificado. 
+ </p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-intro-x509-expiration"></a>Validade de Certificados</h3></div></div></div><p>
+Existe uma camada adicional de segurança de certificados, que identificam o período que ele
+é válido: O certificado permite uma data inicial e final de validade. É claro que 
+o padrão assume que falhas de sistemas e humanas podem ocorrer, e por isso foi 
+criado um certificado especial, agregado ao principal chamado de <span class="emphasis"><em>Lista de Revogação 
+de Certificados</em></span> (<span class="emphasis"><em>CRL</em></span>). 
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-intro-x509-intermCA"></a>CA Intermediária</h3></div></div></div><p>
+Uma CA intermediária, é basicamente um certificado criado pelo certificado raíz, que 
+pode criar novos certificados. A validação é feita usando uma cadeia de validação de confiança.
+ </p><p>
+<span class="emphasis"><em>OBS</em></span> - A versão 3 do X509 suportar estruturas de autenticação da 
+cadeia de confiança, como bridges e mesh.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-intro-x509-certissuing"></a>Como é gerado um Certificado assinado por CA?</h3></div></div></div><p>
+Quando acessa sites como o <a class="link" href="http://www.guiafoca.org" target="_top">Página Oficial do guia Foca
+GNU/Linux</a> pelo seu navegador, provavelmente
+observará que é mostrado um cadeado ao lado da URL, e não é emitido qualquer alerta sobre
+a confiança do certificado. Esse cadeado indica que o site foi autenticado por uma CA válida
+(como <span class="emphasis"><em>CertSign</em></span>, <span class="emphasis"><em>AlphaSSL</em></span>, <span class="emphasis"><em>LetsEncript</em></span>),
+e está dentro da validade. Mas qual é o passo a passo para que isso aconteça?
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+A primeira etapa é gerar um par de chaves, que ficará em sua posse. A partir dessas chaves, 
+emitiremos um tipo especial de certificado, chamado de Requisição de Assinatura de Certificado
+(CSR - Certificate signing request).
+    </p></li><li class="listitem"><p>
+Após isso, o CSR deverá ser enviado para a entidade certificadora escolhida. A CSR contém
+os dados pessoais do requerente preenchidos no certificados e o subject (domínio) que o 
+certificado protegerá. Após a validação e comprovação de autenticidade dos dados, a CA lhe enviará 
+o certificado assinado pela chave privada da CA, com um prazo de validade determinado.
+    </p></li><li class="listitem"><p>
+O certificado assinado então será instalado no servidor web, garantindo o acesso seguro a 
+clientes que estão fazendo acesso ao mesmo
+    </p></li></ol></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-intro-x509-cert-extensions"></a>Tipos de certificados e suas extensões</h3></div></div></div><p>
+Os tipos mais comuns e extensões de certificados seguem abaixo:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+    <code class="filename">.pem</code> – É um dos mais comuns, e geralmente começam com 
+    "-----BEGIN CERTIFICATE-----" and "-----END CERTIFICATE-----". O PEM (Privacy-enhanced Electronic Mail) 
+    Basicamente é um certificado  DER com encode Base64. 
+      </p></li><li class="listitem"><p>
+    <code class="filename">.cer, .crt, .der</code> – Geralmente em formato DER binário, mas também usando Base64 como encoder
+are common too (see .pem above)
+      </p></li><li class="listitem"><p>
+    <code class="filename">.p7b, .p7c</code> – Dados estruturados e assinados PKCS#7 sem dados, apenas certificados ou CRLs.
+      </p></li><li class="listitem"><p>
+    <code class="filename">.p12</code> – O PKCS#12, poder conter certificados público ou privados e chaves (protegidos por senha).
+      </p></li><li class="listitem"><p>
+    <code class="filename">.pfx</code> – Veio antes do PKCS#12 (geralmente contém dados no formato PKCS#12, geralmente
+    usado no IIS.
+      </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-intro-x509-structure"></a>A estrutura básica de um certificado?</h3></div></div></div><p>
+Um certificado X509 padrão possui a seguinte estrutura:
+</p><pre class="screen">
+    Certificate
+        Version Number
+        Serial Number
+        Signature Algorithm ID
+        Issuer Name
+        Validity period
+            Not Before
+            Not After
+        Subject name
+        Subject Public Key Info
+            Public Key Algorithm
+            Subject Public Key
+        Issuer Unique Identifier (optional)
+        Subject Unique Identifier (optional)
+        Extensions (optional)
+            ...
+    Certificate Signature Algorithm
+    Certificate Signature
+</pre>
+Entre os campos acima, os mais importantes são:
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+<span class="emphasis"><em>Issuer Name</em></span> - Nome da CA que emitiu o certificado
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Subject</em></span> - Endereço solicitante do certificado
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Validity</em></span> - Validade do certificado. O <span class="emphasis"><em>Not Before</em></span> 
+impede que o certificado seja usado antes da data determinada. O <span class="emphasis"><em>Not After</em></span> 
+impede que ele seja usado após a data determinada.
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Extensions</em></span> - Estrutura documentada na RFC 1422, indicando que extensões podem ser usadas, geralmente contémum conjunto de valores
+que são classificados como <span class="emphasis"><em>criticos</em></span> ou <span class="emphasis"><em>não-criticos</em></span>. Caso seja
+encontrado uma extensão crítica faltando, o processamento será finalizado. Erros <span class="emphasis"><em>não-críticos</em></span>
+podem ser ignorados se não forem reconhecidos (mesmo assim são processados como válidos).
+   </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-intro-x509-extensions"></a>Extensões para uso em certificados</h3></div></div></div><p>
+Basicamente as extensões do SSLv3 são divididos em:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+<span class="emphasis"><em>Politicas Básicas</em></span> - São usados para indicar se o certificado pertemce a uma CA
+
+    </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Uso da Chave</em></span> - Prove a especificação de operações de criptografia
+que podem ser feitas usando a chave pública contida no certificado: por exemplo, pode indicar que a 
+chave pode ser usads para assinatura mas não para criptografia.
+    </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Uso de chave Extendido</em></span> - É usado tipicamente nos últimos
+certificados emitidos na cadeia, para indicar o propósito de uma 
+chave ocntendo o certificado. 
+    </p></li></ul></div><p>
+O <span class="emphasis"><em>RFC 5280</em></span> traz detalhes e exemplos específicos do certificado 
+contendo ambos <span class="emphasis"><em>keyUsage</em></span> e <span class="emphasis"><em>extendedKeyUsage</em></span>.
+</p></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s02.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s04.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Introdução aos protocolos SSL e TLS </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Cadeia de confiança de certificados</td></tr></table></div></body></html>

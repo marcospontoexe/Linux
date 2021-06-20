@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Introdução aos protocolos SSL e TLS</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="next" href="ch07s03.html" title="Introdução a Certificados" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Introdução aos protocolos SSL e TLS</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s03.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Introdução aos protocolos SSL e TLS</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-x509-ssl-tls-intro"></a>Introdução aos protocolos SSL e TLS</h2></div></div></div><p>
+Esta sessão documenta as versões e protocolos utilizados no TLS, SSL e suas características e limitações.
+O objetivo é auxiliar a você na escolha dos mais seguros e riscos da utilização de versões legadas.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-ssl"></a>SSL</h3></div></div></div><p>
+O SSL (Secure Sockets Layer) permite a comunicação segura entre
+servidor e usuários, via canal de criptografia seguro. 
+Tal conexão tem vários benefícios:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Protege dados sensíveis que trafegam entre servidor e navegador, como logins, senhas</p></li><li class="listitem"><p>Protege contra o acesso indevido de criminosos e quer intruso</p></li><li class="listitem"><p>Protege, contra captura e consequentemente uso de dados pessoais, como número de cartões de crédito,
+dados financeiros, endereços e nomes</p></li><li class="listitem"><p>Protege os dados contra mdoificações indevidas durante o transito entre origem e destino
+na rede</p></li></ul></div><p>
+O SSL embaralha os dados transferidos, tornando impossível sua leitura por crackers. Apenas se 
+o invasor obtiver a chave de criptografia, ele conseguirá acesso ao conteúdo.
+</p><p>
+Para fazer a negociação de conexão, o protocolo SSL estabelece uma relação de confiança entre
+origem (muitas vezes seu navegador web) e destino para proteger uma conexão.
+
+Um certificado conecta o domínio, servidor e hostname a uma identidade 
+que pode ser corporativa ou pessoal. O certificado é instalado no servidor web da organização,
+e quando o usuário acessa o website seguro, fornecendo conexão segura entre o navegador
+do usuário e servidor.
+</p><p>
+Para estabelecer essa relação de confiança, um certificado SSL é emitido por uma CA 
+confiável (ou uma origem confiável), onde a CA autentica a o destino utilizando 
+métodos de confirmação da identidade ou posse do domínio, e-mail, da identidade, etc.
+</p>
+Quando um certificado é gerado, geralmente ele possui os seguintes campos:
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>issued to</p>Para quem o certificado foi emitido</li><li class="listitem"><p>issued from</p>Quem emitiu o certificado</li><li class="listitem"><p>start date</p>Data inicial no qual o certificado é válido</li><li class="listitem"><p>expire date</p>Data final de validade (expiração) do certificado</li><li class="listitem"><p>domain name</p>Domínio onde o certificado é válido</li><li class="listitem"><p>CA name</p>Nome da entidade certificadora</li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-https"></a>HTTPS</h3></div></div></div><p>
+O <span class="emphasis"><em>HTTPS</em></span> é um protocolo para comunicação segura sobre HTTP. Esta comunicação é feita dentro
+de uma conexão que é encriptada utilizando <span class="emphasis"><em>TLS</em></span> ou <span class="emphasis"><em>SSL</em></span>.
+</p><p>
+Se um website tem um certificado <span class="emphasis"><em>SSL</em></span>, a URL inicia com <span class="command"><strong>https://</strong></span> 
+ao invés de <span class="command"><strong>http://</strong></span>, ela também terá um símbolo de cadeado, indicando maior
+<code class="literal">proteção</code>. Caso clique no símbolo de cadeado na barra do navegador, você conseguirá 
+obter detalhes do certificado.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-maininmiddle"></a>Ataque Man in the Middle (MITM)</h3></div></div></div><p>
+O <span class="emphasis"><em>HTTPS</em></span> protege contra ataques man-in-the-middle, espionagem de conexão, 
+data tampering (alteração) do conteúdo entre o website e usuários. Por outro lado, o 
+<span class="emphasis"><em>HTTP</em></span> (Hyper Text Transfer Protocol) é vulnerável a estes tipos de ataques, 
+por utilizar a comunicação usando texto plano.
+</p><p>
+Com o <span class="emphasis"><em>HTTP</em></span>, invasores podem acessar as contas do website e informações sensíveis, e 
+injetar um malware e outros arquivos maliciosos no website. Desta forma, transações usando dados sensíveis
+(senhas, cartões de crédito, códigos de autenticação, etc) devem ser protegidos usando HTTPS.
+</p><p>
+Hoje em dia, o <span class="emphasis"><em>HTTPS</em></span> se tornou extremamente importante para protegir todos os
+tipos de sites, devido ao aumento de website atacados. Você nâo deve apenas proteger os sites, mas também proteger a 
+privacidade da comunicações de usuários, informações e identidadees.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-tls"></a>TLS</h3></div></div></div><p>
+O <span class="emphasis"><em>TLS</em></span> (Transport Layer Security), que é uma versão atualizada e 
+<span class="emphasis"><em>mais segura</em></span> do <span class="emphasis"><em>SSL</em></span>. Atualmente ele 
+se encontra na versão 1.3 (lançada em Agosto de 2018, e coberto na RFC 8446).
+Assim como o <span class="emphasis"><em>SSL</em></span>, o <span class="emphasis"><em>TLS</em></span> fornece autenticação 
+e encriptação de dados entre máquinas, servidores e aplicações.
+</p><p>
+O TLS foi desenvolvido para substituir o SSl versão 2, devido a diversas vulnerabilidades que 
+haviam sido descobertas na época. Sua primeira versão (a <span class="emphasis"><em>TLS 1.0</em></span>) foi lançada 
+em 1999, e após isso surgiu o <code class="literal">SSL 3.0</code>.  A versão 1.3 foi diretamente ligada a 
+equipe de engenharia da <code class="literal">CloudFlare</code> e sua primeira implementação foi no navegador 
+<span class="command"><strong>Firefox 52</strong></span>, sendo ativado por padrão.
+</p><p>
+A nova versão <span class="emphasis"><em>1.3</em></span> do TLS é mais rápida que a TLS <span class="emphasis"><em>1.2</em></span>, e 
+também eliminou falhas de segurança da versão anterior.
+</p><p>
+Algumas características notáveis do <span class="emphasis"><em>TLS 1.3</em></span> incluem:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>As diretivas antigas e inseguras de criptografia foram completamente removidas</p></li><li class="listitem"><p>A construção usando técnicas analiticas modernas o tornam seguro</p></li><li class="listitem"><p>Sempre usar PFS, significando que cada sessão é protegida separadamente desde
+que não exista chave em comum, dando assim melhor proteção caso o tráfego for
+interceptado ou a chave de um certificado já usado muito tempo for exposto.</p></li><li class="listitem"><p>Encripta mais dados comparado ao <span class="emphasis"><em>TLS 1.2</em></span></p></li><li class="listitem"><p>Mais rápido que o <span class="emphasis"><em>TLS 1.2</em></span></p></li><li class="listitem"><p>Somente usa ciphers seguros (<span class="emphasis"><em>ChaCHA-Poly</em></span> e <span class="emphasis"><em>AES-GCM</em></span>), facilitando a proteção e 
+configuração de aplicativos que são seguros por padrão.</p></li><li class="listitem"><p>Possui o modo <span class="emphasis"><em>0-RTT</em></span>, removendo o round-trip da latência de handshake. Isto 
+é possível através de métodos inovadores de reuso de conexões já existentes.</p></li></ul></div><p>
+A remoção suporte a ciphers antigos e quebrados de criptografia resultaram no
+<span class="emphasis"><em>TLS 1.3</em></span> ser um padrão bem mais seguro que o <span class="emphasis"><em>TLS 1.2
+</em></span>. Desta forma as falhas que permitiam tais ataques foram removidas, dificultando
+a exploração por crackers
+</p><p>
+O <span class="emphasis"><em> TLS 1.3</em></span> possui características que o tornam mais rápido em 
+Streaming, dando aos usuários uma melhor experiẽncia de navegação web.
+</p><p>
+Devido a essas inovações, as maiores empresas como Google, Mozilla, Akamai, 
+CloudFlare, foram as primeiras a adorarem o uso de TLS 1.3, e também 
+assegurando o uso de software mais atualizados em seu ambiente.
+</p><p>
+Como viu, a atualização de softwares e tecnologias não servem apenas para ganhar 
+novos recursos, mas também auxilia na proteção do ambiente e redução de riscos 
+de segurança, caso estas técnicas não sejam adotadas.
+</p></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s03.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Capítulo 7. Criptografia </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Introdução a Certificados</td></tr></table></div></body></html>

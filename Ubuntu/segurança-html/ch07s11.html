@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Usando o GPG para Autenticação e Criptografia</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s10.html" title="Alternativas seguras a serviços sem criptografia" /><link rel="next" href="ch07s12.html" title="Criptografia de blocos usando DM-Crypt / cryptsetup" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Usando o <span class="command"><strong>GPG</strong></span> para Autenticação e Criptografia</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s10.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s12.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Usando o <span xmlns="http://www.w3.org/1999/xhtml" class="command"><strong>GPG</strong></span> para Autenticação e Criptografia</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-cripto-gpg"></a>Usando o <span class="command"><strong>GPG</strong></span> para Autenticação e Criptografia</h2></div></div></div>
+<p>
+O <span class="command"><strong>GPG</strong></span> (GNU pgp, versão livre da ferramenta pgp) permite
+encriptar dados, assim somente o destinatário terá acesso aos dados,
+adicionalmente poderá verificar se a origem dos dados é confiável (através da
+assinatura de arquivos).  O sistema PGP se baseia no conceito de chave
+<span class="emphasis"><em>pública</em></span> e <span class="emphasis"><em>privada</em></span>: Sua chave
+<span class="emphasis"><em>pública</em></span> é distribuída para as pessoas que deseja trocar
+dados/mensagens e a chave <span class="emphasis"><em>privada</em></span> fica em sua máquina (ela
+não pode ser distribuída).  As chaves públicas e privadas são armazenadas nos
+arquivos <code class="filename">pubring.gpg</code> e <code class="filename">secring.gpg</code>
+respectivamente, dentro do subdiretório <code class="filename">~/.gnupg</code>.  Veja
+<a class="xref" href="ch07s11.html#d-cripto-gpg-criando" title="Criando um par de chaves pública/privada">“Criando um par de chaves pública/privada”</a> para criar este par de chaves.
+</p>
+<p>
+Os dados que recebe de outra pessoa são criptografados usando sua chave pública
+e somente você (de posse da chave privada) poderá desencriptar os dados.
+Quando assina um arquivo usando o pgp, ele faz isto usando sua chave privada, o
+destinatário de posse da chave pública poderá então confirmar que a origem dos
+dados é confiável.
+</p>
+<p>
+O <span class="command"><strong>gpg</strong></span> vem largamente sendo usado para transmissão segura de
+dados via internet.  Muitos programas de e-mails como o <span class="command"><strong>mutt</strong></span>
+e <span class="command"><strong>sylpheed</strong></span> incluem o suporte a pgp embutido para envio de
+mensagens assinadas/encriptadas (MIME não tem uma codificação segura e não
+garante que a mensagem vem de quem realmente diz ser).  Um servidor de e-mail
+no <span class="command"><strong>Linux</strong></span> configurado como as mesmas configurações/endereços
+do provedor da vítima pode enganar com sucesso um usuário passando-se por
+outro.
+</p>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-pacote"></a>Instalando o PGP</h3></div></div></div>
+<p>
+apt-get install gnupg
+</p>
+<p>
+Após instalar o , execute o
+comando <span class="command"><strong>gpg</strong></span> para criar o diretório
+<code class="filename">~/.gnupg</code> que armazenará as chaves pública e privada.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-criando"></a>Criando um par de chaves pública/privada</h3></div></div></div>
+<p>
+Para gerar um par de chaves pessoais use o comando <code class="literal">gpg
+--gen-key</code>.  Ele executará os seguintes passos:
+</p>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+<p>
+<code class="literal">Chave criptográfica</code> - Selecione <span class="emphasis"><em>DSA e
+ELGamal</em></span> a não ser que tenha necessidades específicas.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Tamanho da chave</code> - 1024 bits traz uma boa combinação de
+proteção/velocidade.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Validade da chave</code> - 0 a chave não expira.  Um número
+positivo tem o valor de dias, que pode ser seguido das letras
+<code class="literal">w</code> (semanas), <code class="literal">m</code> (meses) ou
+<code class="literal">y</code> (anos).  Por exemplo, "7m", "2y", "60".
+</p>
+<p>
+Após a validade, a chave será considerada inválida.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Nome de usuário</code> - Nome para identificar a chave
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">E-mail</code> - E-mail do dono da chave
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">comentário</code> - Uma descrição sobre a chave do usuário.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Confirmação</code> - Tecle "O" para confirmar os dados ou uma das
+outras letras para modificar os dados de sua chave.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Digite a FraseSenha</code> - Senha que irá identificá-lo(a) como
+proprietário da chave privada.  É chamada de FraseSenha pois pode conter
+espaços e não há limite de caracteres.  Para alterá-la posteriormente, siga as
+instruções em <a class="xref" href="ch07s11.html#d-cripto-gpg-chpasswd" title="Mudando sua FraseSenha">“Mudando sua FraseSenha”</a>.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">Confirme e aguarde a geração da chave pública/privada</code>.
+</p>
+</li></ol></div>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-e"></a>Encriptando Dados</h3></div></div></div>
+<p>
+Use o comando <code class="literal">gpg -e arquivo</code> faz a encriptação de dados:
+</p>
+<pre class="screen">
+gpg -e arquivo.txt
+</pre>
+<p>
+Será pedida a identificação de usuário, digite o nome que usou para criar a
+chave.  O arquivo criado será encriptado usando a chave pública do usuário
+(<code class="filename">~/.gnupg/pubring.gpg</code>) e terá a extensão
+<code class="filename">.gpg</code> adicionada (<code class="filename">arquivo.txt.gpg</code>).
+Além de criptografado, este arquivo é compactado (recomendável para grande
+quantidade de textos).  A opção <span class="emphasis"><em>-a</em></span> é usada para criar um
+arquivo criptografado com saída ASCII 7 bits:
+</p>
+<pre class="screen">
+gpg -e -a arquivo.txt
+</pre>
+<p>
+O arquivo gerado terá a extensão <code class="filename">.asc</code> acrescentada
+(<code class="filename">arquivo.txt.asc</code>) e não será compactado.  A opção
+<span class="emphasis"><em>-a</em></span> é muito usada para o envio de e-mails.
+</p>
+<p>
+Para criptografar o arquivo para ser enviado a outro usuário, você deverá ter a
+chave pública do usuário cadastrado no seu chaveiro (veja <a class="xref" href="ch07s11.html#d-cripto-gpg-c-a" title="Adicionando chaves públicas ao seu chaveiro pessoal">“Adicionando chaves públicas ao seu chaveiro pessoal”</a>) e especificar a opção <span class="emphasis"><em>-r</em></span>
+seguida do nome/e-mail/ID da chave pública:
+</p>
+<pre class="screen">
+gpg -r kov -e arquivo.txt
+</pre>
+<p>
+O exemplo acima utiliza a chave pública de kov para encriptar o arquivo
+<code class="filename">arquivo.txt</code> (somente ele poderá decriptar a mensagem
+usando sua chave privada).
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> É recomendável especificar o nome de
+arquivo sempre como último argumento.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-d"></a>Decriptando dados com o GPG</h3></div></div></div>
+<p>
+Agora vamos fazer a operação reversa da acima, a opção <span class="emphasis"><em>-d</em></span>
+é usada para decriptar os dados usando a chave privada:
+</p>
+<pre class="screen">
+gpg -d arquivo.txt.asc &gt;arquivo.txt
+gpg -d arquivo.txt.gpg &gt;arquivo.txt
+</pre>
+<p>
+Descriptografa os arquivos <code class="filename">arquivo.txt.asc</code> e
+<code class="filename">arquivo.txt.gpg</code> recuperando seu conteúdo original.  A sua
+"FraseSenha" será pedida para descriptografar os dados usando a chave privada
+(<code class="filename">~/.gnupg/secring.gpg</code>).
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-a"></a>Assinando arquivos</h3></div></div></div>
+<p>
+Assinar um arquivo é garantir que você é a pessoa que realmente enviou aquele
+arquivo.  Use a opção <span class="emphasis"><em>-s</em></span> para assinar arquivos usando sua
+chave privada:
+</p>
+<pre class="screen">
+gpg -s arquivo.txt
+</pre>
+<p>
+A "FraseSenha" será pedida para assinar os dados usando sua chave privada.
+Será gerado um arquivo <code class="filename">arquivo.txt.gpg</code> (assinado e
+compactado).  Adicionalmente a opção <span class="emphasis"><em>--clearsign</em></span> poderá
+ser usada para fazer uma assinatura em um texto plano, este é um recurso muito
+usado por programas de e-mails com suporte ao gpg:
+</p>
+<pre class="screen">
+gpg -s --clearsign arquivo.txt
+</pre>
+<p>
+Será criado um arquivo chamado <code class="filename">arquivo.txt.asc</code> contendo o
+arquivo assinado e sem compactação.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-a-c"></a>Checando assinaturas</h3></div></div></div>
+<p>
+A checagem de assinatura consiste em verificar que quem nos enviou o arquivo é
+realmente quem diz ser e se os dados foram de alguma forma alterados.  Você
+deverá ter a chave pública do usuário no seu chaveiro para fazer esta checagem
+(veja <a class="xref" href="ch07s11.html#d-cripto-gpg-c-a" title="Adicionando chaves públicas ao seu chaveiro pessoal">“Adicionando chaves públicas ao seu chaveiro pessoal”</a>).  Para verificar os dados assinados
+acima usamos a opção <span class="emphasis"><em>--verify</em></span>:
+</p>
+<pre class="screen">
+gpg --verify arquivo.txt.asc
+</pre>
+<p>
+Se a saída for "Assinatura Correta", significa que a origem do arquivo é segura
+e que ele não foi de qualquer forma modificado.
+</p>
+<pre class="screen">
+gpg --verify arquivo.txt.gpg
+</pre>
+<p>
+Se a saída for "Assinatura INCORRETA" significa que ou o usuário que enviou o
+arquivo não confere ou o arquivo enviado foi de alguma forma modificado.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-c-e"></a>Extraindo sua chave pública do chaveiro</h3></div></div></div>
+<p>
+Sua chave pública deve ser distribuída a outros usuários para que possam enviar
+dados criptografados ou checar a autenticidade de seus arquivos.  Para exportar
+sua chave pública em um arquivo que será distribuído a outras pessoas ou
+servidores de chaves na Internet, use a opção <span class="emphasis"><em>--export</em></span>:
+</p>
+<pre class="screen">
+gpg --export -a usuario &gt;chave-pub.txt
+</pre>
+<p>
+Ao invés do nome do usuário, poderá ser usado seu e-mail, ID da chave, etc.  A
+opção <span class="emphasis"><em>-a</em></span> permite que os dados sejam gerados usando bits
+ASCII 7.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-c-a"></a>Adicionando chaves públicas ao seu chaveiro pessoal</h3></div></div></div>
+<p>
+Isto é necessário para o envio de dados criptografados e checagem de assinatura
+do usuário, use a opção <span class="emphasis"><em>--import</em></span>:
+</p>
+<pre class="screen">
+gpg --import chave-pub-usuario.txt
+</pre>
+<p>
+Assumindo que o arquivo <code class="filename">chave-pub-usuario.txt</code> contém a
+chave pública do usuário criada em <a class="xref" href="ch07s11.html#d-cripto-gpg-c-e" title="Extraindo sua chave pública do chaveiro">“Extraindo sua chave pública do chaveiro”</a>.  O
+<span class="command"><strong>gpg</strong></span> detecta chaves públicas dentro de textos e faz a
+extração corretamente.  Minha chave pública pode ser encontrada em <a class="xref" href="ch11s09.html" title="Chave Pública PGP">“Chave Pública PGP”</a> ou <a class="ulink" href="http://pgp.ai.mit.edu" target="_top">http://pgp.ai.mit.edu</a>.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-c-l"></a>Listando chaves de seu chaveiro</h3></div></div></div>
+<p>
+Use o comando <code class="literal">gpg --list-keys</code> para listar as chaves pública
+do seu chaveiro.  O comando <code class="literal">gpg --list-secret-keys</code> lista
+suas chaves privadas.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-c-d"></a>Apagando chaves de seu chaveiro</h3></div></div></div>
+<p>
+Quando uma chave pública é modificada ou por qualquer outro motivo deseja
+retira-la do seu chaveiro público, utilize a opção
+<span class="emphasis"><em>--delete-key</em></span>:
+</p>
+<pre class="screen">
+gpg --delete-key usuario
+</pre>
+<p>
+Pode ser especificado o nome de usuário, e-mail IDchave ou qualquer outro
+detalhe que confira com a chave pública do usuário.  Será pedida a confirmação
+para excluir a chave pública.
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> A chave privada pode ser excluída com a
+opção <span class="emphasis"><em>--delete-secret-key</em></span>.  Utilize-a com o máximo de
+atenção para excluir chaves secretas que não utiliza (caso use mais de uma), a
+exclusão acidental de sua chave secreta significa é como perder a chave de um
+cofre de banco: você não poderá descriptografar os arquivos enviados a você e
+não poderá enviar arquivos assinados.
+</p>
+<p>
+Mesmo assim se isto acontecer acidentalmente, você poderá recuperar o último
+backup da chave privada em <code class="filename">~/.gnupg/secring.gpg~</code>.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-chpasswd"></a>Mudando sua FraseSenha</h3></div></div></div>
+<p>
+Execute o comando <code class="literal">gpg --edit-key usuário</code>, quando o programa
+entrar em modo de comandos, digite <code class="literal">passwd</code>.  Será lhe pedida
+a "Frase Senha" atual e a nova "Frase Senha".  Digite "save" para sair e salvar
+as alterações ou "quit" para sair e abandonar o que foi feito.
+</p>
+<p>
+O <code class="literal">gpg --edit-key</code> permite gerenciar diversos aspectos de suas
+chaves é interessante explora-lo digitando "?"  para exibir todas as opções
+disponíveis.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-sign"></a>Assinando uma chave digital</h3></div></div></div>
+<p>
+A assinatura de chaves é um meio de criar laços de confiança entre usuários
+PGP.  Assinar uma chave de alguém é algo sério, você deve ter noção do que isto
+significa e das conseqüências que isto pode trazer antes de sair assinando
+chaves de qualquer um.
+</p>
+<p>
+O próprio teste para desenvolvedor da distribuição <span class="command"><strong>Debian</strong></span>
+requer como primeiro passo a identificação do candidato, caso sua chave pgp
+seja assinada por algum desenvolvedor desta distribuição, imediatamente o teste
+de identificação é completado.  A partir disso você deve ter uma noção básica
+do que isto significa.  Para assinar uma chave siga os seguintes passos:
+</p>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+<p>
+Importe a chave pública do usuário (veja <a class="xref" href="ch07s11.html#d-cripto-gpg-c-a" title="Adicionando chaves públicas ao seu chaveiro pessoal">“Adicionando chaves públicas ao seu chaveiro pessoal”</a>).
+</p>
+</li><li class="listitem">
+<p>
+Execute o comando <code class="literal">gpg --edit-key usuario</code> (onde
+<span class="emphasis"><em>usuario</em></span> é o nome do usuário/e-mail/IDchave da chave
+pública importada).
+</p>
+</li><li class="listitem">
+<p>
+Digite <code class="literal">list</code>, e selecione a chave pública (pub) do usuário
+com o comando <code class="literal">uid [numero_chave]</code>.  Para assinar todas as
+chaves públicas do usuário, não selecione qualquer chave com o comando
+<code class="literal">uid</code>.
+</p>
+</li><li class="listitem">
+<p>
+Para assinar a chave pública do usuário digite <code class="literal">sign</code>, será
+perguntado se deseja realmente assinar a chave do usuário e então pedida a
+"FraseSenha" de sua chave privada.
+</p>
+</li><li class="listitem">
+<p>
+Digite "list", repare que existe um campo chamado <code class="literal">trust: n/q</code>
+no lado direito.  O primeiro parâmetro do "trust" indica o valor de confiança
+do dono e o segundo (após a <code class="literal">/</code>) o valor de confiança
+calculado automaticamente na chave.  As seguintes possuem o seguinte
+significado:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+<code class="literal">-</code> - Nenhum dono encontrado/confiança não calculada.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">e</code> - Chave expirada/falha na checagem de confiança.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">q</code> - Quando não conhece o usuário.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">n</code> - Quando não confia no usuário (é o padrão).
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">m</code> - Pouca confiança no usuário.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">f</code> - Totalmente confiável.
+</p>
+</li><li class="listitem">
+<p>
+<code class="literal">u</code> - Indiscutivelmente confiável.  Somente usado para
+especificar a chave pública do próprio usuário.
+</p>
+</li></ul></div>
+<p>
+O valor de confiança da chave pode ser modificado com o comando
+<code class="literal">trust</code> e selecionando uma das opções de confiança.  Os
+valores de confiança para a chave pública pessoal é <code class="literal">-/u</code> (não
+é necessário calcular a confiança/indiscutivelmente confiável).
+</p>
+</li></ol></div>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-c-sign-l"></a>Listando assinaturas digitais</h3></div></div></div>
+<p>
+Execute o comando <code class="literal">gpg --list-sigs</code> para listas todas as
+assinaturas existentes no seu chaveiro.  Opcionalmente pode ser especificado um
+parâmetro para fazer referência a assinatura de um usuário:<code class="literal">gpg
+--list-sigs usuario</code>.
+</p>
+<p>
+O comando <code class="literal">gpg --check-sigs</code> adicionalmente faz a checagem de
+assinaturas.
+</p>
+</div>
+
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-cripto-gpg-c-sign-guia"></a>Recomendações para a assinatura de chaves GPG</h3></div></div></div>
+<p>
+Este texto foi divulgado publicamente em 22 de Maio de 2001 por 
+<code class="literal">Henrique de Moraes Holschuh</code> na lista 
+<code class="email">&lt;<a class="email" href="mailto:debian-user-portuguese@lists.debian.org">debian-user-portuguese@lists.debian.org</a>&gt;</code> explicando os
+procedimentos de segurança para a troca de chaves públicas individuais e em
+grupo de usuários.  Ele é um pouco longo mas a pessoa é especializada no
+assunto, e seu foco é a segurança na troca de chaves e o que isto significa.
+Após consulta ao autor do texto, o texto foi reproduzido na íntegra, mantendo
+os padrões de formatação da mensagem.
+</p>
+<pre class="screen">
+Trocando assinaturas de chaves digitais
+
+Direitos de republicação cedidos ao domínio público, contanto que o texto
+seja reproduzido em sua íntegra, sem modificações de quaisquer espécie, e
+incluindo o título e nome do autor.
+
+
+1. Assinaturas digitais
+2. Chaves digitais e a teia de confiança
+3. Trocando assinaturas de chaves digitais com um grupo de pessoas
+
+
+1. Assinaturas digitais
+
+Uma assinatura digital é um número de tamanho razoável (costuma ter de 128 a
+160 bits) que representa um bloco bem maior de informação, como um e-mail.
+
+Pense numa assinatura como se ela fosse uma versão super-comprimida de um
+texto.  Se você muda alguma coisa (por menor que seja) no texto que uma
+assinatura "assina", essa assinatura se torna inválida: ela não mais
+representa aquele texto.
+
+Existe uma relação direta entre uma assinatura e informação que ela assina.
+Se uma das duas for modificada, elas passam a não mais "combinar" uma com a
+a outra. Um programa de computador pode detectar isso, e avisar que a
+assinatura é "inválida".
+
+Os algoritmos mais usados para criar e verificar assinaturas digitais são o
+SHA-1, RIPEM160 e MD5.  O MD5 não é considerado tão bom quanto os outros
+dois.
+
+Assinaturas digitais também funcionam com arquivos "binários", ou seja:
+imagens, som, planilhas de cálculo... e chaves digitais.
+
+
+2. Chaves digitais e a teia de confiança
+
+Chaves digitais são fáceis de falsificar, você só precisa criar uma chave
+nova no nome de sicrano, por um endereço de e-mail novinho em folha daqueles
+que você consegue nesses webmail da vida, e pronto.  Agora é só espalhar
+essa chave por aí que os bestas vão usá-la pensando que é de sicrano.
+
+A menos que os "bestas" não sejam tão bestas assim, tenham lido o manual do
+seu software de criptografia, e saibam usar assinaturas e a teia de
+confiança para verificar se a tal chave é de sicrano mesmo.
+
+Programas de criptografia (os bons, tipo PGP e GNUpg) usam um sistema de
+assinaturas nas chaves digitais para detectar e impedir esse tipo de
+problema:  Ao usuário é dado o poder de "assinar" uma chave digital, dizendo
+"sim, eu tenho certeza que essa chave é de fulano, e que o e-mail de fulano é
+esse que está na chave".
+
+Note bem as palavras "certeza", e "e-mail".  Ao assinar uma chave digital,
+você está empenhando sua palavra de honra que o _nome_ do dono de verdade
+daquela chave é o nome _que está na chave_, e que o endereço de e-mail
+daquela chave é da pessoa (o "nome") que também está na chave.
+
+Se todo mundo fizer isso direitinho (ou seja, não sair assinando a chave de
+qualquer um, só porque a outra pessoa pediu por e-mail, ou numa sala de
+chat), cria-se a chamada teia de confiança.
+
+Numa teia de confiança, você confia na palavra de honra dos outros para
+tentar verificar se uma chave digital é legítima, ou se é uma "pega-bobo".
+
+Suponha que Marcelo tenha assinado a chave de Cláudia, e que Roberto, que
+conhece Marcelo pessoalmente e assinou a chave de Marcelo, queira falar com
+Cláudia.  
+
+Roberto sabe que Marcelo leu o manual do programa de criptografia, e que ele
+não é irresponsável.  Assim, ele pode confiar na palavra de honra de Marcelo
+que aquela chave digital da Cláudia é da Cláudia mesmo, e usar a chave pra
+combinar um encontro com Cláudia.
+
+Por outro lado, Roberto não conhece Cláudia (ainda), e não sabe que tipo de
+pessoa ela é. Assim, rapaz prevenido, ele não confia que Cláudia seja uma
+pessoa responsável que verifica direitinho antes de assinar chaves.
+
+Note que Roberto só confiou na assinatura de Marcelo porque, como ele já
+tinha assinado a chave de Marcelo, ele sabe que foi Marcelo mesmo quem
+assinou a chave de Cláudia.  
+
+Enrolado? Sim, é um pouco complicado, mas desenhe num papel as flechinhas de
+quem confia em quem, que você entende rapidinho como funciona.
+
+O uso da assinatura feita por alguém cuja chave você assinou, para validar
+a chave digital de um terceiro, é um exemplo de uma pequena teia de
+confiança.
+
+
+3. Trocando assinaturas de chaves digitais com um grupo de pessoas
+
+Lembre-se: ao assinar uma chave digital, você está empenhando sua palavra de
+honra que toda a informação que você assinou naquela chave é verdadeira até
+onde você pode verificar, _e_ que você tentou verificar direitinho.
+
+Pense nisso como um juramento: "Eu juro, em nome da minha reputação
+profissional e pessoal, que o nome e endereços de e-mail nessa chave são
+realmente verdadeiros até onde posso verificar, e que fiz uma tentativa real
+e razoável de verificar essa informação."
+
+Sim, é sério desse jeito mesmo. Você pode ficar muito "queimado" em certos
+círculos se você assinar uma chave falsa, pensando que é verdadeira:  a sua
+assinatura mal-verificada pode vir a prejudicar outros que confiaram em
+você.
+
+Bom, já que o assunto é sério, como juntar um grupo de pessoas numa sala, e
+trocar assinaturas de chaves entre si?  Particularmente se são pessoas que
+você nunca viu antes? Siga o protocolo abaixo, passo a passo, e sem pular ou
+violar nenhum dos passos.
+
+
+  1 -  Reúna todos em uma sala, ou outro local não tumultuado, pressa e
+       bagunça são inimigas da segurança.
+  
+  2 -  Cada um dos presentes deve, então, ir de um em um e:
+  
+       2.1 -  Apresentar-se, mostrando _calmamente_ documentação original
+              (nada de fotocópia) comprovando sua identidade.  RG, CPF,
+              passaporte, certidão de nascimento ou casamento, carteira de
+              motorista, cartão de crédito são todos bons exemplos. Só o RG
+              sozinho não é -- tem muito RG falsificado por aí -- mas o RG
+              junto com o cartão de banco já seria suficiente.  Se nenhum
+              documento tiver foto, também não é o bastante.
+              
+              * Se alguém pedir o documento na mão, para verificar
+              direitinho, não leve pro lado pessoal. Deixe a pessoa
+              verificar até estar satisfeita (mas não descuide do
+              documento). Isso só significa que ela leva muito a sério a
+              responsabilidade de assinar chaves.
+
+       2.2 -  Entregar um papel com as informações da chave: Nome
+              (QUE OBRIGATORIAMENTE PRECISA SER O MESMO NOME CONSTANTE NOS
+              DOCUMENTOS APRESENTADOS EM 2.1), e-mail, número da chave
+              (keyID), e fingerprint da chave (assinatura digital da chave)
+
+              RECIPIENTE DO PAPEL: Se você achar que os documentos que te
+              apresentaram não são prova suficiente, talvez porque o nome
+              não bate com o da chave, ou porque uma foto nos documentos não
+              está parecida com quem mostrou os documentos, marque
+              discretamente no papel, porque você NÃO deve assinar essa
+              chave.   Se achar que o outro vai engrossar, não diga para ele
+              que não vai assinar a chave dele.
+
+  3 -  Pronto. Podem ir embora, porque o resto dos passos deve ser feito com
+       calma, em casa.  Lembre-se que você não vai estar efetuando nenhum
+       julgamento moral a respeito de quem você assinar a chave. Você só irá
+       afirmar que a chave de sicrano é realmente aquela, e mais nada.
+
+  4 -  Para cada uma das chaves que você marcou no papel que "posso assinar":
+  
+       4.1 -  Peça para o seu programa de criptografia mostrar a chave e sua
+              assinatura (fingerprint).
+              
+              SE: O nome no papel for exatamente igual ao nome na chave
+              (user ID/UID da chave). E: A assinatura no papel for
+              exatamente igual à assinatura na chave (fingerprint).  ENTÃO:
+              Vá para o passo 4.3.
+
+       4.2 -  As informações não bateram, por isso você não deve assinar a
+              chave.  Se quiser, envie um e-mail avisando que não poderá
+              assinar a chave. Não aceite tentativas de retificação por
+              e-mail ou telefone. Um outro encontro face-à-face, refazendo
+              todos os passos 2.1 e 2.2 é o único jeito de retificar
+              o problema.
+
+       4.3 -  As informações bateram, o que garante que o *nome* está
+              correto. Agora é preciso ter certeza do endereço de e-mail.
+              Para isso, envie uma e-mail *CIFRADA* pela chave que você está
+              testando, para o endereço de e-mail constante na chave.  Nessa
+              e-mail, coloque uma palavra secreta qualquer e peça para o
+              destinatário te responder dizendo qual a palavra secreta que
+              você escreveu. Use uma palavra diferente para cada chave que
+              estiver testando, e anote no papel daquela chave qual palavra
+              você usou.
+
+       4.4 -  Se você receber a resposta contendo a palavra secreta correta,
+              você pode assinar a chave. Caso contrário, não assine a chave -- 
+              o endereço de e-mail pode ser falso.
+
+
+Comandos do gpg (GNUpg) correspondentes a cada passo:
+  2.2 -       gpg --fingerprint &lt;seu nome ou 0xSuaKEYID&gt;
+              (retorna as informações que devem estar no papel a ser
+              entregue no passo 2.2)
+
+  4.1 -       gpg --receive-key &lt;0xKEYID&gt;
+              (procura a chave especificada nos keyservers)
+              gpg --sign-key &lt;0xKEYID&gt;
+              (assina uma chave)
+
+              Assume-se que você sabe cifrar e decifrar mensagens. Caso
+              não saiba, ainda não é hora de querer sair assinando chaves.
+</pre>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s10.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s12.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Alternativas seguras a serviços sem criptografia </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Criptografia de blocos usando DM-Crypt / cryptsetup</td></tr></table></div></body></html>

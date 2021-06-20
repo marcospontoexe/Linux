@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Programas úteis para monitoração e gerenciamento de arquivos de logs</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch03.html" title="Capítulo 3. Arquivos e daemons de Log" /><link rel="prev" href="ch03s03.html" title="logger" /><link rel="next" href="ch03s05.html" title="Configurando um servidor de logs" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Programas úteis para monitoração e gerenciamento de arquivos de logs</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s03.html">Anterior</a> </td><th width="60%" align="center">Capítulo 3. Arquivos e daemons de Log</th><td width="20%" align="right"> <a accesskey="n" href="ch03s05.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch03.html">Arquivos e daemons de Log</a></span> &gt; <span class="breadcrumb-node">Programas úteis para monitoração e gerenciamento de arquivos de logs</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="log-uteis"></a>Programas úteis para monitoração e gerenciamento de arquivos de logs</h2></div></div></div>
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="log-uteis-logcheck"></a>logcheck</h3></div></div></div>
+<p>
+É um programa usado para enviar um e-mail periodicamente ao administrador do
+sistema (através do <span class="command"><strong>cron</strong></span> ou outro daemon com a mesma função)
+alertando sobre os eventos que ocorreram desde a última execução do programa.
+As mensagens do <span class="command"><strong>logcheck</strong></span> são tratadas por arquivos em
+<code class="filename">/etc/logcheck</code> e organizadas em categorias antes de ser
+enviada por e-mail, isto garante muita praticidade na interpretação dos eventos
+ocorridos no sistema.
+</p>
+<p>
+As categorias são organizadas da mais importantes para a menos importante, e
+vão desde "Hacking em andamento" (providências devem ser tomadas imediatamente
+para resolver a situação) até "eventos anormais do sistema" (mensagens de
+inicialização, mensagens dos daemons do sistema, etc.).
+</p>
+<p>
+O tipo de mensagem que será incluída/ignorada nos logs enviados podem ser
+personalizadas pelo administrador do sistema através dos arquivos/diretórios
+dentro de <code class="filename">/etc/logcheck</code>.  Nomes de arquivos/diretórios
+contendo a palavra "ignore" são usados para armazenar expressões regulares que
+NÃO serão enviadas pelo <span class="command"><strong>logcheck</strong></span>.  É permitido o uso de
+expressões regulares <span class="command"><strong>perl/sed</strong></span> para especificar as mensagens
+nos arquivos de log.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="log-uteis-logrotate"></a>logrotate</h3></div></div></div>
+<p>
+Usado para fazer backups dos logs atuais do sistema (programado via
+<span class="command"><strong>cron</strong></span>, ou outro daemon com a mesma função) e criando novos
+arquivos de logs que serão usados pelo sistema.  Opcionalmente os arquivos de
+logs antigos serão compactados para diminuir a utilização de espaço em disco ou
+enviados por e-mail ao administrador.  A rotação dos arquivos de logs
+proporciona maior agilidade quando precisamos encontrar algum detalhe útil (que
+seria mais difícil de se achar em um arquivo de log de 10MB ou maior).
+</p>
+<p>
+A rotação de logs é feita de acordo com o tamanho do arquivo de logs
+especificado, mas a opção <span class="emphasis"><em>-f</em></span> pode ser usada para "forçar"
+a rotação de logs.  A opção <span class="emphasis"><em>-d</em></span> fornece mais detalhes sobre
+o que o <span class="command"><strong>logrotate</strong></span> está fazendo.  Seu arquivo principal de
+configuração é o <code class="filename">/etc/logrotate.conf</code>.  Um modelo deste
+tipo de arquivo é o seguinte:
+</p>
+<pre class="screen">
+#### Estas opções afetam globalmente o funcionamento do logrotate
+# roda os arquivos de log semanalmente
+weekly
+
+# mantém as últimas 4 cópias de logs anteriores
+rotate 4
+
+# Erros de não existência dos logs são enviados para o usuário root
+mail root
+
+# Cria novos arquivos de log (vazios) após rodar os antigos
+create
+
+# Descomente isso se desejar seus arquivos de logs compactados. O parâmetro
+# delaycompress é usado para que o primeiro log rodado seja mantido 
+# descompactado
+compress
+delaycompress
+
+# Executam os scripts em prerotate e postrotate a cada vez que os logs 
+# forem rodados. 
+nosharedscripts
+
+# Definimos um diretório que poderá conter definições individuais para 
+# diversos serviços no sistema, eles podem ir neste arquivo mas 
+# diversas configurações individuais podem deixar a interpretação
+# deste arquivo confusa.
+include /etc/logrotate.d
+
+
+# Define opções específicas para a rotação mensal de /var/log/wtmp, o novo arquivo 
+# de log somente será rodados caso tenha mais de 5MB (size 5M), será criado 
+# com a permissão 0664 e pertencerá ao usuário root grupo utmp
+# (create 0664 root utmp) e será mantida somente uma cópia do log anterior.
+# (rotate 1)
+/var/log/wtmp {
+    monthly
+    create 0664 root utmp
+    size 5M
+    rotate 1
+}
+
+# Define opções específicas para a rotação mensal de /var/log/btmp, se o arquivo 
+# não existir não será necessário gerar alertas (missinkok) que serão enviados 
+# ao administrador. O novo arquivo criado deverá ter a permissão 0664 com o 
+# dono root e grupo utmp (create 0664 root utmp) e será 
+# mantida somente uma cópia do log anterior.
+/var/log/btmp {
+    missingok
+    monthly
+    create 0664 root utmp
+    rotate 1
+}
+
+# Define opções específicas para a rotação mensal de /var/log/lastlog, o novo 
+# arquivo será criado com a permissão 0664 com o dono root e grupo 
+# utmp e será mantida somente uma cópia do arquivo de log anterior 
+# (rotate 1).
+/var/log/lastlog {
+    missingok
+    monthly
+    create 0664 root utmp
+    rotate 1
+}
+
+# Define opções específicas para a rotação diária de /var/log/messages, o 
+# arquivo será rodado se atingir o tamanho de 1Mb, então o
+# novo arquivo será criado com as mesmas permissões do arquivo anterior. 
+# O comando killall -1 syslogd será executado após a rotação 
+# para que o daemon syslogd funcione corretamente mas somente uma vez
+# durante a rotação de vários arquivos de logs (sharedscripts). 
+# Serão mantidas as 10 últimas cópias do arquivo /var/log/messages 
+# compactadas (o parâmetro compress foi especificado na seção global deste
+# arquivo de configuração).
+/var/log/messages {
+    daily
+    size 1M
+    sharedscripts
+    postrotate
+      /sbin/killall -1 syslogd
+    endscript
+    rotate 10
+}
+
+# Define opções específicas para a rotação mensal dos arquivos em /var/log/mirror/*, 
+# a falta desses arquivos não precisa ser notificada ao administrador (missingok), 
+# mesmo assim o parâmetro "nomail" evitará isto de qualquer forma. Os logs 
+# rodados não serão compactados (nocompress) e serão mantidas as últimas 7 cópias
+# dos logs.
+/var/log/mirror/* {
+   montly
+   nomail
+   missingok
+   nocompress
+   rotate 7
+}
+	    
+# logs específicos do sistema podem ser configurados aqui. As opções padrões e 
+# definidas na seção global deste arquivo serão usadas para processar os 
+# arquivos de logs restantes.
+</pre>
+<p>
+Qualquer definição de parâmetro especificado no arquivo de configuração,
+substituirá as definições anteriores.  Quando o número máximo de logs mantidos
+pela opção <span class="emphasis"><em>rotate [num]</em></span> é atingida, os logs eliminados
+serão enviados para o usuário especificado na opção <span class="emphasis"><em>mail
+[email]</em></span>.  A utilização da diretiva <span class="emphasis"><em>nomail</em></span> evita
+isso.
+</p>
+<p>
+Quando for utilizar coringas para se referir a determinados arquivos dentro de
+um diretório, não utilize a sintaxe "log-xxx-*" porque isto forçaria a
+recompactação de arquivos ".gz" já feitas, gerando arquivos do tipo
+<code class="filename">.gz.gz...</code> e derrubando o processamento da sua máquina
+gerada por um loop de compactação e enchendo as entradas de diretório.  Prefira
+usar a sintaxe <code class="filename">log-xxx-*.log</code> (ou outra, modificando a
+configuração do programa que gera os logs).
+</p>
+<p>
+<span class="strong"><strong>OBS:</strong></span> É importante enviar um sinal HUP ao
+programa que grava para aquele arquivo de log para que não ocorram problemas
+após a rotação, isto é feito usando o parâmetro
+<span class="emphasis"><em>postrotate</em></span>.
+</p>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s03.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch03.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch03s05.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">logger </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Configurando um servidor de logs</td></tr></table></div></body></html>

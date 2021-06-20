@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Usando o eCryptfs para encriptar arquivos, montagem automatica do home</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s13.html" title="Criptografia de arquivos usando ENCFS" /><link rel="next" href="ch07s15.html" title="Criptografia usando TrueCrypt/VeraCrypt" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Usando o eCryptfs para encriptar arquivos, montagem automatica do home</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s13.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s15.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Usando o eCryptfs para encriptar arquivos, montagem automatica do home</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-fs-ecryptfs"></a>Usando o eCryptfs para encriptar arquivos, montagem automatica do home</h2></div></div></div><p>
+Versão em vídeo desta seção pode estar disponível no canal do <span class="emphasis"><em>Guia Foca</em></span> no <span class="command"><strong>YouTube</strong></span>: 
+<a class="link" href="https://rdr.guiafoca.org/gf-segur-cripto-ecrypt" target="_top">Criptografia com o eCrypt</a>.
+</p><p>
+O <span class="command"><strong>eCryptfs</strong></span> permite fazer criptografia a nível do sistema de arquivos. Ele
+consiste na criptografia de uma pasta dentro do sistema de arquivo
+chamada de <code class="filename">Private</code>. O suporte nativo ao <span class="command"><strong>eCryptFS</strong></span> foi
+adicionado oficionalmente a partir do kernel <code class="literal">2.6.19</code> e
+para ele funcionar, precisa que o suporte do kernel 
+ao módulo <code class="filename">ecryptfs</code> esteja incluído na distribuição.
+</p><p>
+<span class="emphasis"><em>OBS</em></span>: No <code class="literal">Debian</code>, o pacote <span class="command"><strong>ecryptfs-utils</strong></span> 
+foi removido da <span class="emphasis"><em>Buster</em></span> (<span class="emphasis"><em>Debian 10</em></span>) devido a bugs na 
+desmontagem automática do diretório <code class="filename">Private</code>, mantendo o conteúdo acessível 
+para usuários com privilégios (BUG 765854). Este problema pode ser contornado adicionando-se
+o <span class="command"><strong>ecyrptfs-umount-private</strong></span> no <code class="filename">.bash_logout</code> (no 
+entanto não é possível prever esse funcionamento em quedas de conexões inesperadas). 
+</p><p>
+O pacote <code class="filename">ecryptfs-utils</code> pode ser instalado no sistema adicionado o 
+repositório da <code class="literal">stretch</code> em <code class="filename">/etc/apt/sources.list</code>.
+</p><p>
+Após isso, execute o comando: <span class="command"><strong>apt-get install ecryptfs-utils</strong></span>
+</p><p>
+O padrão do ecryptfs é a montagem automatica da pasta no login dos sistema.
+</p><p>
+É requerido o suporte a key retention no kernel. Assim como habilitar
+o suporte criptográfico a CBC, ECB, MD5 e AES. Em <code class="literal">Miscelaneous filesystem</code>,
+e também habilitar o suporte a <code class="literal">eCrypt filesystem layer support</code> (que 
+gera o módulo do kernel <span class="command"><strong>ecryptfs</strong></span>).
+</p><p>
+<span class="emphasis"><em>NOTA</em></span>: O <span class="command"><strong>eCryptfs</strong></span> é ainda experimental, embora mais
+seguro que o <span class="command"><strong>EncFS</strong></span>. Como o formato interno pode mudar, é recomendável manter um backup de arquivos.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-ecryptfs-manualcreating"></a>Configurando o <span class="command"><strong>ecryptfs</strong></span></h3></div></div></div><p>
+Para fazer a configuração <code class="literal">manual</code> do eCryptfs, primeiro selecione um diretório que receberá o 
+conteúdo criptografado e também um ponto de montagem com o comando:
+</p><span class="command"><strong>
+mount -t ecryptfs ~/origem ~/destino
+</strong></span><p>
+O sistema perguntará a forma de criptografia desejada:
+</p><pre class="screen">
+1) Frase Senha
+2) tspi
+</pre><p>
+Selecione a opção 1, você será perguntado do cifra que será usada (a
+AES é uma boa escolha):
+</p><pre class="screen">
+Select cipher: 
+ 1) aes: blocksize = 16; min keysize = 16; max keysize = 32
+ 2) blowfish: blocksize = 8; min keysize = 16; max keysize = 56
+ 3) des3_ede: blocksize = 8; min keysize = 24; max keysize = 24
+ 4) twofish: blocksize = 16; min keysize = 16; max keysize = 32
+ 5) cast6: blocksize = 16; min keysize = 16; max keysize = 32
+ 6) cast5: blocksize = 8; min keysize = 5; max keysize = 16
+</pre><p>
+Após isso, será mostrada a mensagem pedindo para selecionar o
+tamanho de bits da chave:
+</p><pre class="screen">
+Select key bytes:
+  1) 16
+  2) 32
+  3) 24
+
+Selection [16]: 3
+</pre><p>
+Após isso, selecione ser texto plano deverá ser ativado:
+</p><pre class="screen">
+Enable plaintext passthrough (y/n) [n]: n
+</pre><p>
+Após, ser o nome do arquivo também deverá ser encriptado (isso é importante para 
+reduzir risco de ataques dirigidos a arquivos específicos):
+</p><pre class="screen">
+Enable filename encryption (y/n) [n]: n
+Attempting to mount with the following options:
+  ecryptfs_unlink_sigs
+  ecryptfs_key_bytes=56
+  ecryptfs_cipher=blowfish
+  ecryptfs_sig=7261b2ffab9ae159
+WARNING: Based on the contents of [~/.ecryptfs/sig-cache.txt],
+it looks like you have never mounted with this key 
+before. This could mean that you have typed your 
+passphrase wrong.
+</pre><p>
+Em seguida, o ecrypt perguntará se deseja prosseguir com a montagem:
+</p><pre class="screen">
+Would you like to proceed with the mount (yes/no)? : yes
+</pre><p>
+Agora você será perguntado se deseja adicionar a assinatura ao 
+arquivo sig-cache.txt, para evitar o warning de montagem no futuro. 
+Responda 'yes' para evitar novas mensagens sobre esse warning:
+</p><pre class="screen">
+Would you like to append sig [9c21b2ffab9ae159] to
+[/~/.ecryptfs/sig-cache.txt] 
+in order to avoid this warning in the future (yes/no)? : yes
+Successfully appended new sig to user sig cache file
+Mounted eCryptfs
+</pre><p>
+Note que o cache de assinaturas é adicionado automaticamente em 
+<code class="filename">~/.ecryptfs/sig-cache.txt</code>
+evitando o warning de que foi a primeira vez que montou o arquivo. É importante
+observar as opções de montagem usadas:
+</p><pre class="screen">
+  ecryptfs_unlink_sigs
+  ecryptfs_key_bytes=56
+  ecryptfs_cipher=blowfish
+  ecryptfs_sig=7261b2ffab9ae159
+</pre><p>
+Após isso, o diretório será montado e tudo que for gravado em <code class="filename">
+~/origem</code>, será gravado criptografado em <code class="filename">~/destino</code>:
+</p><pre class="screen">
+/dev/vda1                           ext2      236M   37M  187M  17% /boot
+/dev/mapper/lpi303--debian--vg-home ext4      428M  7.9M  386M   3% /home
+tmpfs                               tmpfs     100M     0  100M   0% /run/user/0
+/home/guiafoca/origem                 ecryptfs  3.5G  1.7G  1.6G  52% /home/guiafoca/destino
+</pre><p>
+Caso tenha obtido o erro:
+<code class="literal">Error mounting eCryptFS: [-2] No such file or directory</code>, verifique se tanto
+o diretório de origem ou destino existem em sua máquina. Caso estiver criando
+uma nova criptografia, crie os diretórios com o comando
+<span class="command"><strong>mkdir -p ~/origem ~/destino</strong></span> 
+e repita os passos para criar os sistema de arquivos criptografado.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-ecryptfs-remount"></a>Remontando o sistema de arquivos criptografado</h3></div></div></div><p>
+Na hora de remontar o sistema, ele perguntará novamente todos os dados, basta
+preencher corretamente, e seu conteúdo será novamente disponibilizado na pasta 
+especificada. caso digite a frase senha <span class="emphasis"><em>ERRADA</em></span>, o sistema 
+mostrará o seguinte alerta:
+</p><pre class="screen">
+WARNING: Based on the contents of [~/.ecryptfs/sig-cache.txt],
+it looks like you have never mounted with this key 
+before. This could mean that you have typed your 
+passphrase wrong.
+
+Would you like to proceed with the mount (yes/no)? : no
+Aborting mount.
+</pre><p>
+Caso prossiga, os arquivos criptografados anteriormente serão listados,
+mas ao tentar abrir o conteúdo, o ecryptfs retornará:
+</p><pre class="screen">
+cat: teste2.txt: Input/output error
+</pre><p>
+<span class="emphasis"><em>OBS</em></span>: O sistema de criptografia garante privacidade nos arquivos, mas eles
+podem ser removidos por qualquer usuário do sistema permissões aprioriadas.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-ecryptfs-ecryptfsd"></a>ecryptfsd</h3></div></div></div><p>
+O <span class="command"><strong>ecryptfsd</strong></span> é um daemon userspace que executa operações sob o ponto 
+de montagem <span class="command"><strong>eCryptfs</strong></span>. Ele requisita serviços de chave pública do 
+módulo do kernel, enviando os mesmos via <code class="filename">/dev/ecryptfs</code>. O 
+<span class="command"><strong>ecryptfsd</strong></span> somente precisa ser executado quando a monatgem é 
+feita usando módulo chave pública.
+</p><p>
+Todas as chamadas ao </p><p>ecryptfsd</p><p> são servidas sob o contexto do usuário
+que rodou o daemon.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-ecryptfs-privatehome"></a>Diretório Privado Automático para o usuário</h3></div></div></div><p>
+O utilitário <span class="command"><strong>ecryptfs-setup-private</strong></span> pode ser usado para configurar o diretório
+privado. Nesse caso, os utilitários <span class="command"><strong>ecryptfs-mount-private</strong></span> são usados para
+configurar a criptografia disponibilizando os dados de forma padronizada em  <code class="filename">~/Private</code> 
+e o <span class="command"><strong>ecryptfs-umount-private</strong></span> para desmontar o filesystem <code class="filename">~/Private</code>
+</p><p>
+A seguinte estrutura é usada nessa situação:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+<code class="filename">~/Private</code> - conteúdo descriptografado do ecrypfs
+    </p></li><li class="listitem"><p>
+<code class="filename">~/.Private</code> - Contém o conteúdo criptografado, em diretório oculto
+    </p></li></ul></div><p>
+A seguinte estrutura é criado em <code class="filename">~/.ecryptfs</code>:
+</p><pre class="screen">
+-rw-r--r--   1 gleydson gleydson     0 jul  2 11:25 auto-mount
+-rw-r--r--   1 gleydson gleydson     0 jul  2 11:25 auto-umount
+-rw-------   1 gleydson gleydson    23 jul  2 11:25 Private.mnt
+-rw-------   1 gleydson gleydson    34 jul  2 11:25 Private.sig
+-rw-------   1 gleydson gleydson    42 jul  2 11:25 wrapped-passphrase
+</pre><p>
+Para criar o diretório privado de usuário, execute o seguinte procedimento:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Execute o <span class="command"><strong>&gt;ecryptfs-setup-private</strong></span>
+    </p></li><li class="listitem"><p>
+Será solicitado sua senha de login no sistema para continuar
+    </p><pre class="screen">
+ Enter your login password [guiafoca]:
+    </pre></li><li class="listitem"><p>
+Será pedido a senha para montagem do sistema de arquivos criptografado. Selecione
+uma senha cuidadosamente seguindo os critérios de NNNNNNNN:
+    </p><pre class="screen">
+  Enter your mount passwphrase:
+     </pre><p>
+<span class="emphasis"><em>ATENÇÃO</em></span>: Guarde sua frase senha e armazene-a em um local seguro. 
+Caso perca a frase-senha, não conseguirá mais ter acesso aos dados!
+    </p><pre class="screen">
+Será exibida as seguintes mensagens de validação da montagem/desmontagem e leitura:
+************************************************************************
+YOU SHOULD RECORD YOUR MOUNT PASSPHRASE AND STORE IT IN A SAFE LOCATION.
+  ecryptfs-unwrap-passphrase ~/.ecryptfs/wrapped-passphrase
+THIS WILL BE REQUIRED IF YOU NEED TO RECOVER YOUR DATA AT A LATER TIME.
+************************************************************************
+
+
+Done configuring.
+
+Testing mount/write/umount/read...
+Inserted auth tok with sig [cffe18c2df6fd3b2] into the user session keyring
+Inserted auth tok with sig [c70fae191ab3be11] into the user session keyring
+Inserted auth tok with sig [cffe18c2df6fd3b2] into the user session keyring
+Inserted auth tok with sig [c70fae191ab3be11] into the user session keyring
+Testing succeeded.
+
+Logout, and log back in to begin using your encrypted directory.
+   </pre></li><li class="listitem"><p>  
+Agora, faça logout, e novamente login para poder começar a usar seu diretório 
+<code class="filename">~/Private</code> montado.
+    </p></li><li class="listitem"><p>
+Você pode desmontar o diretório no momento que desejar, mas ao invés de usar o comando 
+<span class="command"><strong>umount</strong></span>, utilize:
+<span class="command"><strong>ecryptfs-umount-private</strong></span>. Para montar novamente o diretório 
+<code class="filename">~/.Private</code> sem a necessidade
+de logout/login, use <span class="command"><strong>ecryptfs-mount-private</strong></span>.
+    </p></li><li class="listitem"><p>
+Para validar se a senha e conteúdo podem ser corretamente acessados e descriptografados,
+use o comando:
+    </p><span class="command"><strong>ecryptfs-unwrap-passphrase ~/.ecryptfs/wrapped-passphrase</strong></span></li></ol></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-ecryptfs-fullEncHome"></a>Migrando o home do usuário para criptografado</h3></div></div></div><p>
+Caso deseje migrar um diretório home existente para criptografia, isso é possível com
+o <span class="command"><strong>ecryptfs</strong></span>. Quando o home é criptografado, assim que fizer o logon, 
+os dados estarão disponíveis de forma automatica, e o <code class="filename">/home/usuario</code> 
+deixará de ficar montado assim que o usuário fizer logout (usando o <code class="filename">pam_ecryptfs</code>):
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Como root, rode: <span class="command"><strong>ecryptfs-migrate-user -u usuario</strong></span>
+   </p></li><li class="listitem"><p>
+Será perguntada a passpharase do usuário, que deverá ser fornecida (siga os critérios de 
+segurança em NNNNNNNN)
+   </p></li><li class="listitem"><p>
+Peça para o usuário logar no sistema e ver se o sistema montou corretamente
+seu home. Se estiver tudo ok, o diretório de migração <code class="filename">/home/usuario.XXXXXXX</code>
+poderá ser removido
+   </p></li><li class="listitem"><p>
+Rode <code class="filename">ecryptfs-unwrap-passphrase</code> e salve o código aleatório gerado
+   </p></li></ol></div><p>
+para que a montagem funcione automaticamente com o <code class="filename">pam_ecryptfs</code>,
+é necessário que a frase senha de acesso esteja sincronizada
+com o login de usuário, e que o módulo seja configurado no PAM com:
+</p><pre class="screen">
+auth    required    pam_ecryptfs.so unwrap
+password    optional    pam_ecryptfs.so
+session    optional    pam_ecryptfs.so unwrap
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-ecryptfs-PAMeCryptFS"></a>PAM ecryptfs</h3></div></div></div><p>
+Para configurar a montagem automática do eCryptFS, proceda da seguinte forma:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Monte o sistema de arquivos atual: <span class="command"><strong>mount -t ecryptfs /root/testecripto /mnt</strong></span>
+   </p></li><li class="listitem"><p>
+Pegue os parametros de montagem do <code class="filename">/etc/mtab</code>:
+   </p><p>
+    <span class="command"><strong>grep 'ecryptfs' /etc/mtab</strong></span>
+/root/testeecryptfs /mnt ecryptfs rw,relatime,ecryptfs_sig=5251a2b3b9ae159,ecryptfs_cipher=blowfish,ecryptfs_key_bytes=56,ecryptfs_unlink_sigs 0 0
+    </p></li><li class="listitem"><p>
+ Adicione a linha no <code class="filename">/etc/fstab</code> adicionando os parâmetros, <code class="literal">user</code> 
+e <code class="literal">noauto</code>:
+   </p></li><li class="listitem"><p>
+Desmote o compartilhamento montado
+   </p></li><li class="listitem"><p>
+Adicione sua frase-senha do keyring via utilitário <code class="filename">ecryptfs-manager</code>,
+usando a <code class="literal">opção 1</code>.
+   </p></li><li class="listitem"><p>
+Monte o diretório com: <span class="command"><strong>mount -i /mnt'</strong></span> (a opção <code class="literal">-i</code> impede
+o <span class="command"><strong>mount</strong></span> de chamar o helper ecryptfs externo).
+   </p></li><li class="listitem"><p>
+O diretório deverá agora ser montado automaticamente.
+   </p></li><li class="listitem"><p>
+Agora que o diretório montou usando o keyring, limpe a chave da sessão de
+    usuário com o <span class="command"><strong>keyctl clear @u</strong></span>
+   </p></li><li class="listitem"><p>
+Adicione o comando mount no <code class="filename">~/.bash_profile</code>:
+    <span class="command"><strong>
+    mount -i /mnt
+    </strong></span>
+   </p></li><li class="listitem"><p>
+Finalmente adicione isto ao seu arquivo <code class="filename">/etc/pam/login</code>, após o 
+<code class="filename">pam_unix.so</code>:
+   </p><pre class="screen">
+    auth required pam_ecryptfs.so
+</pre></li></ol></div><p>
+No RedHat, pode ser usado o script <code class="filename">src/utils/ecryptfs-setup-pam.sh</code> para
+fornecer essa montagem automática
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-fs-ecryptfs-limitacoes"></a>Limitações do eCryptfs</h3></div></div></div><p>
+O <span class="command"><strong>ecrypt</strong></span> não deve ser usado para criptografar dispositivos de rede <span class="command"><strong>NFS
+</strong></span>. O <span class="command"><strong>EncFS</strong></span> (veja NNNNNNNN) é uma melhor opção nessa situação.
+</p><p>
+Nomes maiores que 143 caracteres não podem ser encriptados com a opção 
+<span class="emphasis"><em>FNEK</em></span> (<code class="literal">File Name Encryption Key</code>).
+</p><p>
+Caso crie arquivos de imagem com o <span class="command"><strong>truncate</strong></span> (comando muito usado 
+para criação de imagens em virtualização ou de arquivos vazios, por ex: 
+<span class="command"><strong>truncate -s 10G teste.img</strong></span>, será produzido um arquivo criptografado
+de 10Gb no sistema de arquivos origem.
+</p></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s13.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s15.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Criptografia de arquivos usando ENCFS </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Criptografia usando TrueCrypt/VeraCrypt</td></tr></table></div></body></html>

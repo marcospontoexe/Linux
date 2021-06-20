@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Certificados Auto-Assinados</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s06.html" title="Gerenciamento de uma CA e de chaves publicas e privadas" /><link rel="next" href="ch07s08.html" title="Teste de cliente/servidor SSL/TLS com openssl" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Certificados Auto-Assinados</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s06.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s08.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Certificados Auto-Assinados</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-x509-selfsigned-certs"></a>Certificados Auto-Assinados</h2></div></div></div><p>
+Caso sua empresa ou você deseje rodar um servidor web que só é usado por conhecidos, 
+ou se quiser autenticar usuários conhecidos para conectar em sua máquina/acessar um
+serviço de VPN corporativo, então você não precisará pagar ou utilizar uma CA 
+oficial para criar esses certificados. Você tem a opção de se tornar uma CA e 
+criar quantos certificados quiser (isso é especialmente útil em servidores de
+VPN em empresas)
+</p><p>
+Usar um certificado auto-assinado (self signed), não significa que os dados
+que trafegam entre as duas pontas estarão inseguros, a principal 
+diferença é que o sistema precisará ter a CA que você gerou instalada manualmente para 
+que o certificado de cliente autentique como confiável a conexão.
+</p><p>
+Você precisará manter a sua chave CA privada segura, para prevenir que 
+invadores utilize-a pra emitir certificados fraudulentos, mas isso é 
+incontestavelmente não mais inseguro que confiar em uma CA de terceiros 
+manter sua chave privada segura (como o caso da Diginotar mostrou).
+</p><p>
+Você já deve ter notado que se o navegador encontra um certificado emitido
+por uma CA auto-assinada, ele alertará que não se trata de uma fonte
+não confiável, ou em um repositório de certificados raíz conhecidos do
+navegador. Desta forma, ao instalar o certificado CA na máquina ou 
+navegador dos usuários que precisam acessar o site, assim estes alertas 
+serão facilmente removidos. 
+</p><p>
+É impossível distribuir esse certificado para pessoas fora da organização de 
+uma forma automatica, desta forma o uso de certificados auto-assinados são
+somente úteis para pessoas que precisam acessar aquela página web, seja
+dentro de seu grupo, de uma empresa, etc.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-selfsigned-benefits"></a>Beneficios de rodar uma CA própria</h3></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+Te poupa de custos de comprar certificados SSL comerciais de uma CA autorizada, 
+para cada dispositivo embarcado, resultando em altissima economia. Mesmo que 
+possa gerar certificados usando LetsEncrypt, existe uma limitação de aproximadamente
+200 certificados por domíno, e isso é uma limitação em economai de escala.
+    </p></li><li class="listitem"><p>
+Certificados auto-assinados, cria um nível de segurança muito maior que 
+usar certificados de terceiros, que são criados para uso em geral. Caso 
+uma CA oficial seja comprometida, TODOS os certificados que foram emitidos
+por ela também estarão comprometidos e precisarão ser re-emitidos. 
+    </p><p>
+Este problema simplesmente não existem em CA auto-assinadas, pois a segurança em ambas as pontas
+estão sob seu controle.
+    </p></li><li class="listitem"><p>
+Maior granularidade no controle e níveis de acesso dos certificados gerados.
+    </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-selfsigned-certs-create"></a>Criando Certificados Auto-Assinados</h3></div></div></div><p>
+Basicamente certificados auto-assinados, possuem o campo <span class="emphasis"><em>issuer</em></span> igual ao
+<span class="emphasis"><em>subject</em></span>. Em algumas distribuições como o <span class="command"><strong>Debian, Ubuntu, CentOS, Mint</strong></span>,
+um certificado self-signed é criado automaticamente e por padrão e possui o nome <code class="literal">Snake Oil</code> para 
+indicar que não são confiáveis, servindo apenas para criptografia básica, e uso didático, e não para 
+utilização em  ambientes de produção. 
+</p><p>
+Desta forma, para criar um certificado auto-assinado gerado por você, com seus parâmetros de 
+segurança e criptografia customizados, siga os seguintes procedimentos:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Antes de gerar a chave, vamos criar a estrutura de diretórios para armazenar os certificados. Aqui 
+usaremos a pasta /tmp/ssl/guia e /tmp/ssl/foca pra criar 'duas empresas' fictícias: uma se 
+chamará <span class="emphasis"><em>guia</em></span>  e a outra... humm... <span class="emphasis"><em>foca</em></span>:
+ <span class="command"><strong>
+mkdir -p /tmp/ssl/guia /tmp/ssl/foca
+</strong></span>
+  </p></li><li class="listitem"><p>
+O primeiro passo é criar a <span class="emphasis"><em>CA</em></span> para cada uma das empresas criadas. Como convenção, 
+vamos gravar as chaves privadas geradas em arquivos <code class="filename">.key</code> e as chaves 
+públicas em arquivos <code class="filename">.crt</code>. Caso desejar gerar o certificado sem incluir uma 
+senha de proteção do certificado da <span class="emphasis"><em>CA</em></span>, apenas remova o parametro 
+<code class="literal">-des3</code> da linha e comando:
+</p><pre class="screen">
+# Gera a chave RSA 4096 para a empresa 'guia'
+openssl genrsa -des3 -out /tmp/ssl/guia/ca.key 4096
+# Gera o certificado X509 para a empresa 'guia'
+openssl req -new -x509 -days 365 -key /tmp/ssl/guia/ca.key -out /tmp/ssl/guia/ca.crt
+
+# Gera a chave RSA 4096 para a empresa 'foca'
+openssl genrsa -des3 -out /tmp/ssl/foca/ca.key 4096
+# Gera o certificado X509 para a empresa 'foca'
+openssl req -new -x509 -days 365 -key /tmp/ssl/foca/ca.key -out /tmp/ssl/foca/ca.crt
+</pre><p>
+Note que após concluir esse procedimento, temos a chave RSA (com o nome <code class="filename">ca.key</code>)
+e o certificado privado da CA (com o nome <code class="filename">ca.crt</code>).
+</p></li><li class="listitem"><p>
+O segundo passo é criar o certificado do servidor. Ele é chamado assim, pois será instalado 
+no serviço que fornecerá acesso a clientes (como um sevidor web <span class="command"><strong>NgINX</strong></span>, 
+<span class="command"><strong>Apache</strong></span>, <span class="command"><strong>Postfix</strong></span>, <span class="command"><strong>VPN</strong></span>, etc).
+ O primeiro passo é gerar os certificados, que serão assinados em seguida:
+ </p><pre class="screen">
+
+# Gera o certificado privado do 'guia'
+openssl genrsa -des3 -out /tmp/ssl/guia/servidor.key 4096
+# Gera o certificado privado do 'foca'
+openssl genrsa -des3 -out /tmp/ssl/foca/servidor.key 4096
+
+</pre><p>
+Caso deseje gerar certificados sem senhas, remova o parametro <code class="literal">-des3</code> do comando.
+</p></li><li class="listitem"><p>
+Assim que tiver os certificados de servidores privados, precisaremos gerar um 
+<span class="emphasis"><em>CSR</em></span> (Certificate Signing Request). O CSR é simplesmente um 
+arquivo de requisição de assinatura, que você envia para a CA para que ela devolva 
+o certificado assinado, e usaremos isso para criar o certificado público.
+ </p><p>
+Quando ele pergutnar pelo <span class="emphasis"><em>Common Name</em></span> para a empresa <code class="literal">guia</code>,
+coloque <span class="emphasis"><em>guiafoca.teste</em></span> e da empresa <code class="literal">foca</code> será <span class="emphasis"><em>focalinux.teste</em></span>:
+ </p><pre class="screen">
+
+# Gera CSR para a empresa guia
+openssl req -new -key /tmp/ssl/guia/servidor.key -out /tmp/ssl/guia/servidor.csr
+# Cria o certificado publico assinando com a CA 'guia'
+openssl x509 -req -days 365 -in /tmp/ssl/guia/servidor.csr -CA /tmp/ssl/guia/ca.crt -CAkey /tmp/ssl/guia/ca.key -set_serial 01 -out /tmp/ssl/guia/servidor.crt
+
+# Gera CSR para a empresa foca
+openssl req -new -key /tmp/ssl/foca/servidor.key -out /tmp/ssl/foca/servidor.csr
+# Cria o certificado publico assinando com a CA 'foca'
+openssl x509 -req -days 365 -in /tmp/ssl/foca/servidor.csr -CA /tmp/ssl/foca/ca.crt -CAkey /tmp/ssl/foca/ca.key -set_serial 01 -out /tmp/ssl/foca/servidor.crt
+</pre><p>
+Voce poderá ainda fornecer uma senha desafio junto aos atributos extras:
+</p><pre class="screen">
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []: Sua_senha_aqui
+An optional company name []: Sua_senha_aqui
+</pre></li></ol></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-selfsigned-certs-concat"></a>Concatenando os Certificados gerados</h3></div></div></div><p>
+Como estamos usando certificados de 2 empresas e auto-assinados, preciaremos enviar ambos 
+os certificados e nossa CA para nos identificarmos. Este procedimento é bastante simples, e 
+usaremos a simples concatenação de arquivos. Faremos o mesmo com as chaves privadas:
+</p><pre class="screen">
+cat /tmp/ssl/guia/ca.crt /tmp/ssl/guia/servidor.crt &gt; /tmp/ssl/guia/all.crt
+cat /tmp/ssl/guia/ca.key /tmp/ssl/guia/servidor.key &gt; /tmp/ssl/guia/all.key
+</pre><p>
+Agora para o certificado <code class="literal">foca</code>:
+</p><pre class="screen">
+cat /tmp/ssl/foca/ca.crt /tmp/ssl/foca/servidor.crt &gt; /tmp/ssl/foca/all.crt
+cat /tmp/ssl/foca/ca.key /tmp/ssl/foca/servidor.key &gt; /tmp/ssl/foca/all.key
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-selfsigned-certs-cfg-apache"></a>Configurando o Apache e Virtual Hosts</h3></div></div></div><p>
+Assim que tivermos todos os certificados que precisamos, nós poderemos testar se temos acesso
+ao site via SSL. Faremos o seguinte procedimento:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>
+Crie o diretório <code class="filename">/etc/apache2/ssl</code>: <span class="command"><strong>mkdir /etc/apache2/ssl</strong></span>
+   </p></li><li class="listitem"><p>
+  Crie um arquivo <code class="filename">guiafoca.conf</code> em <code class="filename">/etc/apache2/sites-available</code> com o conteúdo:
+  </p><pre class="screen">
+  &lt;VirtualHost *:443&gt;
+    ServerName guiafoca.teste
+
+    DocumentRoot /var/www/html
+
+    SSLEngine On
+    SSLCertificateFile /etc/apache2/ssl/all.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/all.key
+    SSLCACertificateFile /etc/apache2/ssl/ca.crt
+  &lt;/VirtualHost&gt;
+  </pre></li><li class="listitem"><p>Ative o site recém gerado com: <span class="command"><strong>a2ensite guiafoca</strong></span></p></li><li class="listitem"><p>
+   Ative o módulo <code class="filename">ssl</code> do <span class="command"><strong>Apache</strong></span> 
+   com o comando: <span class="command"><strong>a2enmod ssl</strong></span>
+  </p></li><li class="listitem"><p>Reinicie o servidor <span class="command"><strong>Apache</strong></span> com: <span class="command"><strong>apache2ctl reload</strong></span></p></li></ol></div><p>
+Após isso, terá um site configurado para servidor SSL na porta 443. Para exibir uma página
+web padrão, crie um arquivo <code class="filename">/var/www/html/index.php</code> com o seguinte conteúdo:
+</p><pre class="screen">
+&lt;?php
+
+print_r($_SERVER);
+</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-selfsigned-certs-ssl-test"></a>Testando a conexão SSL</h3></div></div></div><p>
+Novamente utilizaremos o canivete suiço dos profissionais de segurança: o <span class="command"><strong>curl</strong></span>. 
+Utilizaremos ele para fazer a conexão usando SSL e validarndo o site:
+<span class="command"><strong>curl https://guiafoca.teste</strong></span>
+</p><p>
+Durante a execução da abertura do SSL, o <span class="command"><strong>curl</strong></span> executará as 
+seguintes ações:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p> 
+    Ele tentará autenticar o certificado SSL padrão, usando as chaves instaladas
+    no sistema operacional. Caso esse certificado não esteja instalado, você pode
+    orientar o <span class="command"><strong>curl</strong></span> a abrir o certificado correto, apontando ele diretamente
+    para o certificando gerado usando o parametro <code class="literal">--cacert [arquivo]</code>.
+    </p></li><li class="listitem"><p>
+  Se obter um erro de <span class="emphasis"><em>certificado expirado</em></span>, ou problemas 
+  relacionados as verificações de certificado, você poderá usar a opção
+  <code class="literal">--insecure / -k</code> no <span class="command"><strong>curl</strong></span> para ignorar
+  validações de certificado, assumindo que o mesmo é confiável e permitindo
+  o uso de criptografia para tráfego de dados.
+   </p></li></ol></div><p>
+Por exemplo, para permitir a abertura de um site usando um certificado sem
+retornar erros:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+    Validando o certificado auto-assinado: <span class="command"><strong>curl --cacert /tmp/ssl/foca/ca.crt https://guiafoca.teste</strong></span>
+   </p></li><li class="listitem"><p>
+   Ignorando a validação de auto-assinado: <span class="command"><strong>curl --ignore /tmp/ssl/foca/ca.crt https://guiafoca.teste</strong></span>
+   </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-selfsigned-certs-ecc"></a>Sobre certificados usando Curva Eliptica</h3></div></div></div><p>
+A técnica de criptografia usando Curva Eliptica (ECC) é bastante recente, e os 
+certificados gerados por ela são bem menores em tamamnho que os gerados usando RSA.
+Nem por causa do tamanho reduzido sua segurança é menor: Um certifica ECC de 224 bits 
+possui segurança igualmetne forte se comparada a um certificado 2048 bits, embora
+consuma bem menos CPU.
+</p><p>
+Devido a essas características, certificados ECC devem ser preferenciais quando utilizar 
+dispositivos embarcados ou quando o o número de acessos a um determinado tiver um
+grande número de concorrencias.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-selfsigned-certs-graph-prgs"></a>Programas para gerenciamento de CA usando ambiente gráfico e WEB</h3></div></div></div><p>
+Esta sessão documenta uma série de programas e suas características que podem ser usados para gerenciar
+uma CA de forma mais fácil. Algumas ferramentas possuem profundo nível de maturidade, assim como 
+o <span class="command"><strong>openssl</strong></span> e algumas são voltadas para facilidade, apenas gerando o certificado
+e facilitando seu gerenciamento:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+<span class="emphasis"><em>TinyCA</em></span> - Um dos melhores, suportam muitos algoritmos e permitem trabalhar com CAs independentes
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Xca</em></span> - Muito bom, baseado em qt, e salva os dados em banco de dados criptografado.
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>easy-rsa</em></span> - Voltado principalmente a gerencia de certificados no <span class="command"><strong>OpenVPN</strong></span>. Não é muito usado para gerenciamento de CA de forma customizada.
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>GnoMint</em></span> - Somente usa <span class="emphasis"><em>SHA1</em></span> como assinatura e o desenvolvimento não é mais ativo. Google  Microsoft consideram SHA1 obsoleto  nos produtos desde 2017.
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>FreeIPA</em></span> - Possui o módulo de gerenciamento de certificados em sua interface gráfica, embora tenha como funcionaldiade principal o provimento de autenticação no sistema.
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>SimpleAuthority</em></span> - Este é pago, e possui excelentes recursos de gerenciamento
+de certificados. O programa <span class="command"><strong>simpleAuthority</strong></span> pode ser usado para gerenciar as CAs, 
+rodando em <span class="command"><strong>Linux</strong></span>, <span class="command"><strong>Windows</strong></span>, <span class="command"><strong>MacOS</strong></span>.
+   </p></li></ul></div></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s06.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s08.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Gerenciamento de uma CA e de chaves publicas e privadas </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Teste de cliente/servidor SSL/TLS com openssl</td></tr></table></div></body></html>

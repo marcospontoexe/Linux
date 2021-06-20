@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Melhorando a segurança das senhas armazenadas em seu sistema</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch04.html" title="Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas" /><link rel="prev" href="ch04s03.html" title="Tipos de ataques mais comuns para se conseguir uma senha." /><link rel="next" href="ch05.html" title="Capítulo 5. Firewall iptables" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Melhorando a segurança das senhas armazenadas em seu sistema</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04s03.html">Anterior</a> </td><th width="60%" align="center">Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas</th><td width="20%" align="right"> <a accesskey="n" href="ch05.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch04.html">Gerenciamento de contas e cuidados para a proteção de senhas</a></span> &gt; <span class="breadcrumb-node">Melhorando a segurança das senhas armazenadas em seu sistema</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-contas-segsenhas"></a>Melhorando a segurança das senhas armazenadas em seu sistema</h2></div></div></div>
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-segsenhas-shadow"></a>Shadow Passwords</h3></div></div></div>
+<p>
+Senhas Ocultas (shadow passwords) aumentam consideravelmente a senha do seu
+sistema pois as senhas serão armazenadas em um arquivo separado:
+<code class="filename">/etc/shadow</code> para senhas de usuários e
+<code class="filename">/etc/gshadow</code> para senhas de grupos.  Estes dois arquivos
+poderão ser acessados somente pelo usuário root.  O armazenamento de senhas no
+arquivo <code class="filename">/etc/passwd</code> e <code class="filename">/etc/groups</code> não
+é seguro, estes arquivos devem ser lidos por todos os usuários porque muitos
+programas mapeiam a UID do usuário com seu nome e vice versa.
+</p>
+<p>
+O utilitário <span class="command"><strong>shadowconfig</strong></span> é usado para ativar/desativar o
+suporte a senhas ocultas (de usuários e grupos) em seu sistema.  Adicionalmente
+os utilitários <span class="command"><strong>pwconv</strong></span>/<span class="command"><strong>grpconv</strong></span> podem ser
+usados separadamente para ativar o suporte a senhas ocultas de usuários/grupos
+e <span class="command"><strong>pwunconv</strong></span>/<span class="command"><strong>grpunconv</strong></span> para desativar este
+suporte.
+</p>
+<p>
+<span class="strong"><strong>ATENÇÃO:</strong></span> Caso você inclua usuários em grupos
+manualmente no arquivo <code class="filename">/etc/passwd</code>, também precisará fazer
+isto no arquivo <code class="filename">/etc/shadow</code> para que não tenha problemas.
+Esta tarefa é feita automaticamente com o comando <code class="literal">adduser usuário
+grupo</code>.  O programa <span class="command"><strong>vipw</strong></span> e <span class="command"><strong>vigr</strong></span>
+também podem ser usados com a opção <span class="emphasis"><em>-s</em></span> para editar os
+arquivos <code class="filename">/etc/shadow</code> e <code class="filename">/etc/gshadow</code>
+respectivamente.
+</p>
+</div>
+
+<div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="d-contas-segsenhas-sha-md5"></a>Senhas Sha512, SHA256 e MD5</h3></div></div></div>
+<p>
+O sistema de criptografia usado pelo <code class="literal">SHA512</code> é mais seguro que o 
+<code class="literal">SHA256</code>, e este é mais seguro que o <code class="literal">MD5</code>. Na escala de 
+algoritmos mais seguros para o menos seguro, seguido da respectiva forma de identificar qual é 
+qual no <code class="filename">/etc/shadow</code> temos o seguintes:
+</p>
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>SHA512</p> - Tipicammente inicia por <code class="literal">$6$Salt$Encriptacao</code></li></ol></div>
+
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>SHA256</p> - Tipicammente inicia por <code class="literal">$5$Salt$Encriptacao</code></li></ol></div>
+
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Blowfish</p> - Tipicammente inicia por <code class="literal">$2$Salt$Encriptacao</code></li></ol></div>
+
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Blowfish (com correçao caracteres 8 bits)</p> - Tipicammente inicia por <code class="literal">$2y$Salt$Encriptacao</code></li></ol></div>
+
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>MD5</p> - Tipicammente inicia por <code class="literal">$1$Salt$Encriptacao</code>. O uso 
+  de MD5 é desencorajado hoje em dia devido ao ataque de colisão de hash</li></ol></div>
+
+<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Crypto</p> - Obsoleto, não deve ser mais utilizado de forma alguma! Limitado
+  ao máximo de 8 caracteres. Uso é totalmente desencorajado hoje em dia.</li></ol></div>
+<p>
+O <code class="literal">Salt</code> de uma senha pode ter até 16 caracteres, e <code class="literal">Encriptacao</code>
+é a senha criptografada.
+</p>
+<p>
+Para gerar uma senha com um algoritmo específico, utilize:
+<span class="command"><strong>mkpasswd --method=sha512 --salt=abacabbXYZ SENHA</strong></span>
+</p>
+<p>
+Caso utilize senhas SHA512 em um sistema com PAM,
+inclua a palavra <code class="literal">SHA5125</code> na linha de configuração do método de
+autenticação <code class="literal">password</code> do módulo
+<code class="filename">pam_unix.so</code>:
+</p>
+<pre class="screen">
+password required pam_unix.so sha512
+</pre>
+</div>
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04s03.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch05.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Tipos de ataques mais comuns para se conseguir uma senha. </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Capítulo 5. Firewall iptables</td></tr></table></div></body></html>

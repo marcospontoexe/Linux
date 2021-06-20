@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Criptografia usando TrueCrypt/VeraCrypt</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s14.html" title="Usando o eCryptfs para encriptar arquivos, montagem automatica do home" /><link rel="next" href="ch08.html" title="Capítulo 8. Segurança de Host" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Criptografia usando TrueCrypt/VeraCrypt</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s14.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch08.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Criptografia usando TrueCrypt/VeraCrypt</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-fs-veracrypt"></a>Criptografia usando TrueCrypt/VeraCrypt</h2></div></div></div><p>
+Versão em vídeo desta seção pode estar disponível no canal do <span class="emphasis"><em>Guia Foca</em></span> no <span class="command"><strong>YouTube</strong></span>: 
+<a class="link" href="https://rdr.guiafoca.org/gf-segur-cripto-veracrypt" target="_top">Criptografia com o Veracrypt</a>.
+</p><p>
+Durante anos o <span class="command"><strong>TrueCrypt</strong></span> foi bastante popular, ele possui características 
+muito interessantes, e a <span class="emphasis"><em>negação plausível</em></span> é um dos recursos mais 
+famosos. Infelizmente seu desenvolvimento foi descontinuado há bastante tempo, mas 
+existe uma alternativa ao <span class="command"><strong>TrueCrypt</strong></span> que herda todos os 
+recursos e adiciona mais recursos de segurança chamado <span class="command"><strong>VeraCrypt</strong></span>. O 
+<span class="command"><strong>VeraCrypt</strong></span> possui as seguintes características:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+  Executa em paralelo (usando cores no servidor)
+    </p></li><li class="listitem"><p>
+Operações de leitura/gravação em Pipeline (melhor performance)
+    </p></li><li class="listitem"><p>
+Possui licenca opensource
+  </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Negaçao plausível</em></span> - Caso seja forçado a revelar sua frase-senha, o 
+<span class="command"><strong>VeraCrypt</strong></span> prove e suporta dois tipos de negação plausível.
+  </p></li></ul></div><p>
+Segundo os desenvolvedores do <span class="command"><strong>VeraCrypt</strong></span>, ele se sobressai em cima do 
+<span class="command"><strong>TrueCrypt</strong></span> pois utiliza 327 mil  interações do altoritmo <code class="literal">PBKDF2-RIPEMD160
+</code> contra 1000 interações no <span class="command"><strong>TrueCrypt</strong></span>, sendo que em containers,
+o Veracrypt usa 655 mil interações contra 500 mil interações do sha2 e Whirlpool do 
+<span class="command"><strong>VeraCrypt</strong></span>.
+</p></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s14.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch08.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Usando o eCryptfs para encriptar arquivos, montagem automatica do home </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Capítulo 8. Segurança de Host</td></tr></table></div></body></html>

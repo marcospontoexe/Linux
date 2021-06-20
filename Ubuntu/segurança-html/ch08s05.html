@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Limitando o uso de recursos de usuários</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch08.html" title="Capítulo 8. Segurança de Host" /><link rel="prev" href="ch08s04.html" title="Protegendo BIOS e o GRUB2" /><link rel="next" href="ch09.html" title="Capítulo 9. Controle de Acesso" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Limitando o uso de recursos de usuários</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch08s04.html">Anterior</a> </td><th width="60%" align="center">Capítulo 8. Segurança de Host</th><td width="20%" align="right"> <a accesskey="n" href="ch09.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch08.html">Segurança de Host</a></span> &gt; <span class="breadcrumb-node">Limitando o uso de recursos de usuários</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-hostsecurity-ulimit"></a>Limitando o uso de recursos de usuários</h2></div></div></div><p>
+Versão em vídeo desta seção pode estar disponível no canal do <span class="emphasis"><em>Guia Foca</em></span> no YouTube: 
+<a class="link" href="https://rdr.guiafoca.org/gf-segur-hostsec-ulimit" target="_top">Limitando o uso de recursos de usuários</a>.
+</p><p>
+Usuários requerem recursos como tempo de CPU, memória e espaço em disco para fazer
+o tarbalho. Em muitods sistemas é possível aos usuários usarem todos os recursos, atrapalhando
+o funcionamento do sistema e de outros usuários e algumas vezes deixando o servidor
+muito lento ao ponto de trava-lo. 
+</p><p>
+O uso grande de recursos pode ser grandes core dumps, usar toda memória. Uma 
+coisa para ser lembrada: limites globais se aplicam ao root, assim se não permitir
+ao root executar processos os suficientes, você poderá ter problemas até mesmo para
+entrar na máquina para corrigir falhas.
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-hostsecurity-ulimit-pam"></a>Módulo PAM pam_limits</h3></div></div></div><p>
+O módulo usado para fornecer lmites aos usuários no pam é o <span class="emphasis"><em>pam_limits.so</em></span>:
+</p><pre class="screen">
+session		required	/lib/security/pam_limits.so
+</pre><p>
+O aruquivo de configuração padrão se encontra em 
+<code class="filename">/etc/security/limits.conf</code>. Como muitos dos limites são forçados pelo shell,
+o sistema <span class="emphasis"><em>Não</em></span> registrará todas as violações de limites (voce receberá tentativas
+de acesso indevida, mas não receberá um alerta se o usuário tnetar usar mais espaço
+em disco que é permitido).
+</p><p>
+Um exemplo da limitação de recurso do usuário "foca" a 4Mb de RAM:
+</p><pre class="screen">
+# Dominio   Tipo    Item	    Valor
+foca		hard	memlock		4096
+</pre><p>
+</p><p>
+Onde:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+<span class="emphasis"><em>Dominio</em></span> - Pode ser usuario, @grupo, 1000-2000 (Uid Range), @1000-2000 (GID Range), %
+é aplicavel para maxlogins somente (é eqivalente equivalente ao '*').
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Tipo</em></span> - Pode ser hard, soft, ou - (especific ambos)
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Item</em></span> - Pode ser um dos abaixo:
+
+    </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p><span class="emphasis"><em>core</em></span> - Limita o tmanho do arquivo core (KB). Geralmente ajustado para 0 para evitar core dumps</p></li><li class="listitem"><p><span class="emphasis"><em>data</em></span>  - Tamanho máximo de dados em memória (KB)</p></li><li class="listitem"><p><span class="emphasis"><em>fsize</em></span>  - Tamanho máximo de arquivo no disco (KB)</p></li><li class="listitem"><p><span class="emphasis"><em>memlock</em></span>  - Tamanho máximo do espaço de memória locked (KB)</p></li><li class="listitem"><p><span class="emphasis"><em>nofile</em></span>  - Nùmero máximo de arquivos abertos</p></li><li class="listitem"><p><span class="emphasis"><em>rss</em></span>  - Tamanho máximo de arquivos residentes (KB) (Ignorado no 2.4.30 e superiores)</p></li><li class="listitem"><p><span class="emphasis"><em>stack</em></span>  - Tamnho máximo da pilha (KB)</p></li><li class="listitem"><p><span class="emphasis"><em>cpu</em></span>  - Tempo máximo da CPU (MIN)</p></li><li class="listitem"><p><span class="emphasis"><em>nproc</em></span>  - Número máximo de processos</p></li><li class="listitem"><p><span class="emphasis"><em>as</em></span>  - Limite do Address Space</p></li><li class="listitem"><p><span class="emphasis"><em>maxlogins</em></span>  - Número máximo de logins para este usuário ou grupo</p></li><li class="listitem"><p><span class="emphasis"><em>maxsyslogins</em></span>  - Número maximo de todos os logins do sistema. Nenhum usuário
+ 		pode conectar se o número estiver maior que o definido.</p></li><li class="listitem"><p><span class="emphasis"><em>priority</em></span>  - A prioridade de execução de processos deste usuário.</p></li><li class="listitem"><p><span class="emphasis"><em>nice</em></span>  - Prioridade máxima permitida para aumentar. Valores entre <span class="emphasis"><em>-20</em></span> a <span class="emphasis"><em>19</em></span>. Linux 2.6.12 e maiores</p></li><li class="listitem"><p><span class="emphasis"><em>rtprio</em></span>  - prioridade em tempo real máxima permitida para processos não privilegiados (Linux 2.6.12 e superiores)</p></li></ul></div><p>
+   </p></li><li class="listitem"><p>
+<span class="emphasis"><em>Valor</em></span> - O valor que deve ser apliado
+   </p></li></ul></div><p>
+Em geral, limites individuais tem mais prioridade que limite de grupos. Assim se os 
+limites do grupo <span class="emphasis"><em>@admins</em></span> não tiver limite, mas existir um limite para seu usuário em
+particular, o particular será usado. Os limites também são definidos por sessão de login.
+</p><p>
+Grupos podem eser especificados usando a sintaxe <span class="emphasis"><em>@grupo</em></span> no campo nome. Caso
+seja usado <span class="emphasis"><em>*</em></span>, a limitação se aplicará a todos os usuários.
+</p><p>
+Arquivos core podem ser criados quando um programa trava. Eles são usados por
+exploits de segurança, sobrescrevendo arquivos de sistemas, ou 
+contendo informações sensíveis (como senhas). Você pode facilmente
+desativar core dumps usando <span class="emphasis"><em>PAM</em></span>, e geralmente, a maioria 
+dos usuários nem notará isto. No entanto, se tiver desenvolvedores de softwares, 
+eles reclamarão:
+</p><pre class="screen">
+*		hard	core		0
+</pre><p>
+O <span class="command"><strong>fsize</strong></span> é uma bom parametro ser usado, muitos usuários tem uma quota 
+grande de sistemas, no entanto se eles tiverem permissões de criar um arquivo
+gigantes, eles poderão facilmente tomar o I/O de recursos de disco (pena intensiva operação
+combinada de I/O). O ajuste deste limite globalmente
+evita o invasor tentar lotar as opartições onde seus logs são aramzanados. Por isto é
+uma boa política usar partições separadas do / para log e outros dados.
+</p><p>
+A cpu é uma limitação classica de administração, é muito útil para evitar que processos
+sejam disparados consumindo todo o tempo de cpu, caso o usuário deixar coisas rodando
+em segundo plano (como um sniffer de pacotes), ele será morto pelo sistema. A limitaçao
+do tempo de CPU tem muitos efeitos, no entanto, caso os usuário passar muito tempo
+logado na máquina, ele poderá ser afetado. Dependendo da CPU da sua máquina, este tempo
+pode variar fortemente (um minuto no 386 é bem mais longo do que um minuto no i7).
+</p><p>
+<span class="emphasis"><em>Exemplo:</em></span>
+</p><pre class="screen">
+@guiafoca hard cpu 2
+</pre><p>
+A limitação do número de logins simultâneos que o usuário pode usar, é extremamente
+recomendável, a maioria das situações os usuários podem nem precisar de muitos logins, 
+assim eles poderão estar consumindo mais recursos do que realmente precisam. Isto 
+também pode ser usado para detectar atividades suspeitas, caso os usuários sabem que 
+o sistema utiliza esta limitações:
+</p><pre class="screen">
+Apr 15 15:09:32 stench pam_limits[10015]: Too many logins (max 1) for test
+
+</pre><p>
+Os limites aplicados ao usuário podem ser visualizados através do comando <span class="command"><strong>ulimit -S -a </strong></span>
+(para listar limites suaves - soft) e <span class="command"><strong>ulimit -H -a</strong></span> 
+(para listar limites rígidos - hard). 
+</p><p>
+Caso os parâmetros <code class="literal">-S</code> ou <code class="literal">-H</code> sejam omitidos, os limites listados serão 
+os suaves (<code class="literal">soft</code>). 
+</p></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch08s04.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch08.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch09.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Protegendo BIOS e o GRUB2 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Capítulo 9. Controle de Acesso</td></tr></table></div></body></html>

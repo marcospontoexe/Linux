@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="index.html" title="Guia Foca - Segurança" /><link rel="prev" href="ch03s05.html" title="Configurando um servidor de logs" /><link rel="next" href="ch04s02.html" title="Criação, monitoramento e segurança de contas" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s05.html">Anterior</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch04s02.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-node">Gerenciamento de contas e cuidados para a proteção de senhas</span></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a id="d-contas"></a>Capítulo 4. Gerenciamento de contas e cuidados para a proteção de senhas</h1></div></div></div><div class="toc"><p><strong>Índice</strong></p><dl class="toc"><dt><span class="section"><a href="ch04.html#d-contas-intro">Introdução</a></span></dt><dt><span class="section"><a href="ch04s02.html">Criação, monitoramento e segurança de contas</a></span></dt><dd><dl><dt><span class="section"><a href="ch04s02.html#d-contas-cms-padroes">Definindo valores padrões de restrição</a></span></dt><dt><span class="section"><a href="ch04s02.html#d-contas-cms-senhas">Senhas fáceis de adivinhar e a escolha de boas senhas</a></span></dt><dt><span class="section"><a href="ch04s02.html#d-contas-cms-multipasswd">Atualização de senhas de múltiplas contas</a></span></dt><dt><span class="section"><a href="ch04s02.html#d-contas-cms-senharoot">A senha do usuário root</a></span></dt></dl></dd><dt><span class="section"><a href="ch04s03.html">Tipos de ataques mais comuns para se conseguir uma senha.</a></span></dt><dd><dl><dt><span class="section"><a href="ch04s03.html#d-contas-ataques-deducao">Dedução</a></span></dt><dt><span class="section"><a href="ch04s03.html#d-contas-ataques-engsocial">Engenharia Social</a></span></dt><dt><span class="section"><a href="ch04s03.html#d-contas-ataques-dicionario">Ataques por dicionário</a></span></dt><dt><span class="section"><a href="ch04s03.html#d-contas-ataques-bruteforce">Brute Force</a></span></dt><dt><span class="section"><a href="ch04s03.html#d-contas-ataques-monteclad">Monitoramento de toques do teclado</a></span></dt><dt><span class="section"><a href="ch04s03.html#d-contas-ataques-loginfalso">Login falso</a></span></dt></dl></dd><dt><span class="section"><a href="ch04s04.html">Melhorando a segurança das senhas armazenadas em seu sistema</a></span></dt><dd><dl><dt><span class="section"><a href="ch04s04.html#d-contas-segsenhas-shadow">Shadow Passwords</a></span></dt><dt><span class="section"><a href="ch04s04.html#d-contas-segsenhas-sha-md5">Senhas Sha512, SHA256 e MD5</a></span></dt></dl></dd></dl></div>
+<p>
+Este capítulo traz explicações e comandos úteis para o gerenciamento de contas
+e proteção de senhas de usuários em sistemas <span class="command"><strong>Linux</strong></span>.  Também
+explica os principais métodos usados para quebra de senha usando diversos
+métodos como engenharia social, brute force, etc., bem como dicas de como
+escolher boas senhas para você e seus usuários e métodos automatizados de
+checagem de senhas vulneráveis.
+</p>
+<p>
+Estes métodos são explicados para que você entenda, se previna destes tipos de
+ataques além de entender a importância de políticas de proteção de senhas.
+</p>
+
+<div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-contas-intro"></a>Introdução</h2></div></div></div>
+<p>
+A criação de uma conta em uma máquina <span class="command"><strong>Linux</strong></span> pode expor seu
+sistema (ou todas suas redes) a crackers simplesmente com a falta de
+treinamento e políticas de segurança.  Uma invasor com um simples acesso a uma
+conta de usuário pode conseguir acesso a áreas que contém dados importantes
+expondo seu sistema a ataques ou roubo de dados.
+</p>
+<p>
+Um firewall não pode fazer muito em uma situação dessas, um acesso através de
+uma conta de sistema válida é difícil de ser auditado e descoberto, a não ser
+que o usuário monitore seus acesso via <span class="command"><strong>lastlog</strong></span> e o
+administrador conheça os hábitos de seus usuários para notar o uso estranho de
+contas em determinados dias/horários.  Evitar situações como esta depende mais
+de conscientização e treinamento tanto do administrador como dos usuários das
+contas para não expor o sistema a um ataque direto.  Este capítulo do guia
+explicará as situações mais comuns e alguns exemplos de como tais ataques
+acontecem.
+</p>
+<p>
+<span class="strong"><strong>ATENÇÃO:</strong></span> - Os dados aqui disponibilizados
+são puramente para fins didáticos e compreensão de como tais situações
+funcionam para se criar mecanismos de defesa personalizados de acordo com o que
+deseja proteger.
+</p>
+</div>
+
+
+
+
+
+
+
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s05.html">Anterior</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch04s02.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Configurando um servidor de logs </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Criação, monitoramento e segurança de contas</td></tr></table></div></body></html>

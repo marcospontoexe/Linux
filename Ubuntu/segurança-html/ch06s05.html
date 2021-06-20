@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Restringindo o comando su</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s04.html" title="Dando poderes de root para executar determinados programas" /><link rel="next" href="ch06s06.html" title="Restrições baseadas em usuário/IP" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Restringindo o comando <span class="command"><strong>su</strong></span></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s04.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s06.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Restringindo o comando <span xmlns="http://www.w3.org/1999/xhtml" class="command"><strong>su</strong></span></span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-su"></a>Restringindo o comando <span class="command"><strong>su</strong></span></h2></div></div></div>
+<p>
+Restrições de acesso através de grupos, bloqueio de acesso, acesso direto sem
+senha, etc.  podem ser aplicados ao sudo via seu arquivo de configuração PAM
+<code class="filename">/etc/pam.d/su</code>.  Abaixo um exemplo explicativo deste
+arquivo:
+</p>
+<pre class="screen">
+# A configuração abaixo requer que o usuário seja membro do 
+# grupo adm para usar o 'su'. 
+# auth       required   pam_wheel.so group=adm
+
+# Membros do grupo acima não precisam fornecer senha, temos confiança neles.
+# auth       sufficient pam_wheel.so trust
+
+# Usuário que pertencem ao grupo "nosu" nunca deverão ter acesso ao 'su'
+# auth       required   pam_wheel.so deny group=nosu
+
+# O root não precisa fornecer senha ao 'su'
+auth       sufficient pam_rootok.so
+
+# Ativa as restrições PAM de /etc/security/limits.conf
+session    required   pam_limits.so
+
+# Isto ativa as restrições PAM de /etc/security/time.conf no 
+# comando 'su'
+account    requisite  pam_time.so
+
+# Módulos padrões de autenticação Unix
+auth       required   pam_unix.so
+account    required   pam_unix.so
+session    required   pam_unix.so
+</pre>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s04.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s06.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Dando poderes de root para executar determinados programas </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Restrições baseadas em usuário/IP</td></tr></table></div></body></html>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Cadeia de confiança de certificados</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch07.html" title="Capítulo 7. Criptografia" /><link rel="prev" href="ch07s03.html" title="Introdução a Certificados" /><link rel="next" href="ch07s05.html" title="openssl" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Cadeia de confiança de certificados</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s03.html">Anterior</a> </td><th width="60%" align="center">Capítulo 7. Criptografia</th><td width="20%" align="right"> <a accesskey="n" href="ch07s05.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch07.html">Criptografia</a></span> &gt; <span class="breadcrumb-node">Cadeia de confiança de certificados</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="s-criptografia-x509-trust-anchor"></a>Cadeia de confiança de certificados</h2></div></div></div><p>
+Nesta seção, faremos a explicação sobre como funciona a cadeia de confiança
+utilizado em certificados, abrangendo os temas: Certificado raíz, certificado TLS. 
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-trust-anchor-root-certificate"></a>Certificado raíz</h3></div></div></div><p>
+O certificado raíz é basicamente conhecido por muitos como CA. Entre as CA's
+podemos citar: Certsign, Microsoft, Let's encrypt, Trustsign, etc.
+O que diferencia um certificado raíz (CA) de um certificado convencional?
+Basicamente o campo <span class="emphasis"><em>issuer</em></span> e <span class="emphasis"><em>subject</em></span>
+são os mesmos. Certificados <span class="emphasis"><em>auto-assinados</em></span> também
+possuem essa característica, a validação é feita pela distribuição 
+do certificad para outros sistemas operacionais, navegadores, etc. 
+Isso diferencia um certificado auto-assinado de um certificado CA 
+oficial, pois este último é distribuido para navegadores e sistemas 
+operacionais automaticamente para autenticar qualquer certificado gerado 
+por sua chave pública. 
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-trust-anchor-ssl-tls"></a>Autenticação de Certificado SSL TLS</h3></div></div></div><p>
+Em sistemas <span class="emphasis"><em>TLS</em></span>, é necessário que o servidor envie um certificado
+como parte do handshake. No caso de conexões vindas de clientes, ocorrerá o seguinte 
+caminho de validação do certificado:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>O <span class="emphasis"><em>subject</em></span> do certificado deve conferir com o hostname que o cliente está 
+se conectando</p></li><li class="listitem"><p>O certificado está assinado por uma entidade certificadora confiável</p></li></ul></div><p>
+O nome de host principal (primário) do website será listado como 
+<code class="literal">Common Name (CN)</code>, no campo Subject do certificado. Um certificado pode 
+ser válido para múltiplos hostnames (ou diversos websites).
+</p><p>
+Certificados que possuem múltiplos nomes de hosts, são chamados de 
+certificados SAN: <span class="emphasis"><em>Subject Alternative Names</em></span>. ou 
+<span class="emphasis"><em>Unified Communications Certificates (UCC)</em></span>. 
+Estes certificados contém o campo <span class="emphasis"><em>Subject Alternative Name</em></span>, 
+assim mais CAs podem também ser colocadas no campo <span class="emphasis"><em>Subject Common Name</em></span>
+do certificado para garantir retro-compatibilidade. Caso um dos hostnames contém um
+<span class="emphasis"><em>*</em></span> o certificado também será chamado <span class="emphasis"><em>Certificado Wildcard</em></span>.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-trust-anchor-cert-types"></a>Tipos de certificados</h3></div></div></div><p>
+Aqui explicaremos a diferença entre os diversos tipos de certificados e onde eles podem ser
+usados
+</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-cert-types-tls-ssl-client"></a>Certificado de clienteTLS/SSL</h4></div></div></div><p>
+Os certificados usados para clientes autenticam um serviço ao invés de um 
+servidor ao serviço remoto, garantindo mais segurança e granularidade que 
+a autenticação por host. Seu uso é bem menos comum (as vezes chega a ser desconhecido) 
+em comparação a certificado de servidores. Basicamente ele autentica o cliente ao servidor remoto
+de forma segura (substituindo ou complementando a autenticação via credenciais, token ou cookies). 
+</p><p>
+Como forma de garantir mais segurança (e redução de custos), pode ser utilizado 
+certificados <span class="emphasis"><em>Auto assinados</em></span> para fazer a autenticação deste tipo
+de conexão. Para detalhes, veja a <a class="xref" href="ch07s07.html" title="Certificados Auto-Assinados">“Certificados Auto-Assinados”</a>.
+ </p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-cert-types-smime"></a>Certificado de Emails</h4></div></div></div><p>
+Para aumento da segurança de e-mails, geralmente é utilizado certificados
+S/MIME. Esta técnica consiste que os remetentes possuem previamente a chave
+pública do destinatário, geralmente obtida por um certificado de e-mail ou
+autoridade de certificações confiáveis publicamente para e-mail. O uso mais
+comum é o uso de S/MIME dentro de uma empresa. 
+</p><p>
+Uma outra técnica usando <span class="command"><strong>GPG</strong></span> pode ser usada para substituir
+o uso de S/MIME no e-mail, além de expandir as possibildiades de autenticação
+usando cadeia de confiança. Veja detalhes em <a class="xref" href="ch07s11.html" title="Usando o GPG para Autenticação e Criptografia">“Usando o <span class="command"><strong>GPG</strong></span> para Autenticação e Criptografia”</a>.
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-cert-code-signing"></a>Assinatura de código</h4></div></div></div><p>
+Uma das utilizações de certificados é durante a validação de assinatura de programas
+para ter certeza que eles não foram alterados no momento da etnrega. A autenticação
+é apenas um exemplo de um esquema de assinatura de código.
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-cert-qualified-cert"></a>Certificado Qualificado</h4></div></div></div><p>
+Este é um tipo de certificado que está ganhando popularidade aos poucos no Brasil, geralmente 
+emitido pela SERASA para criar uma identificação chamada de <span class="emphasis"><em>CPF</em></span> ou <span class="emphasis"><em>CNPJ</em></span> Digital.
+</p><p>
+Tipicamente é usado para assinatura eletronica em sites do governo, e até documentos, sendo
+bastante comum na Europa.
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-cert-rootcert"></a>Certificado CA raíz</h4></div></div></div><p>
+Este certificado é um certificado auto-assinado (o campo <span class="emphasis"><em>subject</em></span> é o mesmo do <span class="emphasis"><em>issuer</em></span>),
+sendo é usado para assinar outros certificados, e criando uma relação de confiança quando distribuido 
+no repositório de navegadores, sistemas operacionais, etc.
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-cert-intercert"></a>Certificado Intermediário</h4></div></div></div><p>
+Este é um certificado assinado por um certificado raíz (veja <a class="xref" href="ch07s04.html#s-criptografia-x509-trust-anchor-cert-rootcert" title="Certificado CA raíz">“Certificado CA raíz”</a>) 
+ou outro certificado intermediário e serve apenas para assinar outros certificados.
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-cert-leafcert"></a>Certificado Final</h4></div></div></div><p>
+Este certificado é designado apenas a utilização em servidores, clientes, 
+e-mails, assinatura de código, e não pode ser uitlizado para criar e assinar
+outros certificados.
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-cert-selfsigned"></a>Certificado Auto-Assinado</h4></div></div></div><p>
+Basicamente é um certificado onde o campo <span class="emphasis"><em>issuer</em></span> (Emissor) é igual ao <span class="emphasis"><em>subject</em></span> (assunto),
+podendo validar a assinatura com sua chave pública. Ele não possui uma cadeia de confiança pública,
+mas isso não quer dizer que sejam menos seguros.
+</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-trust-anchor-cert-fields"></a>Significado de campos usados em certificados</h3></div></div></div><p>
+Certificados X.509 possuem campos que definem os parametros de cadeia de confiança, 
+validade e identidade. Seguem a apresentação de alguns campos usados na identificação
+de certificados:
+</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">Not Before</span></dt><dd><p>
+    Intervalo inicial de validade do certificado. Antes desta data/hora
+o certificado não estará válido. Geralmente configurado com alguns
+dias ou horas antes do momento que o certificado foi emitido, para 
+evitar problemas de configuração do relógio.
+      </p></dd><dt><span class="term">Not After</span></dt><dd><p>
+     Data e hora de expiração do certificado. Após este intervalo, o certificado será exibido como
+     expirado no navegador ou sistema que utiliza para autenticação.
+      </p></dd><dt><span class="term">Subject</span></dt><dd><p>
+    Nome da máquina, da pessoa ou organização que recebeu o certificado.
+      </p></dd><dt><span class="term">Issuer</span></dt><dd><p>
+    Identificação da entidade que emitiu e assinou o certificado.
+      </p></dd><dt><span class="term">Serial Number</span></dt><dd><p>
+    O número serial é usado para identifição e revogação de um certificado
+    dentro de um sistema de uma CA.
+      </p></dd><dt><span class="term">Key Usage</span></dt><dd><p>
+    Determina os usos válidos para a chave pública.
+Valores geralmente usados incluem <span class="emphasis"><em>validação de assinatura</em></span>, 
+<span class="emphasis"><em>codificação da chave</em></span> e <span class="emphasis"><em>assinatura de certificado</em></span>.
+      </p></dd><dt><span class="term">Extended Key Usage</span></dt><dd><p>
+    Uso extendido da chave indica as aplicações onde o certificado pode ser 
+    usado. Normalmente encontramos nesse campo assinatura de e-mail, assinatura
+    de código e autenticação com servidores.
+      </p></dd><dt><span class="term">Public Key</span></dt><dd><p>
+ A chave pública que foi gerada para o dono do certificado.
+      </p></dd><dt><span class="term">Signature Algorithm</span></dt><dd><p>
+Algoritmo usado para assinar a chave pública do certificado.
+      </p></dd><dt><span class="term">Signature</span></dt><dd><p>
+    Corpo de assinatura do certificado (assinado pela chave privada do issuer)
+      </p></dd></dl></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="s-criptografia-x509-trust-anchor-validation-levels"></a>Nívels de validação do certificado</h3></div></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-validation-levels-domain"></a>Validação de Domínio - DV</h4></div></div></div><p>
+A entidade certificadora emite um certificado de validação de dominio (DV) para quem
+provar que possui direito a gerenciar um domínio
+</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-validation-levels-organization"></a>Validação de Organização - OV</h4></div></div></div><p>
+A entidade certificadora emite um certificado de Validação de Organização (OV) desde que
+atenda dois requisitos: 
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+O direito de gerenciar administrativamente o domínio listado
+</p></li><li class="listitem"><p>
+Ser o representante legal da entidade
+</p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a id="s-criptografia-x509-trust-anchor-validation-levels-ext"></a>Validação Extendida - EV</h4></div></div></div><p>
+Para conseguir um certificado de validação extendida, o comprador precisa
+provar ao emissor de certificao os seguintes pontos:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+Sua identidade oficial, com verificação feita por outras pessoas.
+</p></li></ul></div><p>
+Assim como certificados OV (veja <a class="xref" href="ch07s04.html#s-criptografia-x509-trust-anchor-validation-levels-organization" title="Validação de Organização - OV">“Validação de Organização - OV”</a>) 
+o emissor pode definir critérios para proibir a emissão de acordo com sua politica de certificação.
+</p><p>
+Quando você acessa um site com <span class="emphasis"><em>EV</em></span>, o navegador
+exibe um aviso diferente comprovando que o site possui um certificado
+de validação extendida.
+</p><p>
+<code class="literal">
+<span class="emphasis"><em>OBS</em></span>: Alguns navegadores mais modernos não diferenciam
+mais na barra de endereços certificados EV de certificados convencionais,
+exibindo somente este detalhamento ao solicitar exibir os dados de 
+certifidos.
+</code>
+</p></div></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s03.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s05.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Introdução a Certificados </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> openssl</td></tr></table></div></body></html>

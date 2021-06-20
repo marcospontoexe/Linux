@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Evitando o uso de hosts.equiv e .rhosts</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s08.html" title="Desabilitando serviços não usados no Inetd" /><link rel="next" href="ch06s10.html" title="Restringindo o uso do shutdown" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Evitando o uso de <code class="filename">hosts.equiv</code> e <code class="filename">.rhosts</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s08.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s10.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Evitando o uso de <code xmlns="http://www.w3.org/1999/xhtml" class="filename">hosts.equiv</code> e <code xmlns="http://www.w3.org/1999/xhtml" class="filename">.rhosts</code></span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-authinseg"></a>Evitando o uso de <code class="filename">hosts.equiv</code> e <code class="filename">.rhosts</code></h2></div></div></div>
+<p>
+O arquivo <code class="filename">hosts.equiv</code> contém uma lista de usuários
+autorizados/desautorizados que podem fazer uso dos serviços "r*" sem fornecer
+uma senha (como <span class="command"><strong>rsh</strong></span>, <span class="command"><strong>rcp</strong></span>,
+<span class="command"><strong>rexec</strong></span>, etc) , veja <a class="xref" href="">???</a>.  É
+muito fácil falsificar um nome de usuário para obter acesso aos privilégios de
+outro usuário usando este recurso.
+</p>
+<p>
+Os arquivos <code class="filename">~/.rhosts</code>, <code class="filename">~/.shosts</code> tem
+o funcionamento parecido com o <code class="filename">hosts.equiv</code> mas contém
+somente dois campos, o primeiro especificando o nome do computador (FQDN) e o
+segundo o nome do usuário que tem permissão de acesso sem fornecer senha.  Ele
+garantirá este acesso ao usuário e máquina remota especificada neste arquivo.
+Se for definido somente o nome do computador, o nome de usuário deverá ser o
+mesmo do local para que o acesso sem senha seja garantido.  É recomendável
+restringir o acesso a estes arquivos somente ao usuário/grupo quando for
+realmente necessário.  Um exemplo de <code class="filename">~/.rhosts</code>:
+</p>
+<pre class="screen">
+maquina1.dominio.com.br usuario1
+maquina2.dominio.com.br usuario2
+</pre>
+<p>
+O uso destes dois mecanismos e dos serviços "r*" são desencorajados!  (o último
+por usar transferência de dados não criptografadas).  Veja <a class="xref" href="">???</a> para uma alternativa melhor.  Utilize estes dois mecanismos
+somente se deseja facilidade no gerenciamento e se sua rede seja absolutamente
+confiável e a segurança de dados não seja prioridade pra você...
+</p>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s08.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s10.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Desabilitando serviços não usados no Inetd </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Restringindo o uso do shutdown</td></tr></table></div></body></html>

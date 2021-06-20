@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Restrições de acesso a programas/diretórios/arquivos usando grupos</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch06.html" title="Capítulo 6. Restrições de acesso, recursos e serviços" /><link rel="prev" href="ch06s02.html" title="Limitação de recursos usando PAM" /><link rel="next" href="ch06s04.html" title="Dando poderes de root para executar determinados programas" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Restrições de acesso a programas/diretórios/arquivos usando grupos</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s02.html">Anterior</a> </td><th width="60%" align="center">Capítulo 6. Restrições de acesso, recursos e serviços</th><td width="20%" align="right"> <a accesskey="n" href="ch06s04.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch06.html">Restrições de acesso, recursos e serviços</a></span> &gt; <span class="breadcrumb-node">Restrições de acesso a programas/diretórios/arquivos usando grupos</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="d-restr-grupos"></a>Restrições de acesso a programas/diretórios/arquivos usando grupos</h2></div></div></div>
+<p>
+Usuários podem ter o acesso liberado a diretórios/arquivos execução de
+programas de acordo com o grupo que pertencem.  Este é um recurso valioso na
+administração de sistemas <span class="command"><strong>Unix</strong></span> que se bem usado, aumenta as
+restrições de acesso e segurança no acesso/utilização de programas em um
+ambiente de trabalho.  Usuários de sistema tendem a usar o usuário
+<code class="literal">root</code> para fazer tarefas como conexão com internet,
+utilização da placa de som, modem, etc.  e as vezes nem sabem que isso pode ser
+feito através do mesmo usuário adicionando este a um grupo específico.
+</p>
+<p>
+Esta tarefa pode ser feita com o comando <code class="literal">adduser usuário
+grupo</code> ou editando manualmente os arquivos
+<code class="filename">/etc/group</code> e <code class="filename">/etc/gshadow</code>.  Podemos
+ter as seguintes situações facilitadas com o uso de grupos:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<p>
+Usar a placa de som.  Os dispositivos usados pela placa de som como
+<code class="filename">/dev/audio</code>, <code class="filename">/dev/dsp</code>,
+<code class="filename">/dev/sndstat</code>, etc.  normalmente tem permissão
+leitura/gravação para o usuário <code class="literal">root</code> e grupo
+<code class="literal">audio</code> (cheque com o comando <code class="literal">ls -la
+/dev/audio</code>).  Para autorizar determinados usuários usar a placa de
+som basta adiciona-los neste grupo: <code class="literal">adduser usuario audio</code>.
+</p>
+</li><li class="listitem">
+<p>
+Conectar a Internet.  Normalmente o utilitário ppp tem as permissões SUID
+<code class="literal">root</code> e grupo <code class="literal">dip</code>.  Adicionamos o usuário
+a este grupo: <code class="literal">adduser usuario dip</code>.  Agora ele poderá
+conectar/desconectar a internet sem a intervenção do usuário
+<code class="literal">root</code>.
+</p>
+<p>
+<span class="strong"><strong>OBS</strong></span> Certamente o usuário terá acesso aos
+arquivos de configuração da discagem do <span class="command"><strong>ppp</strong></span> e
+conseqüentemente a senha de conexão internet, e esta senha é a mesma usada no
+e-mail primário do provedor (com o mesmo nome da conta).  Esta mesma situação
+pode acontecer com outros programas que autorize o acesso a grupos, é
+importante que conheça bem as permissões do programa e entender se existem
+riscos.
+</p>
+</li><li class="listitem">
+<p>
+Utilizar o modem.  Um bom grupo para permitir a utilização do modem é
+<code class="literal">dialout</code>.  O dispositivo utilizado pelo modem (não seu link)
+deve ter permissões leitura/gravação para o usuário <code class="literal">root</code> e
+grupo <code class="literal">dialout</code>.  Cadastrando o usuário neste grupo autorizará
+a utilização do modem: <code class="literal">adduser usuario dialout</code>.
+</p>
+</li><li class="listitem">
+<p>
+Permitir que diversos usuários compartilhem um mesmo diretório.  Isto é útil
+quando muitas pessoas estão desenvolvendo um mesmo projeto.  Siga estes passos:
+</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+<p>
+Crie um novo grupo no sistema: <span class="command"><strong>groupadd gp1</strong></span>, a opção
+<span class="emphasis"><em>-g</em></span> permite selecionar manualmente a GID.  Opcionalmente
+você poderá usar um grupo já existente no sistema (veja o arquivo
+<code class="filename">/etc/group</code>).
+</p>
+</li><li class="listitem">
+<p>
+Crie o diretório que será usado para armazenar os arquivos deste grupo de
+usuários: <code class="filename">mkdir projeto1</code>).
+</p>
+</li><li class="listitem">
+<p>
+Mude o dono/grupo do diretório: <code class="literal">chown root.gp1 projeto1/</code>
+</p>
+</li><li class="listitem">
+<p>
+De permissões de leitura/gravação para o dono/grupo do diretório, vamos também
+incluir a permissão SGID para que todos os arquivos criados dentro deste
+diretório pertençam ao mesmo grupo e não ao grupo primário do usuário, assim
+todos os usuários terão acesso: <code class="literal">chmod 2770 projeto1</code>
+</p>
+</li><li class="listitem">
+<p>
+Agora cadastre os usuários que deverão ter acesso ao diretório
+<code class="filename">projeto1/</code> no grupo <code class="literal">gp1</code>, somente estes
+usuários e o root terão acesso ao diretório (permissões 2770).
+</p>
+</li><li class="listitem">
+<p>
+É interessante também mudar a "umask" do usuário de <code class="literal">022</code> para
+<code class="literal">002</code> (ou equivalente) para que os novos arquivos criados
+tenham permissão de leitura/gravação para o grupo <code class="literal">gp1</code>.  Caso
+contrário, lembre-se de modificar as permissões de seus arquivos manualmente.
+Um ótimo comando para fazer isso (sem afetar diretórios) é: <code class="literal">find .
+-type f -user usuario1 -exec chmod 0660 \{\} \;</code>.  Este comando parece
+estranho mas é excelente!  um <code class="literal">chmod -R 0660</code> afetaria até os
+diretórios, imagine o caos.
+</p>
+</li></ul></div>
+</li></ul></div>
+<p>
+A maioria das distribuições <span class="command"><strong>Linux</strong></span> vem com uma boa política
+de grupos para permitir um controle eficaz de recurso.  Se você quer saber
+quais arquivos em seu sistema pertencem a determinado grupo (útil para saber o
+que o usuário terá acesso se adiciona-lo àquele grupo) execute o comando:
+</p>
+<pre class="screen">
+find / -group nome_do_grupo
+</pre>
+</div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s02.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch06.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s04.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">Limitação de recursos usando PAM </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Dando poderes de root para executar determinados programas</td></tr></table></div></body></html>

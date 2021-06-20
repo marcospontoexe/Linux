@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>A tabela mangle</title><meta name="generator" content="DocBook XSL Stylesheets V1.79.1" /><link rel="home" href="index.html" title="Guia Foca - Segurança" /><link rel="up" href="ch05.html" title="Capítulo 5. Firewall iptables" /><link rel="prev" href="ch05s04.html" title="A tabela nat (Network Address Translation) - fazendo nat" /><link rel="next" href="ch05s06.html" title="Outros módulos do iptables" /></head><body text="black" link="#0000FF" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">A tabela mangle</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch05s04.html">Anterior</a> </td><th width="60%" align="center">Capítulo 5. Firewall iptables</th><td width="20%" align="right"> <a accesskey="n" href="ch05s06.html">Próximo</a></td></tr></table><hr /></div><div xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format" class="breadcrumbs"><span class="breadcrumb-link"><a href="index.html">Guia Foca - Segurança</a></span> &gt; <span class="breadcrumb-link"><a href="ch05.html">Firewall iptables</a></span> &gt; <span class="breadcrumb-node">A tabela mangle</span></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="fw-iptables-mangle"></a>A tabela mangle</h2></div></div></div><p>
+A tabela <span class="emphasis"><em>mangle</em></span> serve para especificar ações especiais
+para o tratamento do tráfego que atravessa os chains.  Nesta tabela existem
+cincos chains: <span class="emphasis"><em>PREROUTING</em></span>,
+<span class="emphasis"><em>POSTROUTING</em></span>, <span class="emphasis"><em>INPUT</em></span>,
+<span class="emphasis"><em>OUTPUT</em></span> e <span class="emphasis"><em>FORWARD</em></span> (veja <a class="xref" href="ch05.html#fw-iptables-tabelas" title="O que são tabelas?">“O que são tabelas?”</a> para maiores detalhes).
+</p><p>
+Em geral, cada um deste chain é processado antes do chain correspondente na
+tabela <span class="emphasis"><em>filter</em></span> e <span class="emphasis"><em>nat</em></span> para definir
+opções especiais para o tráfego (por exemplo, o chain
+<span class="emphasis"><em>PREROUTING</em></span> da tabela <span class="emphasis"><em>mangle</em></span> é
+processado antes do <span class="emphasis"><em>PREROUTING</em></span> da tabela
+<span class="emphasis"><em>nat</em></span>).  O chain <span class="emphasis"><em>OUTPUT</em></span> da tablea
+<span class="emphasis"><em>mangle</em></span> corresponde ao <span class="emphasis"><em>OUTPUT</em></span> da
+tabela <span class="emphasis"><em>nat</em></span>.  Opções como o <span class="emphasis"><em>Tipo de Serviço
+(TOS)</em></span> é especificado nesta tabela para classificar e aumentar
+consideravelmente a velocidade de tráfego considerados em tempo real.  Mesmo
+após o tráfego ser estabelecido, os chains da tabela mangle continuam ativos
+para garantir que as opções especiais relacionadas com a conexão continuem
+fazendo efeito (veja os exemplos de <a class="xref" href="ch05s07.html" title="Caminho percorrido pelos pacotes nas tabelas e chains">“Caminho percorrido pelos pacotes nas tabelas e chains”</a>).
+</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="fw-iptables-mangle-TOS"></a>Especificando o tipo de serviço</h3></div></div></div><p>
+O tipo de serviço é um campo existente no cabeçalho de pacotes do protocolo
+ipv4 que tem a função especificar qual é a prioridade daquele pacote.  A
+prioridade é definida usando o algoritmo FIFO do próprio kernel, sendo uma das
+alternativas de controle/priorização de tráfego das mais simples e rápidas.
+</p><p>
+Uma das vantagens da utilização do tipo de serviço é dar prioridade ao tráfego
+de pacotes interativos (como os do ICQ, IRC, servidores de chat), etc.  Com o
+TOS especificado, mesmo que esteja fazendo um download consumindo toda a banda
+de sua interface de rede, o tráfego com prioridade interativa será enviado
+antes, aumentando a eficiência do uso de serviços em sua máquina.
+</p><p>
+Em testes realizados em minha conexão de 56K, o uso de regras TOS aumentou
+bastante o desempenho em tráfego interativo (em torno de 300%), durante o uso
+total da banda da interface ppp em grande consumo de banda.
+</p><p>
+Usamos o alvo TOS (-j TOS) para especificar a modificação do tipo de serviço
+nos pacotes que atravessam as regras do firewall, acompanhada do argumento
+<span class="emphasis"><em>--set-tos TOS</em></span> que define a nova prioridade dos pacotes.
+Os valores aceitos são os seguintes:
+</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">Espera Mínima</span></dt><dd><p>
+É especificado através de <span class="emphasis"><em>Minimize-Delay</em></span>,
+<span class="emphasis"><em>16</em></span> ou <span class="emphasis"><em>0x10</em></span>
+</p></dd><dt><span class="term">Máximo Processamento</span></dt><dd><p>
+É especificado através de <span class="emphasis"><em>Maximize-Throughput</em></span>,
+<span class="emphasis"><em>8,</em></span> ou <span class="emphasis"><em>0x08</em></span>.
+</p></dd><dt><span class="term">Máxima Confiança</span></dt><dd><p>
+É especificado através de <span class="emphasis"><em>Maximize-Reliability</em></span>,
+<span class="emphasis"><em>4</em></span> ou <span class="emphasis"><em>0x04</em></span>.
+</p></dd><dt><span class="term">Custo mínimo</span></dt><dd><p>
+Especificado através de <span class="emphasis"><em>Minimize-Cost</em></span>,
+<span class="emphasis"><em>2</em></span> ou <span class="emphasis"><em>0x02</em></span>.
+</p></dd><dt><span class="term">Prioridade Normal</span></dt><dd><p>
+Especificado através de <span class="emphasis"><em>Normal-Service</em></span>,
+<span class="emphasis"><em>0</em></span> ou <span class="emphasis"><em>0x00</em></span>.
+</p></dd></dl></div><p>
+Os pacotes vem por padrão com o valor TOS ajustado como <span class="emphasis"><em>prioridade
+normal</em></span> (bits tos ajustados para 0x00).  O tipo <span class="emphasis"><em>Mínima
+Espera</em></span> é o de maior prioridade, recomendado para tráfego interativo.
+</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a id="fw-iptables-mangle-TOS-out"></a>Especificando o TOS para tráfego de saída</h3></div></div></div><p>
+Este é o mais usado, pois prioriza o tráfego que sai da máquina (com destino a
+Internet, por exemplo).  Sua operação é realizada através do chain
+<span class="emphasis"><em>OUTPUT</em></span> ou <span class="emphasis"><em>POSTROUTING</em></span>.
+</p><p>
+Para priorizar todo o tráfego de IRC de nossa rede interna indo para a
+interface ppp0:
+</p><pre class="screen">
+iptables -t mangle -A OUTPUT -o ppp0 -p tcp --dport 6666-6668 -j TOS --set-tos 16
+</pre><p>
+O bit TOS é ajustado para <span class="emphasis"><em>Espera mínima</em></span> e será enviado
+antes dos pacotes com prioridade normal para fora.  Para priorizar a
+transmissão de dados ftp saindo da rede:
+</p><pre class="screen">
+iptables -t mangle -A OUTPUT -o ppp0 -p tcp --dport 20 -j TOS --set-tos 8
+</pre><p>
+Para priorizar o tráfego de ICQ da rede:
+</p><pre class="screen">
+iptables -t mangle -A OUTPUT -o ppp0 -p tcp --dport 5190 -j TOS --set-tos 16
+</pre><p>
+Existem muitas outras otimizações que podem ser feitas, só depende dos
+requerimentos e análise de cada serviço da rede pelo administrador.
+</p><p>
+<span class="strong"><strong>OBS:</strong></span> - Os pacotes que atravessam o alvo TOS
+somente tem os bits tipo do serviço modificados, eles não serão de qualquer
+forma rejeitados.
+</p></div></div><HR xmlns="" xmlns:fo="http://www.w3.org/1999/XSL/Format"></HR><p class="copyright">Copyright © 1999-2020 - Gleydson Mazioli da Silva</p><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch05s04.html">Anterior</a> </td><td width="20%" align="center"><a accesskey="u" href="ch05.html">Subir</a></td><td width="40%" align="right"> <a accesskey="n" href="ch05s06.html">Próximo</a></td></tr><tr><td width="40%" align="left" valign="top">A tabela nat (Network Address Translation) - fazendo nat </td><td width="20%" align="center"><a accesskey="h" href="index.html">Voltar ao Índice</a></td><td width="40%" align="right" valign="top"> Outros módulos do iptables</td></tr></table></div></body></html>
