@@ -55,4 +55,10 @@ Comando dpkg:
 O comando mkdir é utilizado para criar diretórios.
 * `mkdir “nome do riretorio”`: cria um diretório.
 * `mkdir "diretorio1" "diretorio2" "diretorio3"`: cria vários diretórios de uma só vez.
+* `mkdir -p diretorio1/diretorio2/diretori`: criará tanto diretorio1, diretorio2 e diretorio3, mesmo que diretorio1 não exista previamente.
+* `mkdir -m 755 nome-do-diretorio`: Permite especificar as permissões (modo) dos diretórios criados. Criará um diretório com permissões de leitura, escrita e execução para o proprietário, e apenas permissões de leitura e execução para os outros.
   
+O comando touch é usado para criar arquivos de qualquer tipo de extensão:
+* `touch “arquivo.extenção”`: cria um arquivo no diretorio atual.
+
+### Caracteres de referência global
