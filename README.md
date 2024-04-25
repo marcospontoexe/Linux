@@ -62,3 +62,6 @@ O comando touch é usado para criar arquivos de qualquer tipo de extensão:
 * `touch “arquivo.extenção”`: cria um arquivo no diretorio atual.
 
 ### Caracteres de referência global
+Os caracteres de referência global são ultilizados nos parâmetros de comandos para realizar operações de busca e manipulação de texto com base em padrões definidos, por exempolo o regex.
+* \*: Usado para substituir um conjunto de caracteres do argumento do comando: *a corresponde a qualquer cadeia de caracteres que tenha a letra "a" no final.
+* 
