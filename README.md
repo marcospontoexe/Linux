@@ -12,10 +12,10 @@ O terminal do Linux permite interagir com o sistema operacional por meio de coma
 ## Comandos de texto
 A linha de comando é composta sequêncialmente por: **nome do comando**,  **parâmetros** e **argumentos**.
 
-* Nome do comando é o próprio comando que você deseja executar. Por exemplo, "ls" é o comando para listar arquivos e diretórios, "cd" é o comando para mudar de diretório e "mkdir" é o comando para criar um novo diretório.
+* Nome do **comando** é o próprio comando que você deseja executar. Por exemplo, "ls" é o comando para listar arquivos e diretórios, "cd" é o comando para mudar de diretório e "mkdir" é o comando para criar um novo diretório.
     * Sempre é escrito com letras minúsculas.
       
-* Os parâmetros modificam o comportamento padrão do comando.
+* Os **parâmetros** modificam o comportamento padrão do comando.
     *  Geralmente são precedidas por um hífen ("-") quando o parâmetro é abreviado com uma letra (`ls -a`, exibe os todos os arquivos e diretórios),
     *  ou dois hifens ("--") quando o parâmetro é escrito por extenso (`ls --all`).
     *  Para alguns comandos não é necessário usar parâmetro na linaha de comando (`cd /diretório pai/diretório filho`).
@@ -23,7 +23,7 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
     *  Os parâmetro são case sensitive.
     *  Em alguns comandos, o parâmetro "-h" lista todos os parâmetros disponíveis para aquele comando.
       
-* Argumentos: É o nome de um arquivo ou path de um diretorio.
+* **Argumentos**: É o nome de um arquivo ou path de um diretorio.
 
 * A tecla **TAB** pressionada uma vez pode ser usada para completar o comando.
 * A tecla **TAB** pressionada duas vezes mostra os possíveis complementos para o comando.
