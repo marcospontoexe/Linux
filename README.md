@@ -116,13 +116,13 @@ para um arquivo.
 ![diretório](https://github.com/marcospontoexe/Linux/blob/main/imagens/ls%20para%20diret%C3%B3rio.png)
 para um diretório.
 
-* A : é o tipo de arquivo.
+* A primeira letra se refere ao tipo de arquivo.
   *  d(diretório)
   *  -(programa)
   *  l(link) 
-* BCD: são as permissões do usuário (u de user), dono do diretorio ou programa ou link. 
-* EFG: são as permissões do grupo (g de group) 
-* HIJ: são as permissões dos demais grupos ou usuários (o de others) 
+* As 2°, 3° e 4° letras são as permissões do usuário (u de user), dono do diretorio ou programa ou link. 
+* As 5°, 6° e 7° letras são as permissões do grupo (g de group) 
+* As 8°, 9° e 10° letras são as permissões dos demais grupos ou usuários (o de others) 
 
 Os seguinte tipos de permissões no Linux são:
 * Leitura (r): Permite visualizar o conteúdo de um arquivo ou listar o conteúdo de um diretório.
