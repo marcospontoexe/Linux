@@ -19,7 +19,7 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
     *  Geralmente são precedidas por um hífen ("-") quando o parâmetro é abreviado com uma letra (`ls -a`, exibe os todos os arquivos e diretórios),
     *  ou dois hifens ("--") quando o parâmetro é escrito por extenso (`ls --all`).
     *  Para alguns comandos não é necessário usar parâmetro na linaha de comando (`cd /diretório pai/diretório filho`).
-    *  É possível usar mais de um parâmetro na mesma linha de comando (`ls -a -h`, exibe todos os arquivos do diretório de forma humanizada).
+    *  É possível usar mais de um parâmetro na mesma linha de comando (`ls -ah`, exibe todos os arquivos do diretório de forma humanizada).
     *  Os parâmetro são case sensitive.
     *  Em alguns comandos, o parâmetro "-h" lista todos os parâmetros disponíveis para aquele comando.
       
