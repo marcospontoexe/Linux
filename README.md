@@ -71,5 +71,6 @@ Os caracteres de referência global são ultilizados nos parâmetros de comandos
 * \[a-z] : substitui qualquer letra do argumento por uma faixa de caracteres (de a até z no exemplo).
     * "c[a-o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por um intervalor de "a" até "o". 
 * \[a,z] : substitui qualquer letra do argumento por a ou z.
-    *  "c[a,o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por "a" ou "o". 
+    *  "c[a,o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por "a" ou "o".
+    *  "c[a,h-o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por "a" mais um intervalor de "h" até "o".
   
