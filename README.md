@@ -73,4 +73,5 @@ Os caracteres de referência global são ultilizados nos parâmetros de comandos
 * \[a,z] : substitui qualquer letra do argumento por a ou z.
     *  "c[a,o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por "a" ou "o".
     *  "c[a,h-o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por "a" mais um intervalor de "h" até "o".
-  
+* \{ab,cd} : Usado para fazer referência a padrões de caractere.
+    * *.{conf, old}: Retorna qualquer extensão .conf e .old.
