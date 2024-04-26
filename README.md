@@ -48,6 +48,7 @@ Comando change directory:
 * `cd ~`: muda para o diretorio do usuário.
 * `cd /`: muda para o diretorio raiz.
 * `cd ..`: retorna um diretorio.
+* * `cd .`: diretorio atual.
 
 Comando dpkg:
 * `sudo dpkg --install “nome do pacote”`: instala um pacote através do gerenciador de pacotes (dpkg).
