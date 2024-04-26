@@ -39,7 +39,7 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
 * `rm arquivo` : apaga um arquivo.
 * `mv arquivo/ arq/` : renomeia o arquivo "arquvio" para "arq".
   
-O comando apt é uma ferramenta de gerenciamento de pacotes usada em sistemas operacionais baseados em Debian:
+O comando **apt** é uma ferramenta de gerenciamento de pacotes usada em sistemas operacionais baseados em Debian:
 * `apt search “nome do pacote”`: mostra uma lista com pacotes disponíveis para instalação pelo apt.
 * `apt install “nome do pacote”`: instala pacotes.
 * `apt update`: atualiza pacote
@@ -47,12 +47,12 @@ O comando apt é uma ferramenta de gerenciamento de pacotes usada em sistemas op
 * `apt cleam`: limpa o cache.
 * `apt autoremove`: apaga pacotes de programas removidos.
   
-Comando list:
+Comando **ls** (list):
 * `ls`: lista os diretorios filhos e arquivos do diretorio atual.
 * `ls -l`: listagem longa.
 * `ls -a`: mostra todos os diretorios e arquivos, incluisve os arquivos ocultos (para deixar o arquivos oculto, colocar um “.” antes do nome do arquivos).
 
-Comando change directory:
+Comando **cd** (change directory):
 * `cd /diretorio/diretorio`: troca de diretório.
 * `cd ..`: retorna um diretorio.
 * `cd .`: diretorio atual.
@@ -74,18 +74,18 @@ Comando change directory:
    * .usr : é uma das pastas mais importantes no sistema de arquivos Linux e geralmente contém dados e programas de uso compartilhado por todos os usuários do sistema. Ela é uma abreviação de "Unix System Resources" (Recursos do Sistema Unix).
    *  .var é uma das pastas fundamentais no sistema de arquivos Linux e é utilizada para armazenar dados variáveis que podem ser modificados durante a operação normal do sistema.     
 
-Comando dpkg:
+Comando **dpkg**:
 * `sudo dpkg --install “nome do pacote”`: instala um pacote através do gerenciador de pacotes (dpkg).
 * `sudo dpkg --remove “nome do pacote”`: remove um pacote através do gerenciador de pacotes (dpkg).
 
-O comando mkdir é utilizado para criar diretórios.
+O comando **mkdir** é utilizado para criar diretórios.
 * `mkdir “nome do riretorio”`: cria um diretório.
 * `mkdir "diretorio1" "diretorio2" "diretorio3"`: cria vários diretórios de uma só vez.
 * `mkdir -p diretorio1/diretorio2/sub\ diretório`: criará tanto diretorio1, diretorio2 e sub diretório, mesmo que diretorio1 não exista previamente.
 * `mkdir "pasta1/pasta2/ sub diretório"` : criará tanto pasta1, pasta2 e sub diretório, sem precisar da contra barra bara inserir o espaço.
 * `mkdir -m 755 nome-do-diretorio`: Permite especificar as permissões (modo) dos diretórios criados. Criará um diretório com permissões de leitura, escrita e execução para o proprietário, e apenas permissões de leitura e execução para os outros.
   
-O comando touch é usado para criar arquivos de qualquer tipo de extensão:
+O comando **touch** é usado para criar arquivos de qualquer tipo de extensão:
 * `touch “arquivo.extenção”`: cria um arquivo no diretorio atual.
 
 ### Caracteres de referência global
