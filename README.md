@@ -23,7 +23,7 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
     *  Os parâmetro são case sensitive.
     *  Em alguns comandos, o parâmetro "-h" lista todos os parâmetros disponíveis para aquele comando.
       
-* Argumentos: São informações adicionais fornecidas ao comando para que ele possa executar sua função. Por exemplo, ao usar o comando "cd", você precisa especificar o diretório para o qual deseja mudar. Da mesma forma, ao usar o comando "mkdir", você precisa fornecer o nome do novo diretório que deseja criar.
+* Argumentos: É o nome de um arquivo ou path de um diretorio.
 
 * A tecla **TAB** pressionada uma vez pode ser usada para completar o comando.
 * A tecla **TAB** pressionada duas vezes mostra os possíveis complementos para o comando.
