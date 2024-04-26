@@ -33,6 +33,10 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
 * `pwd` : mostra o caminho absoluto (caminho atual).
 * `man` : mostra o manual de um comando (man ls, mostra o manual do ls).
 * `history` : mostra o histórico de comando digitados. Para acessar o comando digitar "!" e o número do histórico.
+* `cat` : imprimi o conteúdo do arquivo na tela.
+* `cp arquivo diretório/` : copia o "arquivo" para a pasta "diretório".
+* `mv arquivo diretório/` : move o "arquivo" para a pasta "diretório".
+* `rm arquivo` : apaga um arquivo.
 * 
 O comando apt é uma ferramenta de gerenciamento de pacotes usada em sistemas operacionais baseados em Debian:
 * `apt search “nome do pacote”`: mostra uma lista com pacotes disponíveis para instalação pelo apt.
