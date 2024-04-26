@@ -102,3 +102,34 @@ Os caracteres de referência global são ultilizados nos parâmetros de comandos
     *  "c[a,h-o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por "a" mais um intervalor de "h" até "o".
 * \{ab,cd} : Usado para fazer referência a padrões de caractere.
     * "*.{conf, old}" : Retorna qualquer extensão .conf e .old.
+ 
+## Gerenciamento de permissões
+O gerenciamento de permissões no Linux é uma parte fundamental da segurança do sistema e permite controlar quem pode acessar, modificar ou executar arquivos, diretórios ou link no sistema de arquivos.
+
+As permissões no Linux são atribuídas a cada arquivo e diretório e são definidas para três tipos de usuários: o proprietário do arquivo, o grupo do arquivo e todos os outros usuários do sistema, no seguinte padrão: ABCDEFGHIJ 
+
+* A : é o tipo de arquivo.
+  *  d(diretório)
+  *  -(programa)
+  *  l(link) 
+* BCD: são as permissões do usuário (u de user), dono do diretorio ou programa ou link. 
+* EFG: são as permissões do grupo (g de group) 
+* HIJ: são as permissões dos demais grupos ou usuários (o de others) 
+
+Os seguinte tipos de permissões no Linux são:
+* Leitura (r): Permite visualizar o conteúdo de um arquivo ou listar o conteúdo de um diretório.
+* Escrita (w): Permite modificar ou adicionar conteúdo a um arquivo ou criar, renomear ou excluir arquivos em um diretório.
+* Execução (x): Permite executar um arquivo como um programa ou script ou acessar um diretório e seus subdiretórios.
+* Permissão negada (-).
+  
+exemplo: **drwxr-xrw-**
+* é um diretório
+* USER tem permissão rwx
+* GROUP tem apenas permissão rx
+* OTHERS tem apenas permissão rw
+
+O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, que são os argumentos do comando:
+* `chmod +x “argumento”` : adiciona permissão de execussão para todos usuários 
+* `chmod u-w “argumento”` : remove permissão de escrita para o usuário 
+* `chmod g+r “argumento”` : adiciona permissão de leitura para o grupo 
+* `chmod o-x “argumento”` : remove permissão de execussão para o outros 
