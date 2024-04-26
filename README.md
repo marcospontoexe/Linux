@@ -31,6 +31,8 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
 
 ### Alguns comando úteis
 * `pwd` : mostra o caminho absoluto (caminho atual).
+* `man` : mostra o manual de um comando (man ls, mostra o manual do ls).
+* `history` : mostra o histórico de comando digitados. Para acessar o comando digitar "!" e o número do histórico.
 * 
 O comando apt é uma ferramenta de gerenciamento de pacotes usada em sistemas operacionais baseados em Debian:
 * `apt search “nome do pacote”`: mostra uma lista com pacotes disponíveis para instalação pelo apt.
@@ -68,7 +70,8 @@ Comando dpkg:
 O comando mkdir é utilizado para criar diretórios.
 * `mkdir “nome do riretorio”`: cria um diretório.
 * `mkdir "diretorio1" "diretorio2" "diretorio3"`: cria vários diretórios de uma só vez.
-* `mkdir -p diretorio1/diretorio2/diretori`: criará tanto diretorio1, diretorio2 e diretorio3, mesmo que diretorio1 não exista previamente.
+* `mkdir -p diretorio1/diretorio2/sub\ diretório`: criará tanto diretorio1, diretorio2 e sub diretório, mesmo que diretorio1 não exista previamente.
+* `mkdir "pasta1/pasta2/ sub diretório"` : criará tanto pasta1, pasta2 e sub diretório, sem precisar da contra barra bara inserir o espaço.
 * `mkdir -m 755 nome-do-diretorio`: Permite especificar as permissões (modo) dos diretórios criados. Criará um diretório com permissões de leitura, escrita e execução para o proprietário, e apenas permissões de leitura e execução para os outros.
   
 O comando touch é usado para criar arquivos de qualquer tipo de extensão:
