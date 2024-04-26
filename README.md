@@ -30,6 +30,8 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
 * A palavra **sudo** precedida do comando, executa o comando com permissão de administrador.
 
 ### Alguns comando úteis
+* `pwd` : mostra o caminho absoluto (caminho atual).
+* 
 O comando apt é uma ferramenta de gerenciamento de pacotes usada em sistemas operacionais baseados em Debian:
 * `apt search “nome do pacote”`: mostra uma lista com pacotes disponíveis para instalação pelo apt.
 * `apt install “nome do pacote”`: instala pacotes.
@@ -45,10 +47,19 @@ Comando list:
 
 Comando change directory:
 * `cd /diretorio/diretorio`: troca de diretório.
+* `cd ..`: retorna um diretorio.
+* `cd .`: diretorio atual.
 * `cd ~`: muda para o diretorio do usuário.
 * `cd /`: muda para o diretorio raiz.
-* `cd ..`: retorna um diretorio.
-* * `cd .`: diretorio atual.
+   * .bin : Armazena todos os comandos usado pelo terminal.
+   * .boot: Armazena o kernel.
+   * .dev : Armazenas as unidades (usb, serial, hd...).
+   * .etc : contém arquivos de configuração para o sistema operacional, seus serviços e aplicativos.
+   * .home : onde fica armazenado os arquivos e diretórios dos usuários.
+   * .usr : onde os programas são instalados.
+   * .root: onde fica armazenado os arquivos e diretórios do usuário root.
+   * .sbin : arquivos executáveis de uso exclusivo do root.
+
 
 Comando dpkg:
 * `sudo dpkg --install “nome do pacote”`: instala um pacote através do gerenciador de pacotes (dpkg).
