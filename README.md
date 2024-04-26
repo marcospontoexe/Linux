@@ -104,7 +104,7 @@ Os caracteres de referência global são ultilizados nos parâmetros de comandos
     * "*.{conf, old}" : Retorna qualquer extensão .conf e .old.
  
 ## Gerenciamento de permissões
-O gerenciamento de permissões no Linux é uma parte fundamental da segurança do sistema e permite controlar quem pode acessar, modificar ou executar arquivos, diretórios ou link no sistema de arquivos.
+O gerenciamento de permissões no Linux é uma parte fundamental da segurança do sistema e permite controlar quem pode **acessar**, **modificar** ou **executar** arquivos, diretórios ou link no sistema de arquivos.
 
 As permissões no Linux são atribuídas a cada arquivo e diretório e são definidas para três tipos de usuários: o proprietário do arquivo, o grupo do arquivo e todos os outros usuários do sistema, no seguinte padrão: ABCDEFGHIJ 
 
