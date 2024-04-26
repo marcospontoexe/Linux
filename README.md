@@ -108,7 +108,13 @@ O gerenciamento de permissões no Linux é uma parte fundamental da segurança d
 
 As permissões no Linux são atribuídas a cada arquivo, diretório ou link e são definidas para três tipos de usuários: o proprietário do arquivo, o grupo do arquivo e todos os outros usuários do sistema.
 
-Ao usar o comando `ls -l` será retornado algo parecido com `-rw-r--r-- 1 usuario grupo  1234 Jan 25 10:00 arquivo1.txt` para um arquivo, ou 
+Ao usar o comando `ls -l` será retornado algo parecido com 
+
+![arquivo](https://github.com/marcospontoexe/Linux/blob/main/imagens/ls%20para%20arquivo.png)
+para um arquivo.
+
+![diretório](https://github.com/marcospontoexe/Linux/blob/main/imagens/ls%20para%20diret%C3%B3rio.png)
+para um diretório.
 
 * A : é o tipo de arquivo.
   *  d(diretório)
