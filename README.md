@@ -37,7 +37,8 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
 * `cp arquivo diretório/` : copia o "arquivo" para a pasta "diretório".
 * `mv arquivo diretório/` : move o "arquivo" para a pasta "diretório".
 * `rm arquivo` : apaga um arquivo.
-* 
+* `mv arquivo/ arq/` : renomeia o arquivo "arquvio" para "arq".
+  
 O comando apt é uma ferramenta de gerenciamento de pacotes usada em sistemas operacionais baseados em Debian:
 * `apt search “nome do pacote”`: mostra uma lista com pacotes disponíveis para instalação pelo apt.
 * `apt install “nome do pacote”`: instala pacotes.
@@ -65,7 +66,13 @@ Comando change directory:
    * .usr : onde os programas são instalados.
    * .root: onde fica armazenado os arquivos e diretórios do usuário root.
    * .sbin : arquivos executáveis de uso exclusivo do root.
-
+   * .media : requentemente utilizada para montagem automática de dispositivos de armazenamento removíveis, como unidades USB, CDs, DVDs e outros dispositivos de mídia.
+   * .mnt : é frequentemente utilizada para montagem manual de sistemas de arquivos temporários ou compartilhados.
+   * .opt : é uma pasta comum em sistemas Linux e geralmente é usada para instalar aplicativos e pacotes de software adicionais que não são fornecidos pelos repositórios oficiais da distribuição.
+   *  .proc : é um diretório especial no sistema de arquivos Linux que contém informações sobre processos em execução e informações do kernel.
+   *  .run : é possível que os usuários ou aplicativos criem essa pasta para armazenar arquivos executáveis ou scripts específicos
+   * .usr : é uma das pastas mais importantes no sistema de arquivos Linux e geralmente contém dados e programas de uso compartilhado por todos os usuários do sistema. Ela é uma abreviação de "Unix System Resources" (Recursos do Sistema Unix).
+   *  .var é uma das pastas fundamentais no sistema de arquivos Linux e é utilizada para armazenar dados variáveis que podem ser modificados durante a operação normal do sistema.     
 
 Comando dpkg:
 * `sudo dpkg --install “nome do pacote”`: instala um pacote através do gerenciador de pacotes (dpkg).
