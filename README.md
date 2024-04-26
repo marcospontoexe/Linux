@@ -67,5 +67,9 @@ Os caracteres de referência global são ultilizados nos parâmetros de comandos
     * "cat*" corresponde a qualquer cadeia de caracteres que comece com "cat" e termie com qualquer caractere.
     * "*.conf" corresponde a todos arquivos de configuração.
 * \? : usado para substituir apenas uma letra do argumento do comando.
-    * "?sys" corresponde a qualquer cadeia de caracteres que que tenha apenas uma letra antes de "sys".
-* \[a-z] : substitui qualquer letra do argumento por uma faixa de caracteres (de a até z no exemplo) 
+    * "?sys" corresponde a qualquer cadeia de caracteres que tenha apenas uma letra antes de "sys".
+* \[a-z] : substitui qualquer letra do argumento por uma faixa de caracteres (de a até z no exemplo).
+    * "c[a-o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por um intervalor de "a" até "o". 
+* \[a,z] : substitui qualquer letra do argumento por a ou z.
+    *  "c[a,o]" corresponde a qualquer cadeia de caracteres que comece com a letra "c" seguido por "a" ou "o". 
+  
