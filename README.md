@@ -63,5 +63,9 @@ O comando touch é usado para criar arquivos de qualquer tipo de extensão:
 
 ### Caracteres de referência global
 Os caracteres de referência global são ultilizados nos parâmetros de comandos para realizar operações de busca e manipulação de texto com base em padrões definidos, por exempolo o regex.
-* \*: Usado para substituir um conjunto de caracteres do argumento do comando: *a corresponde a qualquer cadeia de caracteres que tenha a letra "a" no final.
-* 
+* \* : Substitui uma ou mais letra do argumento do comando.
+    * "cat*" corresponde a qualquer cadeia de caracteres que comece com "cat" e termie com qualquer caractere.
+    * "*.conf" corresponde a todos arquivos de configuração.
+* \? : usado para substituir apenas uma letra do argumento do comando.
+    * "?sys" corresponde a qualquer cadeia de caracteres que que tenha apenas uma letra antes de "sys".
+* \[a-z] : substitui qualquer letra do argumento por uma faixa de caracteres (de a até z no exemplo) 
