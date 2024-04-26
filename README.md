@@ -137,7 +137,7 @@ exemplo: **drwxr-xrw-**
 * OTHERS tem apenas permissão rw
 
 O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, que são os argumentos do comando:
-* `chmod +x “argumento”` : adiciona permissão de execussão para todos usuários 
-* `chmod u-w “argumento”` : remove permissão de escrita para o usuário 
-* `chmod g+r “argumento”` : adiciona permissão de leitura para o grupo 
-* `chmod o-x “argumento”` : remove permissão de execussão para o outros 
+* `chmod +x “argumento”` : adiciona permissão de execussão para todos usuários.
+* `chmod u-w “argumento”` : remove permissão de escrita para o usuário (u).
+* `chmod g+r “argumento”` : adiciona permissão de leitura para o grupo (g).
+* `chmod o-x “argumento”` : remove permissão de execussão para o outros (o).
