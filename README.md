@@ -106,7 +106,9 @@ Os caracteres de referência global são ultilizados nos parâmetros de comandos
 ## Gerenciamento de permissões
 O gerenciamento de permissões no Linux é uma parte fundamental da segurança do sistema e permite controlar quem pode **acessar**, **modificar** ou **executar** arquivos, diretórios ou link no sistema de arquivos.
 
-As permissões no Linux são atribuídas a cada arquivo e diretório e são definidas para três tipos de usuários: o proprietário do arquivo, o grupo do arquivo e todos os outros usuários do sistema, no seguinte padrão: ABCDEFGHIJ 
+As permissões no Linux são atribuídas a cada arquivo, diretório ou link e são definidas para três tipos de usuários: o proprietário do arquivo, o grupo do arquivo e todos os outros usuários do sistema.
+
+Ao usar o comando `ls -l` será retornado algo parecido com `-rw-r--r-- 1 usuario grupo  1234 Jan 25 10:00 arquivo1.txt` para um arquivo, ou 
 
 * A : é o tipo de arquivo.
   *  d(diretório)
