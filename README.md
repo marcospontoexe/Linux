@@ -59,8 +59,9 @@ Comando **cd** (change directory):
 * `cd ~`: muda para o diretorio do usuário.
 * `cd /`: muda para o diretorio raiz.
    * .bin : Armazena todos os comandos usado pelo terminal.
-   * .boot: Armazena o kernel.
+   * .boot: Armazena o kernel, contém arquivos necessários para a inicialização do sistema.
    * .dev : Armazenas as unidades (usb, serial, hd...).
+   * .lib : Bibliotecas compartilhadas pelos programas do sistema e módulos do kernel.
    * .etc : contém arquivos de configuração para o sistema operacional, seus serviços e aplicativos.
    * .home : onde fica armazenado os arquivos e diretórios dos usuários.
    * .usr : onde os programas são instalados.
