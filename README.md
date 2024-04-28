@@ -142,3 +142,33 @@ O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, q
 * `chmod u-w “argumento”` : remove permissão de escrita para o usuário (u).
 * `chmod g+r “argumento”` : adiciona permissão de leitura para o grupo (g).
 * `chmod o-x “argumento”` : remove permissão de execussão para o outros (o).
+
+## Iniciando um serviço automaticamente
+Os arquivos de serviço são usados para definir como os serviços devem ser iniciados, parados e gerenciados pelo systemd. Esses arquivos, geralmente encontrados em "/etc/systemd/system/", possuem extensão .service e contêm configurações como o comando a ser executado, as dependências do serviço, entre outras opções de configuração.
+
+### Inicando uma aplicação python
+Para iniciar uma aplicação python, deve-se criar um arquivo de serviço (.service) no diretório "/etc/systemd/system/" e indicar nesse aqurquivo o nome do arquivo python, o diretório onde o arquivo python está, e o nome do usuário do sistema. Após ter criado o arquivo de serviço, recarregue o daemon do systemclt.
+
+O systemctl é uma ferramenta poderosa e central para o gerenciamento de serviços e unidades do sistema em distribuições Linux que usam o systemd como sistema de inicialização padrão. Ele fornece uma interface consistente e eficiente para administradores de sistema controlarem e monitorarem o funcionamento do sistema e dos serviços.
+
+Veja um passo a passo:
+1 Crie um novo arquivo de serviço no diretório "/etc/systemd/system/" usando o comando sudo nano "/etc/systemd/system/nome_do_arquivo.service" no terminal do linux, ou usando a interface gráfica do sistema operacional para navegar até o diretório.
+2 Adicione o seguinte conteúdo ao arquivo de serviço:
+   ```
+   [Unit]
+   Description=Descrição do arquivo .py
+   After=network.target
+   
+   [Service]
+   User=usuário
+   WorkingDirectory=/diretório/do/arquivo
+   ExecStart=/usr/bin/python nome_do_arquivo.py
+   Restart=on-failure
+   
+   [Install]
+   WantedBy=multi-user.target   #ou default.target
+   ```
+3 	No arquivode serviço altere as informações do usuário do sistema (User), diretório e nome do arquivo ".py" de acordo com as informações do seu arquivo python.
+
+
+
