@@ -185,7 +185,7 @@ Veja um passo a passo:
    CGroup: /system.slice/nome_do_arquivo.service
            └─[PID] /caminho/para/executável
 ```
-9. Ative o serviço na inicialização do sistema usando o comando `sudo systemctl enable nome_do_arquivo`.
+8. Ative o serviço na inicialização do sistema usando o comando `sudo systemctl enable nome_do_arquivo`.
 
 
 
