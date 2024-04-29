@@ -173,7 +173,7 @@ Veja um passo a passo:
 5. Recarregue o daemon do systemd usando o comando `sudo systemctl daemon-reload` no terminal do Linux.
 6. Inicie o serviço usando o comando `sudo systemctl start nome_do_arquivo`. O "nome_do_arquivo" é o nome dado ao arquivo de serviços criado.
 7. Verifique o status do serviço usando o comando `sudo systemctl status nome_do_arquivo`, deve ser retornado algo como:
-   ```
+```
    nome_do_arquivo.service - Descrição do serviço
    Loaded: loaded (/etc/systemd/system/nome_do_arquivo.service; enabled; vendor preset: enabled)
    Active: active (running) since [data e hora]
@@ -184,7 +184,7 @@ Veja um passo a passo:
       CPU: [uso da CPU]
    CGroup: /system.slice/nome_do_arquivo.service
            └─[PID] /caminho/para/executável
-   ```
+```
 9. Ative o serviço na inicialização do sistema usando o comando `sudo systemctl enable nome_do_arquivo`.
 
 
