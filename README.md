@@ -144,10 +144,10 @@ O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, q
 * `chmod o-x “argumento”` : remove permissão de execussão para o outros (o).
 
 ## Iniciando um serviço automaticamente
-Os arquivos de serviço são usados para definir como os serviços devem ser iniciados, parados e gerenciados pelo systemd. Esses arquivos, geralmente encontrados em "/etc/systemd/system/", possuem extensão .service e contêm configurações como o comando a ser executado, as dependências do serviço, entre outras opções de configuração.
+Os arquivos de serviço são usados para definir como os serviços devem ser iniciados, parados e gerenciados pelo systemd. Esses arquivos, geralmente são encontrados em "/etc/systemd/system/", possuem extensão .service e contêm configurações como o comando a ser executado, as dependências do serviço, entre outras opções de configuração.
 
 ### Inicando uma aplicação python
-Para iniciar uma aplicação python, deve-se criar um arquivo de serviço (.service) no diretório "/etc/systemd/system/" e indicar nesse aqurquivo o nome do arquivo python, o diretório onde o arquivo python está, e o nome do usuário do sistema. Após ter criado o arquivo de serviço, recarregue o daemon do systemclt.
+Para iniciar uma aplicação python, deve-se criar um arquivo de serviço (.service) no diretório "/etc/systemd/system/" e indicar nesse aqurquivo o nome do arquivo python, o path do diretório onde o arquivo python está, e o nome do usuário do sistema. Após ter criado o arquivo de serviço, recarregue o daemon do systemclt.
 
 O systemctl é uma ferramenta poderosa e central para o gerenciamento de serviços e unidades do sistema em distribuições Linux que usam o systemd como sistema de inicialização padrão. Ele fornece uma interface consistente e eficiente para administradores de sistema controlarem e monitorarem o funcionamento do sistema e dos serviços.
 
