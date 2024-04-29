@@ -152,7 +152,7 @@ Para iniciar uma aplicação python, deve-se criar um arquivo de serviço (.serv
 O systemctl é uma ferramenta poderosa e central para o gerenciamento de serviços e unidades do sistema em distribuições Linux que usam o systemd como sistema de inicialização padrão. Ele fornece uma interface consistente e eficiente para administradores de sistema controlarem e monitorarem o funcionamento do sistema e dos serviços.
 
 Veja um passo a passo:
-1. Crie um novo arquivo de serviço no diretório "/etc/systemd/system/" usando o comando sudo nano "/etc/systemd/system/nome_do_arquivo.service" no terminal do linux, ou usando a interface gráfica do sistema operacional para navegar até o diretório.
+1. Crie um novo arquivo de serviço no diretório "/etc/systemd/system/" usando o comando `sudo touch /etc/systemd/system/nome_do_arquivo.service` no terminal do linux, ou usando a interface gráfica do sistema operacional para navegar até o diretório.
 2. Adicione o seguinte conteúdo ao arquivo de serviço:
    ```
    [Unit]
