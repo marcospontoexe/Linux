@@ -156,13 +156,13 @@ Veja um passo a passo:
 2. Adicione o seguinte conteúdo ao arquivo de serviço:
    ```
    [Unit]
-   Description=Descrição do arquivo .py
+   Description=Descrição do arquivo .py   #descrição sobre o serviço
    After=network.target
    
    [Service]
-   User=usuário
-   WorkingDirectory=/diretório/do/arquivo
-   ExecStart=/usr/bin/python nome_do_arquivo.py
+   User=usuário  #usuário do sistema
+   WorkingDirectory=/diretório/do/arquivo  #diretório do arquivo python a ser executado 
+   ExecStart=/usr/bin/python nome_do_arquivo.py  #nome do arquivo python a ser executado
    Restart=on-failure
    
    [Install]
