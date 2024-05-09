@@ -143,11 +143,18 @@ O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, q
 * `chmod g+r “argumento”` : adiciona permissão de leitura para o grupo (g).
 * `chmod o-x “argumento”` : remove permissão de execussão para o outros (o).
 
-## Scrip Bash
+## Script Bash
 Basicamente, um script bash é um arquivo de texto comum que contém uma série de comandos. Esses comandos são uma mistura de comandos que você normalmente digitaria na linha de comando do terminal (cd, ls, cp...). Um ponto importante a lembrar, no entanto, é:
 * Qualquer coisa que você possa executar normalmente na linha de comando do terminal pode ser colocada em um script e fará exatamente a mesma coisa. Da mesma forma, qualquer coisa que você possa colocar em um script também pode ser executada normalmente na linha de comando e fará exatamente a mesma coisa.
 
-A extensão do arquivo é **`.sh`**. Normalmente, esta é a extensão que você sempre usará ao criar um novo script bash. O script deve começar com a linha `#!/bin/bash`. Todos os scripts bash começarão com esta linha especial. Basicamente, ela permite ao sistema Linux saber que este arquivo é um script bash.
+A extensão do arquivo é **`.sh`**. Normalmente, esta é a extensão que você sempre usará ao criar um novo script bash. O script deve começar com a linha `#!/bin/bash`. Todos os scripts bash começarão com esta linha especial. Basicamente, ela permite ao sistema Linux saber que este arquivo é um script bash. A imagem a baixo mostra o conteudo de um script bash para imprimir "Hello there, Developers!"
+
+![Script bash](https://github.com/marcospontoexe/Linux/blob/main/imagens/script%20bash.png)
+
+Para executar um scrip bash pelo terminal, digite `./nome_do_script.sh`.
+
+### Passando um parâmetro para um script bash
+É possível passar parâmetros para um script bash. Isso é útil quando você deseja que seu script execute de maneira diferente, dependendo dos valores dos parâmetros de entrada (também chamados de argumentos).
 
 ## Iniciando um serviço automaticamente
 Os arquivos de serviço são usados para definir como os serviços devem ser iniciados, parados e gerenciados pelo systemd. Esses arquivos, geralmente são encontrados em "/etc/systemd/system/", possuem extensão .service e contêm configurações como o comando a ser executado, as dependências do serviço, entre outras opções de configuração.
