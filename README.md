@@ -154,7 +154,11 @@ A extensão do arquivo é **`.sh`**. Normalmente, esta é a extensão que você 
 Para executar um scrip bash pelo terminal, digite `./nome_do_script.sh`.
 
 ### Passando um parâmetro para um script bash
-É possível passar parâmetros para um script bash. Isso é útil quando você deseja que seu script execute de maneira diferente, dependendo dos valores dos parâmetros de entrada (também chamados de argumentos).
+É possível passar parâmetros para um script bash. Isso é útil quando você deseja que seu script execute de maneira diferente, dependendo dos valores dos parâmetros de entrada (também chamados de argumentos). Veja a baixo um script que recebe um parâmetro e imprime na tela uma menssagem de acordo com o parâmetro recebido.
+
+![passando parâmetro para o script](https://github.com/marcospontoexe/Linux/blob/main/imagens/script%20bash%20parametros.png)
+
+Para executar o script com o parâmetro, digite no terminal de comando: `./nome_do_script.sh valor_do_parâmetro`.
 
 ## Iniciando um serviço automaticamente
 Os arquivos de serviço são usados para definir como os serviços devem ser iniciados, parados e gerenciados pelo systemd. Esses arquivos, geralmente são encontrados em "/etc/systemd/system/", possuem extensão .service e contêm configurações como o comando a ser executado, as dependências do serviço, entre outras opções de configuração.
