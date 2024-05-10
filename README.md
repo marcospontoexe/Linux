@@ -212,5 +212,11 @@ Usando o comando **`kill`** é possível encerrar um processo. Para isso é prec
 Caso o processo estaja rodando em segundo plano, o camando kill será ignorado pelo processo. Para isso, o comando bg é muito útil. O comando bg é usado para retomar a execução de um processo suspenso em segundo plano, execute agora o seguinte comando `bg`. Então, agora que a execução do processo foi retomada, o sinal de kill que enviamos antes foi recebido corretamente, então o processo que esva em segundo plano será encerrado.
 
 ## Protocolo SSH
+Secure Shell, mais comumente conhecido como ssh, é um protocolo que permite aos usuários conectar-se a uma máquina remota de forma segura. Ele é baseado em uma arquitetura Cliente-Servidor. Assim, a partir da sua máquina local (Cliente), você pode fazer login na máquina remota (Servidor) para transferir arquivos entre as duas máquinas, executar comandos na máquina remota, etc.
 
+A estrutura do comando ssh é a seguinte: `ssh [opções] <user>@<host> [comando]`.
+* [opções]: São as opções específicas do comando ssh, como definir a porta ou especificar um arquivo de chave privada.
+* <user>: Faz referência à conta com a qual você deseja fazer login na máquina remota. Se você não especificar um usuário, será usado o nome de usuário da sua conta local.
+* <host>: Faz referência à máquina remota à qual você deseja acessar (onde o servidor SSH está em execução), pode usar o nome ou endereço ip.
+* [comando]: Opcionalmente, você pode fornecer um comando para ser executado na máquina remota após a conexão ser estabelecida. Se não for fornecido, você será conectado ao shell da máquina remota.
 
