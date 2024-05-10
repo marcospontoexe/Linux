@@ -211,3 +211,6 @@ Usando o comando **`kill`** é possível encerrar um processo. Para isso é prec
 
 Caso o processo estaja rodando em segundo plano, o camando kill será ignorado pelo processo. Para isso, o comando bg é muito útil. O comando bg é usado para retomar a execução de um processo suspenso em segundo plano, execute agora o seguinte comando `bg`. Então, agora que a execução do processo foi retomada, o sinal de kill que enviamos antes foi recebido corretamente, então o processo que esva em segundo plano será encerrado.
 
+## Protocolo SSH
+
+
