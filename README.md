@@ -228,3 +228,5 @@ A seguir algumas opções que podere ser usadas com o comando ssh:
 * **X**: Habilita o encaminhamento de X11 para suportar aplicativos gráficos remotos.
 * **v**: Aumenta o nível de verbosidade, exibindo mais informações de depuração durante a conexão.
 * **o opção**: Permite especificar opções adicionais de configuração, como *UserKnownHostsFile*, *StrictHostKeyChecking*, entre outras.
+
+Para fechar uma sessão ssh e voltar para sua máquina local, execute o comando `exit`.
