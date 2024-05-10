@@ -204,5 +204,10 @@ Veja um passo a passo:
 ```
 8. Ative o serviço na inicialização do sistema usando o comando `sudo systemctl enable nome_do_arquivo`.
 
+## Matando um processo
+Para ver os processos ativos em seu sistema digite `ps faux`. Para filtrar um processo use o comando **`| grep`**: `ps faux | grep nome_do_processo`.
 
+Usando o comando **`kill`** é possível encerrar um processo. Para isso é preciso saber o **número PID** do porcesso: `kill número_PID`.
+
+Caso o processo estaja rodando em segundo plano, o camando kill será ignorado pelo processo. Para isso, o comando bg é muito útil. O comando bg é usado para retomar a execução de um processo suspenso em segundo plano, execute agora o seguinte comando `bg`. Então, agora que a execução do processo foi retomada, o sinal de kill que enviamos antes foi recebido corretamente, então o processo que esva em segundo plano será encerrado.
 
