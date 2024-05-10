@@ -204,6 +204,14 @@ Veja um passo a passo:
 ```
 8. Ative o serviço na inicialização do sistema usando o comando `sudo systemctl enable nome_do_arquivo`.
 
+## Criando um alias
+Cria o arquivo: `touch .bash_aliases`.
+Abre o arquivo: `nano .bash_aliases`.
+
+Exemplo de comando dentro do arquivo: `alias pharmy="ssh -X -C ubuntu@pharmy.local"`
+
+Ativando o alias: `source .bash_aliases`.
+
 ## Matando um processo
 Para ver os processos ativos em seu sistema digite `ps faux`. Para filtrar um processo use o comando **`| grep`**: `ps faux | grep nome_do_processo`.
 
