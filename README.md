@@ -216,7 +216,7 @@ Secure Shell, mais comumente conhecido como ssh, é um protocolo que permite aos
 
 A estrutura do comando ssh é a seguinte: `ssh [opções] <user>@<host> [comando]`.
 * [opções]: São as opções específicas do comando ssh, como definir a porta ou especificar um arquivo de chave privada.
-* /<user/>: Faz referência à conta com a qual você deseja fazer login na máquina remota. Se você não especificar um usuário, será usado o nome de usuário da sua conta local.
-* /<host/>: Faz referência à máquina remota à qual você deseja acessar (onde o servidor SSH está em execução), pode usar o nome ou endereço ip.
+* /<user>: Faz referência à conta com a qual você deseja fazer login na máquina remota. Se você não especificar um usuário, será usado o nome de usuário da sua conta local.
+* /<host>: Faz referência à máquina remota à qual você deseja acessar (onde o servidor SSH está em execução), pode usar o nome ou endereço ip.
 * [comando]: Opcionalmente, você pode fornecer um comando para ser executado na máquina remota após a conexão ser estabelecida. Se não for fornecido, você será conectado ao shell da máquina remota.
 
