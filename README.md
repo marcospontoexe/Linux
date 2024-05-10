@@ -214,9 +214,17 @@ Caso o processo estaja rodando em segundo plano, o camando kill será ignorado p
 ## Protocolo SSH
 Secure Shell, mais comumente conhecido como ssh, é um protocolo que permite aos usuários conectar-se a uma máquina remota de forma segura. Ele é baseado em uma arquitetura Cliente-Servidor. Assim, a partir da sua máquina local (Cliente), você pode fazer login na máquina remota (Servidor) para transferir arquivos entre as duas máquinas, executar comandos na máquina remota, etc.
 
-A estrutura do comando ssh é a seguinte: `ssh [opções] <user>@<host> [comando]`.
-* [opções]: São as opções específicas do comando ssh, como definir a porta ou especificar um arquivo de chave privada.
-* /<user>: Faz referência à conta com a qual você deseja fazer login na máquina remota. Se você não especificar um usuário, será usado o nome de usuário da sua conta local.
-* /<host>: Faz referência à máquina remota à qual você deseja acessar (onde o servidor SSH está em execução), pode usar o nome ou endereço ip.
-* [comando]: Opcionalmente, você pode fornecer um comando para ser executado na máquina remota após a conexão ser estabelecida. Se não for fornecido, você será conectado ao shell da máquina remota.
+A estrutura do comando ssh é a seguinte: `ssh [opções] user@host comando`.
+* opções: São as opções específicas do comando ssh, como definir a porta ou especificar um arquivo de chave privada.
+* user: Faz referência à conta com a qual você deseja fazer login na máquina remota. Se você não especificar um usuário, será usado o nome de usuário da sua conta local.
+* host: Faz referência à máquina remota à qual você deseja acessar (onde o servidor SSH está em execução), pode usar o nome ou endereço ip.
+* comando: Opcionalmente, você pode fornecer um comando para ser executado na máquina remota após a conexão ser estabelecida. Se não for fornecido, você será conectado ao shell da máquina remota.
 
+A seguir algumas opções que podere ser usadas com o comando ssh:
+* **p porta**: Especifica a porta para conectar-se ao servidor SSH.
+* **i arquivo-chave**: Especifica o arquivo de chave privada a ser usado para autenticação.
+* **l usuário**: Especifica o nome de usuário para fazer login no servidor remoto.
+* **C**: Habilita compressão durante a transmissão de dados.
+* **X**: Habilita o encaminhamento de X11 para suportar aplicativos gráficos remotos.
+* **v**: Aumenta o nível de verbosidade, exibindo mais informações de depuração durante a conexão.
+* **o opção**: Permite especificar opções adicionais de configuração, como *UserKnownHostsFile*, *StrictHostKeyChecking*, entre outras.
