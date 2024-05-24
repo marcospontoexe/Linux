@@ -38,6 +38,10 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
 * `mv arquivo diretório/` : move o "arquivo" para a pasta "diretório".
 * `rm arquivo` : apaga um arquivo.
 * `mv arquivo/ arq/` : renomeia o arquivo "arquvio" para "arq".
+
+O comando **aptitude** é uma interface de linha de comando para o gerenciador de pacotes APT (Advanced Package Tool) usado em sistemas operacionais baseados em Debian, como Ubuntu e Debian:
+* `sudo aptitude update`: Antes de instalar qualquer pacote, é uma boa prática garantir que o índice de pacotes esteja atualizado
+* sudo aptitude install nome_pacote: Instala um pacote desejado.
   
 O comando **apt** é uma ferramenta de gerenciamento de pacotes usada em sistemas operacionais baseados em Debian:
 * `apt search “nome do pacote”`: mostra uma lista com pacotes disponíveis para instalação pelo apt.
