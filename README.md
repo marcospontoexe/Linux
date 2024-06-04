@@ -49,7 +49,8 @@ O comando **apt** é uma ferramenta de gerenciamento de pacotes usada em sistema
 * `apt install “nome do pacote”`: instala pacotes.
 * `apt update`: atualiza pacote
 * `apt remove “nome do pacote”`: remove pacotes.
-* `apt cleam`: limpa o cache.
+* `apt clean`: Remove todos os arquivos de cache de pacotes, independentemente de serem necessários ou não
+* `sudo apt autoclean`: Remove apenas os pacotes do cache que não podem mais ser baixados (ou seja, pacotes antigos que não estão mais disponíveis nos repositórios).
 * `apt autoremove`: apaga pacotes de programas removidos.
   
 Comando **ls** (list):
