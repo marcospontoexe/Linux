@@ -91,6 +91,7 @@ O comando **mkdir** é utilizado para criar diretórios.
 * `mkdir -p diretorio1/diretorio2/sub\ diretório`: criará tanto diretorio1, diretorio2 e sub diretório, mesmo que diretorio1 não exista previamente.
 * `mkdir "pasta1/pasta2/ sub diretório"` : criará tanto pasta1, pasta2 e sub diretório, sem precisar da contra barra bara inserir o espaço.
 * `mkdir -m 755 nome-do-diretorio`: Permite especificar as permissões (modo) dos diretórios criados. Criará um diretório com permissões de leitura, escrita e execução para o proprietário, e apenas permissões de leitura e execução para os outros.
+* `mkdir -m 755 -p "this/is/my/linux/exam"`
   
 O comando **touch** é usado para criar arquivos de qualquer tipo de extensão:
 * `touch “arquivo.extenção”`: cria um arquivo no diretorio atual.
