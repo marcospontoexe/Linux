@@ -250,19 +250,21 @@ Para fechar uma sessão ssh e voltar para sua máquina local, execute o comando 
 Para sistemas que utilizam o **NetworkManager**, você pode configurar o IP estático usando a ferramenta **nmcli**.
 
 ### Conectar Automaticamente (DHCP):
-Para conectar automaticamente usando DHCP, você pode simplesmente ativar a interface: `nmcli con up id "ssid".
+Para conectar automaticamente usando DHCP, você pode simplesmente ativar a interface: `nmcli con up id "ssid"`.
 
 ### Configurar um IP Estático 
 Se você precisar configurar um IP estático, use o comando abaixo, substituindo os valores conforme necessário:
 
-1. Listar redes Wi-Fi disponíveis: `nmcli dev wifi list` ou `nmcli con show`
+1. Listar redes Wi-Fi disponíveis: `nmcli dev wifi list` ou `nmcli con show`.
+   
 Suponha que a saída inclua uma rede chamada "MinhaRedeWiFi";
-* Conectar à rede Wi-Fi: `nmcli dev wifi connect "MinhaRedeWiFi" password "senha1234"`
-* Verificar a conexão: `nmcli con show --active`
+   * Conectar à rede Wi-Fi: `nmcli dev wifi connect "MinhaRedeWiFi" password "senha1234"`
+   * Verificar a conexão: `nmcli con show --active`
 
-2. Verificar se o ip ja está em uso com o comando ping: `ping 192.168.1.100`
+3. Verificar se o ip ja está em uso com o comando ping: `ping 192.168.1.100`
 
-3. Definindo o ip estático:
+4. Definindo o ip estático:
+   
 * Definindo ip e máscara de rede: `nmcli con mod MinhaRedeWiFi ipv4.addresses 192.168.1.100/24`
 * Definindo gateway: `nmcli con mod MinhaRedeWiFi ipv4.gateway 192.168.1.1`
 * Definindo dns: `nmcli con mod MinhaRedeWiFi" ipv4.dns "8.8.8.8 8.8.4.4"`
