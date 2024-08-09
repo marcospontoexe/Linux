@@ -154,28 +154,66 @@ O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, q
 Para permitir que o comando shutdown seja executado sem pedir senha, você pode configurar o sudo para não pedir senha ao executar o comando shutdown.
 
 1. Verificar o caminho do comando shutdown: Verifique se o caminho do comando shutdown. Você pode fazer isso usando o comando:
-```sh
+```bash
 which shutdown
 ```
-   
-       which shutdown
-       Certifique-se de que o caminho retornado é /usr/sbin/shutdown.
-    2. Abra o terminal e edite o arquivo sudoers usando o comando visudo:
-       bash:
-       sudo visudo
-    3. Adicione a seguinte linha no final do arquivo sudoers:
-       bash:
-       ubuntu ALL=(ALL) NOPASSWD: /usr/sbin/shutdown
-       nesse exemplo, ubuntu, é o usuário do sistema.
-       Para saber o nome do usuário use o comando “whoami” no terminal.
-    4. Salve e feche o arquivo sudoers.
-       crtl+o , enter, crtl+x
-    5. Verificar a permissão de execução do comando: Verifique se a configuração está correta para o usuário: 
-	sh:
-	sudo -u ubuntu sudo -l	
-	
+Certifique-se de que o caminho retornado é /usr/sbin/shutdown.
 
-	Isso listará todos os comandos que os usuários  pode executar sem senha. Certifique-se de 	que /usr/sbin/shutdown está listado corretamente com a opção NOPASSWD.
+2. Abra o terminal e edite o arquivo sudoers usando o comando visudo:
+```bash
+sudo visudo
+```
+
+3. Adicione a seguinte linha no final do arquivo sudoers:
+```bash:
+ubuntu ALL=(ALL) NOPASSWD: /usr/sbin/shutdown
+```
+nesse exemplo, ubuntu, é o usuário do sistema. Para saber o nome do usuário use o comando `whoami` no terminal.
+
+4. Salve e feche o arquivo sudoers: CRTL+x, yes, ENTER.
+      
+5. Verifique se a configuração está correta para o usuário: 
+```sh
+sudo -u ubuntu sudo -l	
+```
+Isso listará todos os comandos que os usuários  pode executar sem senha. Certifique-se de que 
+`/usr/sbin/shutdown` está listado corretamente com a opção **NOPASSWD**.
+
+## Manter a Porta USB Conectada ao Dispositivo Sempre a Mesma
+No Linux, as portas USB podem ser dinâmicas, mudando de /dev/ttyUSB0 para /dev/ttyUSB1 ou outros dispositivos. Para fixar a porta USB de um dispositivo específico, você pode usar regras udev.
+
+1. Conecte o DIspositivo e encontre os detalhes do dispositivo com o comando `lsusb`.
+Você verá algo como:
+```bash
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 006: ID 8087:0a2a Intel Corp. 
+Bus 001 Device 004: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+Bus 001 Device 007: ID 0d8c:000c C-Media Electronics, Inc. Audio Adapter
+Bus 001 Device 005: ID 1a86:7523 QinHeng Electronics HL-340 USB-Serial adapter
+Bus 001 Device 003: ID 05e3:0608 Genesys Logic, Inc. Hub
+```
+2. Veja qual é o **idVendor** e **idProduct** do dispositivo, para este exemplo vamos usar o dispositivo **Bus 001 Device 005**.
+O  idVendor é  1a86, e o idProduct é 7523.
+
+4. Crie uma regra udev para o Arduino:
+```bash
+sudo nano /etc/udev/rules.d/99-usb-serial.rules
+```
+
+6. Adicione a regra baseada no ID do dispositivo encontrado:
+```bash
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="arduino"
+```
+Substitua idVendor e idProduct pelos valores encontrados e ajuste SYMLINK para o nome desejado (por exemplo, arduino).
+
+7. Salve e feche o arquivo. Use CRTL+x, y, e ENTER.
+
+8. Reinicie as regras udev:
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+Agora, seu Arduino sempre estará acessível através do link simbólico /dev/arduino, independentemente de qual porta USB ele estiver conectado.
 
 ## Script Bash
 Basicamente, um script bash é um arquivo de texto comum que contém uma série de comandos. Esses comandos são uma mistura de comandos que você normalmente digitaria na linha de comando do terminal (cd, ls, cp...). Um ponto importante a lembrar, no entanto, é:
@@ -296,10 +334,4 @@ Suponha que a saída inclua uma rede chamada "MinhaRedeWiFi";
 * Definindo gateway: `nmcli con mod MinhaRedeWiFi ipv4.gateway 192.168.1.1`
 * Definindo dns: `nmcli con mod MinhaRedeWiFi" ipv4.dns "8.8.8.8 8.8.4.4"`
 * Definindo ip estático: `nmcli con mod MinhaRedeWiFi ipv4.method manual`
-* Reinicie a conexão: `nmcli con down MinhaRedeWiFi` e também `nmcli con up MinhaRedeWiFi
-`
-
-
-
-`.
-
+* Reinicie a conexão: `nmcli con down MinhaRedeWiFi` e também `nmcli con up MinhaRedeWiFi`
