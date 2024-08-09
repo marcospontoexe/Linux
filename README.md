@@ -250,9 +250,9 @@ Veja um passo a passo:
    
    [Service]
    User=usuário  #usuário do sistema
-   WorkingDirectory=/diretório/do/arquivo  #diretório do arquivo python a ser executado 
-   ExecStart=/usr/bin/python nome_do_arquivo.py  #nome do arquivo python a ser executado
-   Restart=on-failure
+   WorkingDirectory=/caminho/para/  #diretório do arquivo python a ser executado 
+   ExecStart=/usr/bin/python3 /caminho/para/seu_codigo.py  #nome e caminho do arquivo python a ser executado
+   Restart=on-failure    # ou always
    
    [Install]
    WantedBy=multi-user.target   #ou default.target
