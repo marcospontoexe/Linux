@@ -260,8 +260,9 @@ Veja um passo a passo:
 3. No arquivode serviço altere as informações do usuário do sistema (User), diretório e nome do arquivo ".py" de acordo com as informações do seu arquivo python.
 4. Salve e feche o arquivo de serviços.
 5. Recarregue o daemon do systemd usando o comando `sudo systemctl daemon-reload` no terminal do Linux.
-6. Inicie o serviço usando o comando `sudo systemctl start nome_do_arquivo`. O "nome_do_arquivo" é o nome dado ao arquivo de serviços criado.
-7. Verifique o status do serviço usando o comando `sudo systemctl status nome_do_arquivo`, deve ser retornado algo como:
+6. Se você quiser que o serviço seja iniciado automaticamente na inicialização do sistema, você pode ativá-lo com o comando: `bash sudo systemctl enable nome_do_arquivo.service`.
+7. Inicie o serviço usando o comando `sudo systemctl start nome_do_arquivo.service`. O "nome_do_arquivo" é o nome dado ao arquivo de serviços criado.
+8. Verifique o status do serviço usando o comando `sudo systemctl status nome_do_arquivo.service`, deve ser retornado algo como:
 ```
    nome_do_arquivo.service - Descrição do serviço
    Loaded: loaded (/etc/systemd/system/nome_do_arquivo.service; enabled; vendor preset: enabled)
