@@ -150,6 +150,33 @@ O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, q
 * `chmod g+r “argumento”` : adiciona permissão de leitura para o grupo (g).
 * `chmod o-x “argumento”` : remove permissão de execussão para o outros (o).
 
+## Configurar o sudo para não pedir senha para o comando shutdown
+Para permitir que o comando shutdown seja executado sem pedir senha, você pode configurar o sudo para não pedir senha ao executar o comando shutdown.
+
+1. Verificar o caminho do comando shutdown: Verifique se o caminho do comando shutdown. Você pode fazer isso usando o comando:
+```sh
+which shutdown
+```
+   
+       which shutdown
+       Certifique-se de que o caminho retornado é /usr/sbin/shutdown.
+    2. Abra o terminal e edite o arquivo sudoers usando o comando visudo:
+       bash:
+       sudo visudo
+    3. Adicione a seguinte linha no final do arquivo sudoers:
+       bash:
+       ubuntu ALL=(ALL) NOPASSWD: /usr/sbin/shutdown
+       nesse exemplo, ubuntu, é o usuário do sistema.
+       Para saber o nome do usuário use o comando “whoami” no terminal.
+    4. Salve e feche o arquivo sudoers.
+       crtl+o , enter, crtl+x
+    5. Verificar a permissão de execução do comando: Verifique se a configuração está correta para o usuário: 
+	sh:
+	sudo -u ubuntu sudo -l	
+	
+
+	Isso listará todos os comandos que os usuários  pode executar sem senha. Certifique-se de 	que /usr/sbin/shutdown está listado corretamente com a opção NOPASSWD.
+
 ## Script Bash
 Basicamente, um script bash é um arquivo de texto comum que contém uma série de comandos. Esses comandos são uma mistura de comandos que você normalmente digitaria na linha de comando do terminal (cd, ls, cp...). Um ponto importante a lembrar, no entanto, é:
 * Qualquer coisa que você possa executar normalmente na linha de comando do terminal pode ser colocada em um script e fará exatamente a mesma coisa. Da mesma forma, qualquer coisa que você possa colocar em um script também pode ser executada normalmente na linha de comando e fará exatamente a mesma coisa.
