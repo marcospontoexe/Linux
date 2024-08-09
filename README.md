@@ -34,7 +34,7 @@ A linha de comando é composta sequêncialmente por: **nome do comando**,  **par
 * `man` : mostra o manual de um comando (man ls, mostra o manual do ls).
 * `history` : mostra o histórico de comando digitados. Para acessar o comando digitar "!" e o número do histórico.
 * `cat` : imprimi o conteúdo do arquivo na tela.
-* `cp arquivo diretório/` : copia o "arquivo" para a pasta "diretório".
+* `cp arquivo /nome/do/diretório` : copia o "arquivo" para a pasta "diretório".
 * `mv arquivo diretório/` : move o "arquivo" para a pasta "diretório".
 * `rm arquivo` : apaga um arquivo.
 * `mv arquivo/ arq/` : renomeia o arquivo "arquvio" para "arq".
