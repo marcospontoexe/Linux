@@ -64,13 +64,13 @@ Comando **cd** (change directory):
 * `cd .`: diretorio atual.
 * `cd ~`: muda para o diretorio do usuário.
 * `cd /`: muda para o diretorio raiz.
-   * .bin : Armazena todos os comandos usado pelo terminal.
+   * .bin : Aplicações de base para o sistema. Armazena todos os comandos usado pelo terminal.
    * .boot: Armazena o kernel, contém arquivos necessários para a inicialização do sistema.
-   * .dev : Armazenas as unidades (usb, serial, hd...).
+   * .dev : Arquivos de acesso aos dispositivos físicos e conexões de rede. Armazenas as unidades (usb, serial, hd...)
    * .lib : Bibliotecas compartilhadas pelos programas do sistema e módulos do kernel.
    * .etc : contém arquivos de configuração para o sistema operacional, seus serviços e aplicativos.
    * .home : onde fica armazenado os arquivos e diretórios dos usuários.
-   * .usr : onde os programas são instalados.
+   * .usr : onde os programas são instalados. Aplicações voltadas aos usuários
    * .root: onde fica armazenado os arquivos e diretórios do usuário root.
    * .sbin : arquivos executáveis de uso exclusivo do root.
    * .media : requentemente utilizada para montagem automática de dispositivos de armazenamento removíveis, como unidades USB, CDs, DVDs e outros dispositivos de mídia.
@@ -79,7 +79,8 @@ Comando **cd** (change directory):
    *  .proc : é um diretório especial no sistema de arquivos Linux que contém informações sobre processos em execução e informações do kernel.
    *  .run : é possível que os usuários ou aplicativos criem essa pasta para armazenar arquivos executáveis ou scripts específicos
    * .usr : é uma das pastas mais importantes no sistema de arquivos Linux e geralmente contém dados e programas de uso compartilhado por todos os usuários do sistema. Ela é uma abreviação de "Unix System Resources" (Recursos do Sistema Unix).
-   *  .var é uma das pastas fundamentais no sistema de arquivos Linux e é utilizada para armazenar dados variáveis que podem ser modificados durante a operação normal do sistema.     
+   *  .var é uma das pastas fundamentais no sistema de arquivos Linux e é utilizada para armazenar dados variáveis que podem ser modificados durante a operação normal do sistema. (arquivos diversos, áreas de spool, arquivos de log...)   
+   *  ./mnt: montagem de diretórios compartilhados temporários.
 
 Comando **dpkg**:
 * `sudo dpkg --install “nome do pacote”`: instala um pacote através do gerenciador de pacotes (dpkg).
