@@ -127,7 +127,7 @@ para um diretório.
 
 * A primeira letra se refere ao tipo do objeto que está sendo manipulado.
   *  d (diretório)
-  *  - (programa)
+  *  -(programa)
   *  l (link) 
   *  b (arquivo de bloco)
   *  c (arquivo especial de caractere)
