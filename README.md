@@ -125,13 +125,17 @@ para um arquivo.
 ![diretório](https://github.com/marcospontoexe/Linux/blob/main/imagens/ls%20para%20diret%C3%B3rio.png)
 para um diretório.
 
-* A primeira letra se refere ao tipo de arquivo.
-  *  d(diretório)
-  *  -(programa)
-  *  l(link) 
-* As 2°, 3° e 4° letras são as permissões do usuário (u de user), dono do diretorio ou programa ou link. 
-* As 5°, 6° e 7° letras são as permissões do grupo (g de group) 
-* As 8°, 9° e 10° letras são as permissões dos demais grupos ou usuários (o de others) 
+* A primeira letra se refere ao tipo do objeto que está sendo manipulado.
+  *  d (diretório)
+  *  - (programa)
+  *  l (link) 
+  *  b (arquivo de bloco)
+  *  c (arquivo especial de caractere)
+  *  p (canal)
+  *  s (socket)
+* As 2°, 3° e 4° letras são as permissões do usuário (u de user), em relação ao tipo do objeto que está sendo manipulado. 
+* As 5°, 6° e 7° letras são as permissões que o grupo (g de group), em relação ao tipo do objeto que está sendo manipulado.
+* As 8°, 9° e 10° letras são as permissões dos demais grupos ou usuários (o de others),em relação ao tipo do objeto que está sendo manipulado.
 
 Os seguinte tipos de permissões no Linux são:
 * Leitura (r): Permite visualizar o conteúdo de um arquivo ou listar o conteúdo de um diretório.
@@ -150,6 +154,31 @@ O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, q
 * `chmod u-w “argumento”` : remove permissão de escrita para o usuário (u).
 * `chmod g+r “argumento”` : adiciona permissão de leitura para o grupo (g).
 * `chmod o-x “argumento”` : remove permissão de execussão para o outros (o).
+
+
+
+
+### 📁 **4. Permissões em Diretórios**
+
+As permissões funcionam um pouco diferente:
+
+| Permissão | Significado em diretórios           |
+| --------- | ----------------------------------- |
+| `r`       | Listar conteúdo do diretório        |
+| `w`       | Criar, renomear ou excluir arquivos |
+| `x`       | Entrar no diretório (acesso)        |
+
+
+### ⭐ **5. Permissões Especiais**
+
+Além das permissões básicas, há **3 bits especiais**:
+
+| Bit          | Nome                                                                         | Função                                                                         |
+| ------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `SUID`       | Set User ID                                                                  | Arquivo executa com o UID do dono                                              |
+| `SGID`       | Set Group ID                                                                 | Arquivo executa com o GID do grupo; em diretórios, novos arquivos herdam o GID |
+| `Sticky Bit` | Somente o dono pode apagar ou renomear arquivos em diretórios compartilhados |                                                                                |
+
 
 ## Configurar o sudo para não pedir senha para o comando shutdown
 Para permitir que o comando shutdown seja executado sem pedir senha, você pode configurar o sudo para não pedir senha ao executar o comando shutdown.
