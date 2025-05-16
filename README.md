@@ -155,9 +155,6 @@ O comando **chmod** gerencia as permissões dos arquivos, diretórios ou link, q
 * `chmod g+r “argumento”` : adiciona permissão de leitura para o grupo (g).
 * `chmod o-x “argumento”` : remove permissão de execussão para o outros (o).
 
-
-
-
 ### 📁 **4. Permissões em Diretórios**
 
 As permissões funcionam um pouco diferente:
@@ -167,7 +164,6 @@ As permissões funcionam um pouco diferente:
 | `r`       | Listar conteúdo do diretório        |
 | `w`       | Criar, renomear ou excluir arquivos |
 | `x`       | Entrar no diretório (acesso)        |
-
 
 ### ⭐ **5. Permissões Especiais**
 
@@ -179,6 +175,94 @@ Além das permissões básicas, há **3 bits especiais**:
 | `SGID`       | Set Group ID                                                                 | Arquivo executa com o GID do grupo; em diretórios, novos arquivos herdam o GID |
 | `Sticky Bit` | Somente o dono pode apagar ou renomear arquivos em diretórios compartilhados |                                                                                |
 
+Dados as características das permissões especiais mencionadas, é necessário ter certo cuidado ao definir as permissões. Em particular existe os ID de usuário que possui privilégios de "superusuário", comumente denominado nas distribuições Linux como usuário de "root". O usuário com privilégios de root está isento das restrições designadas pelo mecanismo de controle de acesso, este usuário tem amplo acesso a sistema e arquivos. Neste sentido, qualquer arquivo que pertença ao usuário de "root" e seja concedido permissão de SUID, consequentemente ele fornecerá acesso irrestrito ao sistema a qualquer usuário que execute tal arquivo. Portanto, é necessária muita cautela ao definir tais permissões.
+
+Outro aspecto que deve ser avaliado no esquema tradicional de controle de acesso a arquivos no Linux é que por padrão ele propõe uma estrutura simples de domínios de proteção. O domínio está associado aos usuários, alterar o domínio reflete em substituir o ID do usuário temporariamente. Por exemplo, um usuário comum solicitar privilégios de superusuário para instalar um pacote no sistema ou efetuar uma configuração nos arquivos de sistema.
+
+### **“Listas de Controle de Acesso no Linux” (ACLs)**
+As **ACLs** (Access Control Lists) são um **recurso avançado** do Linux que permite definir **permissões individuais** para **vários usuários e grupos**, além do modelo tradicional (usuário / grupo / outros).
+
+####  **Por que usar ACLs?**
+O modelo tradicional no Linux só permite definir permissões para:
+
+* O **proprietário** do arquivo;
+* Um **único grupo**;
+* E **todos os outros usuários**.
+
+E se você quiser dar acesso de leitura apenas para um usuário específico que não é o dono e não está no grupo?
+A Solução é usar **ACLs estendidas** para definir permissões mais granulares.
+
+#### `setfacl`
+
+Usado para **definir** permissões ACL.
+
+Exemplo:
+
+```bash
+setfacl -m u:joana:rw arquivo.txt
+```
+
+→ Dá permissão de **leitura e escrita** para a usuária `joana` no arquivo `arquivo.txt`.
+
+####  `getfacl`
+
+Usado para **visualizar** as permissões ACL de um arquivo.
+
+Exemplo:
+
+```bash
+getfacl arquivo.txt
+```
+
+Exemplo de saída do comando `getfacl`:
+
+```
+# file: arquivo.txt
+# owner: aluno
+# group: equipe1
+user::rw-
+user:joana:rw-
+group::r--
+mask::rw-
+other::r--
+```
+
+Explicação:
+
+* `user::rw-`: permissões do dono do arquivo.
+* `user:joana:rw-`: permissões para a usuária específica `joana`.
+* `group::r--`: permissões do grupo padrão.
+* `mask::rw-`: **limita** as permissões efetivas de `joana` e do grupo.
+* `other::r--`: permissões para todos os outros usuários.
+
+#### **Como saber se um arquivo tem ACL?**
+
+* O comando `ls -l` mostrará um **sinal de “+”** ao lado das permissões:
+
+  ```
+  -rw-r--r--+ 1 aluno equipe1 1024 arquivo.txt
+  ```
+
+O `+` indica que o arquivo tem **ACLs estendidas configuradas**.
+
+#### Remover todas as ACLs:
+
+```bash
+setfacl -b arquivo.txt
+```
+
+#### Remover permissão específica:
+
+```bash
+setfacl -x u:joana arquivo.txt
+```
+
+
+### ⚠️ **Pontos de Atenção**
+
+* Nem todos os sistemas de arquivos suportam ACLs (ex: precisa ativar no `ext4`, `xfs` etc.).
+* ACLs podem gerar **conflitos de permissões**, se não forem bem planejadas.
+* Requer **administração cuidadosa**, especialmente em ambientes multiusuários.
 
 ## Configurar o sudo para não pedir senha para o comando shutdown
 Para permitir que o comando shutdown seja executado sem pedir senha, você pode configurar o sudo para não pedir senha ao executar o comando shutdown.
