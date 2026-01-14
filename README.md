@@ -316,7 +316,7 @@ sudo nano /etc/udev/rules.d/99-usb-serial.rules
 
 6. Adicione a regra baseada no ID do dispositivo encontrado:
 ```bash
-SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="arduino"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE="0666", GROUP="dialout", SYMLINK+="Arduino"
 ```
 Substitua idVendor e idProduct pelos valores encontrados e ajuste SYMLINK para o nome desejado (por exemplo, arduino).
 
