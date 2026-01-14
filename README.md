@@ -329,6 +329,95 @@ sudo udevadm trigger
 ```
 Agora, seu Arduino sempre estará acessível através do link simbólico /dev/arduino, independentemente de qual porta USB ele estiver conectado.
 
+### E quando mais de um dispositivo tem o mesmo **idVendor** e **idProduct** 
+O melhor atributo para isso é o **número de série** (`serial`) do dispositivo. A maioria dos dispositivos USB de qualidade, como os da Silicon Labs, possui um número de série único gravado em seu firmware.
+
+Vamos seguir um processo semelhante, mas usando o número de série como nosso diferenciador.
+
+#### Passo 1: Encontrar o Número de Série de Cada Dispositivo
+
+Primeiro, precisamos descobrir o número de série de cada um dos seus dois dispositivos.
+
+* Use o comando `ls -l /dev/serial/by-id/` para descobrir qual porta usb foi atribuida ao dispositivo.
+* Outra opção é executar o comando `sudo dmesg -w` e conectar o dispositivo, mostrará algo como **usb 1-2: cp210x converter now attached to ttyUSB2**.
+
+1.  Execute o comando `udevadm` para inspecionar os atributos do dispositivo. Substitua `/dev/ttyUSB0` pelo nome que o sistema atribuiu a ele.
+
+    ```bash
+    udevadm info -a -n /dev/ttyUSB0 | grep '{serial}'
+    ```
+
+2.  Procure pela linha que contém `ATTRS{serial}`. A saída será algo como:
+
+    ```
+    ATTRS{serial}=="00A1B2C3"
+    ```
+    Anote esse número de série (por exemplo, `00A1B2C3`).
+
+3.  **Agora, desconecte o primeiro dispositivo e conecte o segundo.**
+4.  Execute o mesmo comando novamente (ele provavelmente será mapeado para `/dev/ttyUSB0` também, já que é o único conectado).
+
+    ```bash
+    udevadm info -a -n /dev/ttyUSB0 | grep '{serial}'
+    ```
+
+5.  Anote o número de série do segundo dispositivo. Será um valor diferente, por exemplo:
+
+    ```
+    ATTRS{serial}=="00D4E5F6"
+    ```
+
+Agora você tem os identificadores únicos para cada dispositivo físico: `00A1B2C3` e `00D4E5F6`.
+
+#### Passo 2: Criar ou Editar o Arquivo de Regras do udev
+
+Assim como antes, vamos criar (ou editar) um arquivo de regras `udev`.
+
+```bash
+sudo nano /etc/udev/rules.d/99-usb-serial-by-serial.rules
+```
+
+#### Passo 3: Adicionar as Novas Regras Baseadas no Número de Série
+
+Adicione as seguintes regras ao arquivo, substituindo os números de série pelos que você encontrou e escolhendo os nomes para os links simbólicos (`SYMLINK`).
+
+```
+# Regra para o primeiro dispositivo (identificado pelo seu número de série)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="00A1B2C3", SYMLINK+="meu_dispositivo_A"
+
+# Regra para o segundo dispositivo (identificado pelo seu número de série)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="00D4E5F6", SYMLINK+="meu_dispositivo_B"
+```
+#### Passo 4: Recarregar as Regras e Testar
+
+Para aplicar as novas regras, execute:
+
+```bash
+# Recarregar as definições de regras
+sudo udevadm control --reload-rules
+
+# Reavaliar os dispositivos atualmente conectados
+sudo udevadm trigger
+```
+
+Agora, com os dois dispositivos conectados (em quaisquer portas USB), verifique se os links simbólicos foram criados corretamente:
+
+```bash
+ls -l /dev/meu_dispositivo_*
+```
+
+A saída mostrará os links apontando para os `ttyUSB*` correspondentes, não importando a ordem em que foram conectados.
+
+```
+lrwxrwxrwx 1 root root 7 Jan 14 20:55 /dev/meu_dispositivo_A -> ttyUSB1
+lrwxrwxrwx 1 root root 7 Jan 14 20:55 /dev/meu_dispositivo_B -> ttyUSB0
+```
+(Note que `meu_dispositivo_A` pode apontar para `ttyUSB1` e `B` para `ttyUSB0`, ou vice-versa. O importante é que o link simbólico correto está sempre associado ao dispositivo físico correto).
+
+Esta abordagem usando o número de série é a prática recomendada para criar identificadores persistentes para dispositivos USB que podem ser movidos entre diferentes portas.
+
+---
+
 ## Script Bash
 Basicamente, um script bash é um arquivo de texto comum que contém uma série de comandos. Esses comandos são uma mistura de comandos que você normalmente digitaria na linha de comando do terminal (cd, ls, cp...). Um ponto importante a lembrar, no entanto, é:
 * Qualquer coisa que você possa executar normalmente na linha de comando do terminal pode ser colocada em um script e fará exatamente a mesma coisa. Da mesma forma, qualquer coisa que você possa colocar em um script também pode ser executada normalmente na linha de comando e fará exatamente a mesma coisa.
