@@ -374,7 +374,7 @@ Agora você tem os identificadores únicos para cada dispositivo físico: `00A1B
 Assim como antes, vamos criar (ou editar) um arquivo de regras `udev`.
 
 ```bash
-sudo nano /etc/udev/rules.d/99-usb-serial-by-serial.rules
+sudo nano /etc/udev/rules.d/99-usb-serial.rules
 ```
 
 #### Passo 3: Adicionar as Novas Regras Baseadas no Número de Série
