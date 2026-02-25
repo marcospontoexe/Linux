@@ -328,6 +328,7 @@ sudo udevadm control --reload-rules
 sudo udevadm trigger
 ```
 Agora, seu Arduino sempre estará acessível através do link simbólico /dev/arduino, independentemente de qual porta USB ele estiver conectado.
+Listar portas seriais USB: `ls /dev/ttyUSB*` ou `ls /dev`
 
 ### A opção `MODE` em uma regra `udev`
 A opção `MODE` em uma regra `udev` define as permissões de acesso para o arquivo de dispositivo que é criado no diretório `/dev`. Ela funciona exatamente da mesma forma que as permissões de arquivo padrão do Linux, que você pode ver ao usar o comando `ls -l`.
