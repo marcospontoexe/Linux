@@ -766,6 +766,40 @@ Para fechar uma sessão ssh e voltar para sua máquina local, execute o comando 
 ## Coniguração Ethernet usando **nmcli**
 Para sistemas que utilizam o **NetworkManager**, você pode configurar o IP estático usando a ferramenta **nmcli**.
 
+
+
+### Cadastrar e conectar a uma rede nova
+
+#### 1.1 Rede com senha (WPA2)
+```bash
+sudo nmcli connection add type wifi con-name "NOME_DO_PERFIL" ssid "NOME_DA_REDE" \
+  wifi-sec.key-mgmt wpa-psk wifi-sec.psk 'SENHA_DA_REDE'
+
+sudo nmcli connection modify "NOME_DO_PERFIL" \
+  connection.autoconnect yes \
+  connection.autoconnect-priority 10
+```
+
+> **Alternativa mais cautelosa** (não obrigatória, só para evitar a senha em texto puro no histórico do shell): criar o perfil com `connection.autoconnect no`, pedir a senha via `read -s -p "Senha: " WIFI_PASS`, aplicar com `wifi-sec.psk "$WIFI_PASS"` e depois `unset WIFI_PASS`. Funciona igual, é só mais uma etapa.
+
+#### 1.2 Rede aberta (sem senha)
+
+```bash
+sudo nmcli connection add type wifi con-name "NOME_DO_PERFIL" ssid "NOME_DA_REDE"
+
+sudo nmcli connection modify "NOME_DO_PERFIL" \
+  connection.autoconnect yes \
+  connection.autoconnect-priority 10
+```
+
+#### 1.3 Ativar a troca
+
+**Não rode `nmcli connection up NOME_DO_PERFIL` enquanto estiver em SSH pelo hotspot** — a sessão cai no mesmo instante. Prefira derrubar o hotspot, deixando o NetworkManager escolher a rede nova sozinho:
+
+```bash
+sudo nmcli connection down rede_propria
+```
+
 ### Conectar Automaticamente (DHCP):
 Para conectar automaticamente usando DHCP, você pode simplesmente ativar a interface: `nmcli con up id "ssid"`.
 
