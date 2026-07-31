@@ -821,3 +821,66 @@ Suponha que a saída inclua uma rede chamada "MinhaRedeWiFi";
 * Definindo dns: `nmcli con mod MinhaRedeWiFi" ipv4.dns "8.8.8.8 8.8.4.4"`
 * Definindo ip estático: `nmcli con mod MinhaRedeWiFi ipv4.method manual`
 * Reinicie a conexão: `nmcli con down MinhaRedeWiFi` e também `nmcli con up MinhaRedeWiFi`
+
+### Alterar a prioridade de conexão
+
+O NetworkManager escolhe a rede com base na prioridade configurada.
+
+#### 1. Liste as conexões salvas
+
+```bash
+nmcli connection show
+```
+
+Saída de exemplo:
+
+```text
+NAME             UUID                                  TYPE  DEVICE
+MinhaCasa        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx  wifi  wlan0
+Empresa          xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx  wifi  --
+Celular          xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx  wifi  --
+```
+
+---
+
+#### 2. Veja a prioridade atual
+
+```bash
+nmcli connection show "MinhaCasa" | grep connection.autoconnect-priority
+```
+
+---
+
+#### 3. Defina uma prioridade
+
+Quanto **maior o número**, maior a prioridade.
+
+Exemplo:
+
+```bash
+nmcli connection modify "Empresa" connection.autoconnect-priority 100
+```
+
+```bash
+nmcli connection modify "MinhaCasa" connection.autoconnect-priority 50
+```
+
+```bash
+nmcli connection modify "Celular" connection.autoconnect-priority 10
+```
+
+Assim, quando todas estiverem disponíveis, a ordem será:
+
+1. Empresa
+2. MinhaCasa
+3. Celular
+
+---
+
+#### 4. Reinicie a conexão
+
+```bash
+sudo systemctl restart NetworkManager
+```
+
+---
