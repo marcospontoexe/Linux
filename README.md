@@ -405,11 +405,13 @@ A principal vantagem é a **segurança e a conveniência**.
 Em resumo, a opção `GROUP` é a maneira correta e elegante no Linux de conceder acesso a hardware específico para um conjunto de usuários não-root.
 
 ### E quando mais de um dispositivo tem o mesmo **idVendor** e **idProduct** 
+
+#### Pelo número de śeire (`serial`) 
 O melhor atributo para isso é o **número de série** (`serial`) do dispositivo. A maioria dos dispositivos USB de qualidade, como os da Silicon Labs, possui um número de série único gravado em seu firmware.
 
 Vamos seguir um processo semelhante, mas usando o número de série como nosso diferenciador.
 
-#### Passo 1: Encontrar o Número de Série de Cada Dispositivo
+##### Passo 1: Encontrar o Número de Série de Cada Dispositivo
 
 Primeiro, precisamos descobrir o número de série de cada um dos seus dois dispositivos.
 
@@ -444,7 +446,7 @@ Primeiro, precisamos descobrir o número de série de cada um dos seus dois disp
 
 Agora você tem os identificadores únicos para cada dispositivo físico: `00A1B2C3` e `00D4E5F6`.
 
-#### Passo 2: Criar ou Editar o Arquivo de Regras do udev
+##### Passo 2: Criar ou Editar o Arquivo de Regras do udev
 
 Assim como antes, vamos criar (ou editar) um arquivo de regras `udev`.
 
@@ -452,7 +454,7 @@ Assim como antes, vamos criar (ou editar) um arquivo de regras `udev`.
 sudo nano /etc/udev/rules.d/99-usb-serial.rules
 ```
 
-#### Passo 3: Adicionar as Novas Regras Baseadas no Número de Série
+##### Passo 3: Adicionar as Novas Regras Baseadas no Número de Série
 
 Adicione as seguintes regras ao arquivo, substituindo os números de série pelos que você encontrou e escolhendo os nomes para os links simbólicos (`SYMLINK`).
 
@@ -463,7 +465,7 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{seria
 # Regra para o segundo dispositivo (identificado pelo seu número de série)
 SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="00D4E5F6", SYMLINK+="meu_dispositivo_B"
 ```
-#### Passo 4: Recarregar as Regras e Testar
+##### Passo 4: Recarregar as Regras e Testar
 
 Para aplicar as novas regras, execute:
 
@@ -490,6 +492,188 @@ lrwxrwxrwx 1 root root 7 Jan 14 20:55 /dev/meu_dispositivo_B -> ttyUSB0
 (Note que `meu_dispositivo_A` pode apontar para `ttyUSB1` e `B` para `ttyUSB0`, ou vice-versa. O importante é que o link simbólico correto está sempre associado ao dispositivo físico correto).
 
 Esta abordagem usando o número de série é a prática recomendada para criar identificadores persistentes para dispositivos USB que podem ser movidos entre diferentes portas.
+
+#### Pelo KERNELS
+No `udev`, existem diferentes atributos para identificar dispositivos. `KERNELS` verifica o **nome do dispositivo atribuído pelo kernel em algum nível da árvore de dispositivos (device tree)**.
+
+No caso:
+
+```udev
+KERNELS=="3-1"
+```
+
+significa:
+
+> "Aplique esta regra somente se, na hierarquia de dispositivos USB, existir um dispositivo cujo nome no kernel seja `3-1`."
+
+Por exemplo, imagine:
+
+```text
+USB controller
+└── 3-1
+    └── 3-1:1.0
+        └── ttyUSB0
+```
+
+O `3-1` normalmente representa algo como:
+
+```text
+USB bus 3
+└── porta 1
+```
+
+Ou seja, **a porta física/topologia USB**.
+
+procura esse nome **na árvore de dispositivos, incluindo dispositivos ancestrais**.
+
+Por isso `KERNELS` é muito útil para identificar **a porta USB física**.
+
+
+##### Como descobrir o `KERNELS` correto?
+
+1. Descubra o dispositivo serial
+
+```bash
+ls /dev/ttyUSB*
+```
+
+Supondo:
+
+```text
+/dev/ttyUSB0
+```
+
+2. Obtenha o caminho do dispositivo
+
+```bash
+udevadm info --query=path --name=/dev/ttyUSB0
+```
+
+Você poderá obter algo parecido com:
+
+```text
+/devices/pci0000:00/0000:00:14.0/usb3/3-1/3-1:1.0/ttyUSB0/tty/ttyUSB0
+```
+
+O trecho:
+
+```text
+usb3/3-1/3-1:1.0
+```
+
+é o que nos interessa.
+
+Nesse exemplo:
+
+```text
+KERNELS=="3-1"
+```
+
+corresponde ao dispositivo USB conectado ao **bus 3, porta 1**.
+
+---
+
+3. Crie a regra
+
+Crie o arquivo:
+
+```bash
+sudo nano /etc/udev/rules.d/99-esp.rules
+```
+
+E coloque:
+
+```udev
+SUBSYSTEM=="tty", KERNELS=="3-1", SYMLINK+="ESP", MODE="0666", GROUP="dialout"
+```
+
+Se quiser garantir que somente seu conversor específico seja selecionado, use também Vendor/Product:
+
+```udev
+SUBSYSTEM=="tty", KERNELS=="3-1", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="ESP", MODE="0666", GROUP="dialout"
+```
+
+---
+
+4. Recarregue as regras
+
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+Ou simplesmente desconecte e conecte novamente o dispositivo USB.
+
+---
+
+5. Verifique
+
+```bash
+ls -l /dev/ESP
+```
+
+Deve aparecer algo como:
+
+```text
+/dev/ESP -> ttyUSB0
+```
+
+Você também pode verificar:
+
+```bash
+readlink -f /dev/ESP
+```
+
+Resultado:
+
+```text
+/dev/ttyUSB0
+```
+
+---
+
+##### Um detalhe importante
+
+O comando:
+
+```bash
+udevadm info --query=path --name=/dev/ttyUSB0
+```
+
+**não mostra explicitamente `KERNELS=="3-1"`**.
+
+Ele mostra o caminho:
+
+```text
+.../usb3/3-1/3-1:1.0/...
+```
+
+Você identifica o `KERNELS` olhando para os componentes desse caminho.
+
+Por exemplo:
+
+```text
+/devices/.../usb3/3-1/3-1:1.0/ttyUSB0/...
+                   ↑
+                KERNELS
+                  3-1
+```
+
+Então, o fluxo fica:
+
+```text
+/dev/ttyUSB0
+     ↓
+udevadm info --query=path --name=/dev/ttyUSB0
+     ↓
+/devices/.../usb3/3-1/3-1:1.0/...
+                   ↓
+              KERNELS=="3-1"
+                   ↓
+              /dev/ESP
+```
+
+Se você tiver **2 ou 4 ESP32 idênticos conectados ao robô**, esse método é particularmente útil para criar `/dev/ESP1`, `/dev/ESP2`, `/dev/ESP3` e `/dev/ESP4` com base nas portas USB físicas.
 
 ---
 
