@@ -578,7 +578,7 @@ corresponde ao dispositivo USB conectado ao **bus 3, porta 1**.
 Crie o arquivo:
 
 ```bash
-sudo nano /etc/udev/rules.d/99-esp.rules
+sudo nano /etc/udev/rules.d/99-usb-serial.rules
 ```
 
 E coloque:
